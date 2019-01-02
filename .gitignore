@@ -9,3 +9,6 @@ build
 *.pyc
 *.log
 *.sqlite3
+
+.lock-waf_darwin_build
+.waf-2.0.9*
