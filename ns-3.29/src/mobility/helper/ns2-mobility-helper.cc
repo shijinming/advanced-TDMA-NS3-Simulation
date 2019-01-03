@@ -223,6 +223,7 @@ Ns2MobilityHelper::ConfigNodesMovements (const ObjectStore &store) const
   // Look through the whole the file for the the initial node
   // positions to make this helper robust to handle trace files with
   // the initial node positions at the end.
+  // 全面检索文件来检查所有点的初始化位置
   std::ifstream file (m_filename.c_str (), std::ios::in);
   if (file.is_open ())
     {
@@ -231,7 +232,7 @@ Ns2MobilityHelper::ConfigNodesMovements (const ObjectStore &store) const
           int         iNodeId = 0;
           std::string nodeId;
           std::string line;
-
+          // 读取一行记录
           getline (file, line);
 
           // ignore empty lines
@@ -239,7 +240,7 @@ Ns2MobilityHelper::ConfigNodesMovements (const ObjectStore &store) const
             {
               continue;
             }
-
+          
           ParseResult pr = ParseNs2Line (line); // Parse line and obtain tokens
 
           // Check if the line corresponds with setting the initial
@@ -294,6 +295,7 @@ Ns2MobilityHelper::ConfigNodesMovements (const ObjectStore &store) const
 
   // The reason the file is parsed again is to make this helper robust
   // to handle trace files with the initial node positions at the end.
+  // 完成载入初始点后再载入其他节点
   file.open (m_filename.c_str (), std::ios::in);
   if (file.is_open ())
     {
@@ -380,16 +382,20 @@ Ns2MobilityHelper::ConfigNodesMovements (const ObjectStore &store) const
                */
               if (IsSchedMobilityPos (pr))
                 {
+                  // 上一个目标点还没有到达
                   if (last_pos[iNodeId].m_targetArrivalTime > at)
                     {
                       NS_LOG_LOGIC ("Did not reach a destination! stoptime = " << last_pos[iNodeId].m_targetArrivalTime << ", at = "<<  at);
+                      // 实际已经运动的时间
                       double actuallytraveled = at - last_pos[iNodeId].m_travelStartTime;
+                      // 计算当前所处的位置
                       Vector reached = Vector (
                           last_pos[iNodeId].m_startPosition.x + last_pos[iNodeId].m_speed.x * actuallytraveled,
                           last_pos[iNodeId].m_startPosition.y + last_pos[iNodeId].m_speed.y * actuallytraveled,
                           0
                           );
                       NS_LOG_LOGIC ("Final point = " << last_pos[iNodeId].m_finalPosition << ", actually reached = " << reached);
+                      // 取消stopEvent?
                       last_pos[iNodeId].m_stopEvent.Cancel ();
                       last_pos[iNodeId].m_finalPosition = reached;
                     }
@@ -807,9 +813,13 @@ SetSchedPosition (Ptr<ConstantVelocityMobilityModel> model, double at, std::stri
   return position;
 }
 
+// ns2导入的入口
 void
 Ns2MobilityHelper::Install (void) const
 {
+  // 安装到所有的Node列表
+  // 这个函数的定义在头文件里，其中将NodeList的iterator包装上一个MyObjectStore后
+  // 再调用ConfigNodeMovements
   Install (NodeList::Begin (), NodeList::End ());
 }
 
