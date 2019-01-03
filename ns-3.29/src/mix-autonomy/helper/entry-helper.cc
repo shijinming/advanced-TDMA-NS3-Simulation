@@ -88,7 +88,7 @@ void SimulationEntry::CourseChange(std::string context, Ptr<const MobilityModel>
   }
 
   uint32_t iNodeId = std::stoul(elements[2]);
-  istringstream iss (elements[2]);
+  std::istringstream iss (elements[2]);
   iss >> iNodeId;
   // TODO: activate this node 
   LOG_UNCOND ("Node " << iNodeId << " starts to move!");
