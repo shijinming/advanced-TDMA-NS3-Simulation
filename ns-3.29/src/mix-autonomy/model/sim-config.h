@@ -29,10 +29,10 @@ public:
 
     void ParceCommandLineArguments (int argc, char **argv);
     static SimulationConfig& Default ();
+    void PrintConfiguration ();
 
 private:
     void ConfigureCommandLineParams (CommandLine &cmd);
-    void PrintConfiguration ();
     void Validate ();
 };
 
