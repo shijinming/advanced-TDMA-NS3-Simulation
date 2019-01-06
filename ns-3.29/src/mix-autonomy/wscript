@@ -9,8 +9,16 @@
 def build(bld):
     module = bld.create_ns3_module('mix-autonomy', ['core'])
     module.source = [
+        'model/tdma-mac.cc',
+        'model/slot-manager.cc',
+        'model/my-header.cc',
         'model/mix-autonomy.cc',
+        'model/hdv.cc',
+        'model/ap.cc',
+        'helper/tdma-mac-helper.cc',
         'helper/mix-autonomy-helper.cc',
+        'helper/hdv-helper.cc',
+        'helper/ap-helper.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('mix-autonomy')
@@ -21,8 +29,17 @@ def build(bld):
     headers = bld(features='ns3header')
     headers.module = 'mix-autonomy'
     headers.source = [
+        'model/tdma-mac.h',
+        'model/slot-manager.h',
+        'model/my-header.h',
         'model/mix-autonomy.h',
+        'model/hdv.h',
+        'model/ap.h',
+        'helper/tdma-mac-helper.h',
         'helper/mix-autonomy-helper.h',
+        'helper/mix-autonomy-common.h',
+        'helper/hdv-helper.h',
+        'helper/ap-helper.h',
         ]
 
     if bld.env.ENABLE_EXAMPLES:
