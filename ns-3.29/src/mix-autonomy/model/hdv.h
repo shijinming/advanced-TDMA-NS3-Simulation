@@ -28,7 +28,6 @@ private:
     virtual void StartApplication ();
     virtual void StopApplication ();
 
-    bool                m_verbose;
     bool                m_tdmaEnabled;  //只对中间层节点有效,true时意味着此节点可以在tdma时隙发送数据包
     Status              m_status;
 

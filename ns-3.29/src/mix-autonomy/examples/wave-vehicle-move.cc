@@ -68,7 +68,7 @@ int main (int argc, char *argv[])
 
 
   NodeContainer c;
-  c.Create (17);
+  c.Create (143); //由读入数据中的节点数决定
 
   // The below set of helpers will help us to put together the wifi NICs we want
   YansWifiPhyHelper wifiPhy =  YansWifiPhyHelper::Default ();
@@ -90,15 +90,10 @@ int main (int argc, char *argv[])
   NetDeviceContainer devices = wifi80211p.Install (wifiPhy, wifi80211pMac, c);
 
   // Tracing
-  wifiPhy.EnablePcap ("wave-simple-80211p", devices);
+  //wifiPhy.EnablePcap ("wave-simple-80211p", devices);
 
-  MobilityHelper mobility;
-  Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
-  positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (5.0, 0.0, 0.0));
-  mobility.SetPositionAllocator (positionAlloc);
-  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-  mobility.Install (c);
+   Ns2MobilityHelper ns2Helper = Ns2MobilityHelper (mobilityTraceFile); //读入车辆移动文件
+   ns2Helper.Install ();
 
   InternetStackHelper internet;
   internet.Install (c);
@@ -108,6 +103,7 @@ int main (int argc, char *argv[])
   ipv4.SetBase ("10.1.1.0", "255.255.255.0");
   Ipv4InterfaceContainer i = ipv4.Assign (devices);
 
+  //使用默认socket，从第一个节点向第二个节点发送一个packet，需改
   TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
   Ptr<Socket> recvSink = Socket::CreateSocket (c.Get (0), tid);
   InetSocketAddress local = InetSocketAddress (Ipv4Address::GetAny (), 80);

@@ -39,7 +39,6 @@ void
 AutonomyApplication::StartApplication ()
 {
     NS_LOG_FUNCTION (this);
-    TryCreateSockets ();
 }
  
 void

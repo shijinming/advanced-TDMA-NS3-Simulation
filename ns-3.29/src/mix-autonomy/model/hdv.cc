@@ -47,7 +47,7 @@ HumanApplication::StopApplication ()
     NS_LOG_FUNCTION (this);
 }
 
-Status
+HumanApplication::Status
 HumanApplication::GetStatus ()
 {
     return m_status;
