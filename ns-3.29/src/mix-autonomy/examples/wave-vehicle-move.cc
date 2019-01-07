@@ -19,6 +19,7 @@
 #include "ns3/ocb-wifi-mac.h"
 #include "ns3/wifi-80211p-helper.h"
 #include "ns3/wave-mac-helper.h"
+#include "ns3/mobility-module.h"
 
 using namespace ns3;
 
@@ -88,10 +89,14 @@ int main (int argc, char *argv[])
                                       "DataMode",StringValue (phyMode),
                                       "ControlMode",StringValue (phyMode));
   NetDeviceContainer devices = wifi80211p.Install (wifiPhy, wifi80211pMac, c);
+  std::string mobilityTraceFile ("");
 
   // Tracing
   //wifiPhy.EnablePcap ("wave-simple-80211p", devices);
-
+  if (mobilityTraceFile.empty()) {
+    std::cout << "Invalid mobility trace file input" << std::endl;
+    exit(1);
+  }
    Ns2MobilityHelper ns2Helper = Ns2MobilityHelper (mobilityTraceFile); //读入车辆移动文件
    ns2Helper.Install ();
 

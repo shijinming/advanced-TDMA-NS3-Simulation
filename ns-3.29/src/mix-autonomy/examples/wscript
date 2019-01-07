@@ -9,7 +9,7 @@ def build(bld):
     obj.source = 'wave-vehicle-move.cc'
 
     obj = bld.create_ns3_program('demo1.0',
-        ['core', 'applications', 'mobility', 'network', 'wifi'])
+        ['core', 'applications', 'mobility', 'network', 'wifi', 'csma'])
     obj.source = 'demo1.0.cc'
 
     obj = bld.create_ns3_program('demo2.0',
