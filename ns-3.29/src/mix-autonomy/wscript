@@ -16,7 +16,7 @@ def _list_sources(bld, suffix):
     ]
     res += [
         x for x in 
-            [os.path.join("model", y) for y in os.listdir(os.path.join(root_dir, "model"))] 
+            [os.path.join("helper", y) for y in os.listdir(os.path.join(root_dir, "helper"))] 
         if x.endswith(suffix)
     ]
     return res

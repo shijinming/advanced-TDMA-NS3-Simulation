@@ -98,6 +98,11 @@ void SimulationEntry::CourseChange(std::string context, Ptr<const MobilityModel>
 }
 
 void
+SimulationEntry::ConfigureApplication () {
+  
+}
+
+void
 SimulationEntry::PeriodicCheck () {
 
   Simulator::Schedule (Seconds (1),
