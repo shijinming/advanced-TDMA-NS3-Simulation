@@ -4,3 +4,19 @@ def build(bld):
     obj = bld.create_ns3_program('mix-autonomy-example', ['mix-autonomy'])
     obj.source = 'mix-autonomy-example.cc'
 
+    obj = bld.create_ns3_program('wave-vehicle-move',
+        ['core', 'applications', 'mobility', 'network', 'wifi','wave'])
+    obj.source = 'wave-vehicle-move.cc'
+
+    obj = bld.create_ns3_program('demo1.0',
+        ['core', 'applications', 'mobility', 'network', 'wifi', 'csma'])
+    obj.source = 'demo1.0.cc'
+
+    obj = bld.create_ns3_program('demo2.0',
+        ['core', 'applications', 'mobility', 'network', 'wifi'])
+    obj.source = 'demo2.0.cc'
+
+    obj = bld.create_ns3_program('demo3.0',
+        ['core', 'applications', 'mobility', 'network', 'wifi'])
+    obj.source = 'demo3.0.cc'
+

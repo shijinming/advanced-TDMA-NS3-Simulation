@@ -19,11 +19,11 @@ public:
   virtual ~MyHeader ();
 
   struct FrameHeader {
-    bool identity； //judge leader or follower
-    uint32_t allocation；   //time slot allocation
-    uint32_t timestamp；
+    bool identity; //judge leader or follower
+    uint32_t allocation;   //time slot allocation
+    uint32_t timestamp;
     uint32_t location;   //the location of vehicle
-  }
+  };
 
   /**
    * Set the header data.
