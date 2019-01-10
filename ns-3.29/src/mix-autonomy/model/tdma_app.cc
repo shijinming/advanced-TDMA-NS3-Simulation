@@ -17,6 +17,10 @@ TDMAApplication::GetTypeId ()
       UintegerValue (200),
       MakeUintegerAccessor (&TDMAApplication::mockPktSize),
       MakeUintegerChecker<uint32_t> (0))
+    .AddAttribute ("MinTxInterval", "Minimal Tx Interval",
+      TimeValue (MicroSeconds (100)),
+      MakeTimeAccessor (&TDMAApplication::minTxInterval),
+      MakeTimeChecker ())
     .AddTraceSource ("Tx", "A new packet is created and is sent", 
       MakeTraceSourceAccessor (&TDMAApplication::txTrace),
       "ns3::Packet::AddressTraceCallback")
@@ -192,9 +196,9 @@ TDMAApplication::WakeUpTxQueue ()
   if (pktToSend != NULL)
     {
       DoSendPacket (pktToSend);
-      nextTxTime += Seconds (
+      nextTxTime = Max(nextTxTime, Seconds (
         (pktToSend->GetSize () * 8) / static_cast<double>(dataRate.GetBitRate ())
-      );
+      ));
     }
   
   // Schedule Next Tx

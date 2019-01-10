@@ -62,9 +62,10 @@ protected:
   EventId slotStartEvt;
   /** 是否正在发送 */
   bool isAtOwnSlot;
+  /** 是否启用mock packet发送 */
   bool enableMockTraffic;
 
-  /** 当前时隙 */
+  /** 当前时隙信息 */
   TDMASlot curSlot;
   /** slotCount, 本节点经过的时隙计数  */
   uint64_t slotCnt = 0;
