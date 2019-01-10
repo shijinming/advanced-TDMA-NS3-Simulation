@@ -27,6 +27,9 @@ public:
     std::string eventTraceFile = "";
     std::string throughputTraceFile = "";
 
+    /** 全局队列属性 */
+    uint32_t txqCapacity = 100; // 发送队列大小
+
     void ParceCommandLineArguments (int argc, char **argv);
     static SimulationConfig& Default ();
     void PrintConfiguration ();

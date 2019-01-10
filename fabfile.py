@@ -20,4 +20,4 @@ def deploy(configure=False):
         if configure:
             run("./waf configure --build-profile=optimized --enable-examples")
         run("./waf build")
-        run("./waf --run 'mix-autonomy-example --mobility=\"/home/vehicle/mobility/fcd-trace-1.ns2.output.xml\" --nnodes=143'")
+        # run("./waf --run 'mix-autonomy-example --mobility=\"/home/vehicle/mobility/fcd-trace-1.ns2.output.xml\" --nnodes=143'")
