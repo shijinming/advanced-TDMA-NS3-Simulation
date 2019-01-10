@@ -62,10 +62,6 @@ void SimulationEntry::Simulate (int argc, char **argv)
 void SimulationEntry::ConfigureTracing()
 {
   LOG_UNCOND ("Config tracing");
-  Config::Connect ("/NodeList/0/$ns3::MobilityModel/CourseChange",
-                  MakeCallback(&SimulationEntry::CourseChange, this));
-  // Config::Disconnect ("/NodeList/0/$ns3::MobilityModel/CourseChange", 
-  //                 MakeCallback(&SimulationEntry::CourseChange, this));
 }
 
 // https://www.cnblogs.com/dfcao/p/cpp-FAQ-split.html
@@ -83,26 +79,6 @@ static void SplitString(const std::string &s, std::vector<std::string> &v, const
   }
   if (pos1 != s.length())
     v.push_back(s.substr(pos1));
-}
-
-void SimulationEntry::CourseChange(std::string context, Ptr<const MobilityModel> mobility)
-{
-  std::vector<std::string> elements;
-  SplitString(context, elements, "/");
-  if (elements.size() < 3)
-  {
-    LOG_UNCOND("Conext format error[0]: " << context);
-    exit(1);
-  }
-
-  uint32_t iNodeId = std::stoul(elements[2]);
-  std::istringstream iss (elements[2]);
-  iss >> iNodeId;
-  // TODO: activate this node 
-  LOG_UNCOND ("Node " << iNodeId << " starts to move!");
-  LOG_UNCOND (context);
-  // Disconnect this trace callback
-  Config::Disconnect (context, MakeCallback(&SimulationEntry::CourseChange, this));
 }
 
 void
