@@ -54,26 +54,43 @@ protected:
   TypeId socketTid;
   /** 数据率 */
   DataRate dataRate;
+  /** Mock包大小 */
+  uint32_t mockPktSize;
   /** 调度发送的句柄 */
   EventId txEvent;
   EventId slotEndEvt;
   EventId slotStartEvt;
   /** 是否正在发送 */
-  bool isBusySending;
   bool isAtOwnSlot;
+  bool enableMockTraffic;
 
   /** 当前时隙 */
   TDMASlot curSlot;
   /** slotCount, 本节点经过的时隙计数  */
   uint64_t slotCnt = 0;
 
+  Time minTxInterval = MicroSeconds (100);
+
   /** 发送的trace */
-  TracedCallback<Ptr<const Packet>, const Address & > m_txTrace;
+  TracedCallback<Ptr<const Packet>, const Address & > txTrace;
   /** 接收的trace */
-  TracedCallback<Ptr<const Packet>, Ptr<const Application>, const Address & > m_rxTrace;
+  TracedCallback<Ptr<const Packet>, Ptr<const Application>, const Address & > rxTrace;
 
   /** 全局仿真配置 */
   SimulationConfig &config;
+
+  /** 
+   * 发送队列 
+   * 
+   * 注意，发送具有实际意义的控制包的时候，不要直接使用socket，将包放入这个队列，可以直接使用SendPacket这个函数
+   */
+  std::queue<Ptr<Packet> > txq;
+  void SendPacket (Ptr<Packet> pkt);
+
+  /**
+   * @brief 唤醒发送队列
+   */
+  void WakeUpTxQueue (void);
 
 private:
 
@@ -109,6 +126,8 @@ private:
    */
   void CancelAllEvents (void);
 
+  void DoSendPacket (Ptr<Packet> pkt);
+
 protected:
 
   /**
@@ -134,13 +153,20 @@ protected:
   /**
    * @brief 时隙开始的钩子函数
    */
-  virtual void SlotDidStart (void) {};
+  virtual void SlotWillStart (void) {};
 
   /**
    * @brief 时隙结束的钩子函数
    * 
    */
   virtual void SlotDidEnd (void) {};
+
+  /**
+   * @brief  将要发送Mock包，这个回调函数允许你再Mock包被发送前对改包进行修改.
+   * 
+   * @param pkt 
+   */
+  virtual void WillSendMockPacket (Ptr<const Packet> pkt) {};
 };
 
 }

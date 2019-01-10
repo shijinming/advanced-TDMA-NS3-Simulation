@@ -1,3 +1,4 @@
+#include "ns3/internet-module.h"
 #include "tdma_app.h"
 
 
@@ -7,12 +8,28 @@ TypeId
 TDMAApplication::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::TDMAApplication")
-    .SetParent<Application> ();
+    .SetParent<Application> ()
+    .AddAttribute ("DataRate", "Data rate",
+      DataRateValue (DataRate ("1Mb/s")),
+      MakeDataRateAccessor (&TDMAApplication::dataRate),
+      MakeDataRateChecker ())
+    .AddAttribute ("MockPacketSize", "Size of mock packets (in bytes)",
+      UintegerValue (200),
+      MakeUintegerAccessor (&TDMAApplication::mockPktSize),
+      MakeUintegerChecker<uint32_t> (0))
+    .AddTraceSource ("Tx", "A new packet is created and is sent", 
+      MakeTraceSourceAccessor (&TDMAApplication::txTrace),
+      "ns3::Packet::AddressTraceCallback")
+    .AddTraceSource ("Rx", "A new packet is received by sink",
+      MakeTraceSourceAccessor (&TDMAApplication::rxTrace),
+      "ns3::ThreeLayerHelper::TracedCallback");
   return tid;
 }
 
 TDMAApplication::TDMAApplication ()
-  : config (SimulationConfig::Default ()) 
+  : isAtOwnSlot (false),
+    enableMockTraffic (true),
+    config (SimulationConfig::Default ())
 {
 }
 
@@ -74,6 +91,11 @@ TDMAApplication::CancelAllEvents (void)
 void
 TDMAApplication::SlotEnded (void) 
 {
+  if (!isAtOwnSlot) {
+    LOG_UNCOND ("Fatal Error[1]: 时隙调度错误");
+    exit (1);
+  }
+  txEvent.Cancel ();
   curSlot = GetNextSlotInterval ();
   slotStartEvt = Simulator::Schedule (curSlot.start, &TDMAApplication::SlotStarted, this);
   isAtOwnSlot = false;
@@ -83,16 +105,22 @@ TDMAApplication::SlotEnded (void)
 void
 TDMAApplication::SlotStarted (void) 
 {
+  if (isAtOwnSlot) {
+    // 已经开始了的时隙重复启动
+    LOG_UNCOND ("Fatal Error[0]: 时隙调度错误");
+    exit (1);
+  }
   slotEndEvt = Simulator::Schedule (curSlot.duration, &TDMAApplication::SlotEnded, this);
   slotCnt += 1;
   isAtOwnSlot = true;
-  SlotDidStart ();
+  SlotWillStart ();
+  WakeUpTxQueue ();
 }
 
 void 
 TDMAApplication::CreateSocket (void)
 {
-  InetSocketAddress broadcastAddr = InetSocketAddress (Ipv4Address ("255.255.255.255"), config.socketPort);
+  auto broadcastAddr = InetSocketAddress (Ipv4Address ("255.255.255.255"), config.socketPort);
   if (!socket) 
     {
       socket = Socket::CreateSocket (GetNode (), socketTid);
@@ -127,8 +155,50 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
       InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
       Address addr = inetAddr.GetIpv4 ();
       ReceivePacket (pkt, addr);
-      m_rxTrace (pkt, this, addr);
+      rxTrace (pkt, this, addr);
     }
+}
+
+void
+TDMAApplication::SendPacket (Ptr<Packet> pkt)
+{
+  txq.push (pkt);
+}
+
+void
+TDMAApplication::DoSendPacket (Ptr<Packet> pkt)
+{
+  socket->Send (pkt);
+  Ptr<Ipv4> ipv4 = GetNode ()->GetObject<Ipv4> ();
+  txTrace (pkt, ipv4->GetAddress (1, 0).GetLocal ());
+}
+
+void
+TDMAApplication::WakeUpTxQueue ()
+{
+  if (!isAtOwnSlot) return; 
+  Ptr<Packet> pktToSend = NULL;
+  if (!txq.empty ())
+    {
+      pktToSend = txq.front ();
+      txq.pop ();
+    }
+  else if (enableMockTraffic)
+    {
+      pktToSend = Create<Packet> (mockPktSize);
+      WillSendMockPacket (pktToSend);
+    }
+  Time nextTxTime = minTxInterval;
+  if (pktToSend != NULL)
+    {
+      DoSendPacket (pktToSend);
+      nextTxTime += Seconds (
+        (pktToSend->GetSize () * 8) / static_cast<double>(dataRate.GetBitRate ())
+      );
+    }
+  
+  // Schedule Next Tx
+  txEvent = Simulator::Schedule (nextTxTime, &TDMAApplication::WakeUpTxQueue, this);
 }
 
 }
