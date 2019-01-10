@@ -1,6 +1,7 @@
 #ifndef MIX_AUTONOMY_ENTRY_HELPER
 #define MIX_AUTONOMY_ENTRY_HELPER
 
+#include "ns3/mobility-module.h"
 #include "ns3/sim-config.h"
 
 namespace ns3 {

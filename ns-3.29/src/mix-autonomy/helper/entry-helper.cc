@@ -45,19 +45,27 @@ void SimulationEntry::Simulate (int argc, char **argv)
 
   NetDeviceContainer devices = wifi80211p.Install (wifiPhy, wifi80211pMac, nodes);
 
+  LOG_UNCOND ("Load mobility data");
   Ns2MobilityHelper ns2Helper = Ns2MobilityHelper (config.mobilityInput);
   ns2Helper.Install ();
+  LOG_UNCOND ("Load finished");
 
   ConfigureTracing ();
   ConfigureApplication ();
 
   PeriodicCheck ();
+  Simulator::Stop (Seconds (config.simTime));
+  Simulator::Run ();
+  Simulator::Destroy ();
 }
 
 void SimulationEntry::ConfigureTracing()
 {
-  Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange",
+  LOG_UNCOND ("Config tracing");
+  Config::Connect ("/NodeList/0/$ns3::MobilityModel/CourseChange",
                   MakeCallback(&SimulationEntry::CourseChange, this));
+  // Config::Disconnect ("/NodeList/0/$ns3::MobilityModel/CourseChange", 
+  //                 MakeCallback(&SimulationEntry::CourseChange, this));
 }
 
 // https://www.cnblogs.com/dfcao/p/cpp-FAQ-split.html
@@ -92,7 +100,7 @@ void SimulationEntry::CourseChange(std::string context, Ptr<const MobilityModel>
   iss >> iNodeId;
   // TODO: activate this node 
   LOG_UNCOND ("Node " << iNodeId << " starts to move!");
-
+  LOG_UNCOND (context);
   // Disconnect this trace callback
   Config::Disconnect (context, MakeCallback(&SimulationEntry::CourseChange, this));
 }
@@ -104,7 +112,7 @@ SimulationEntry::ConfigureApplication () {
 
 void
 SimulationEntry::PeriodicCheck () {
-
+  LOG_UNCOND ("Tick" << Simulator::Now ().GetMilliSeconds () << "ms");
   Simulator::Schedule (Seconds (1),
     &SimulationEntry::PeriodicCheck, this);
 }

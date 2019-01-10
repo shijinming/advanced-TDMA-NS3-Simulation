@@ -15,7 +15,7 @@ public:
     /** 节点数量 */
     uint32_t nNodes = 0;
     /** 仿真时间 */
-    uint32_t simTime = 0;
+    uint32_t simTime = 600;
     /** Socket使用的端口 */
     uint32_t socketPort = 9;
     /** 物理层设置 */
