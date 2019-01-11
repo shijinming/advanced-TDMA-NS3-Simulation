@@ -20,6 +20,7 @@ namespace ns3
 class BeaconVehicleApplication : public TDMAApplication {
 public:
   static TypeId GetTypeId (void);
+  BeaconVehicleApplication () {};
 private:
   Time slotSize;
 
@@ -33,6 +34,7 @@ BeaconVehicleApplication::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::BeaconVehicleApplication")
     .SetParent <TDMAApplication> ()
+    .AddConstructor <BeaconVehicleApplication> ()
     .AddAttribute ("SlotSize", "Size of time slot",
       TimeValue (MilliSeconds (20)),
       MakeTimeAccessor (&BeaconVehicleApplication::slotSize),
@@ -44,19 +46,23 @@ struct TDMASlot
 BeaconVehicleApplication::GetNextSlotInterval (void)
 {
   struct TDMASlot slot;
-  slot.start = slotSize * (config.nNodes - 1);
-  slot.duration = slotSize;
+  LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
+  slot.start = slotSize * (config.nNodes - 1) + minTxInterval;
+  slot.duration = slotSize - minTxInterval;
   return slot;
 }
 
-struct
+struct TDMASlot
 BeaconVehicleApplication::GetInitalSlot (void)
 {
   struct TDMASlot slot;
-  slot.start = slotSize * GetNode ()->GetId ();
-  slot.duration =  slotSize;
+  LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
+  slot.start = slotSize * GetNode ()->GetId () + minTxInterval;
+  slot.duration =  slotSize - minTxInterval;
   return slot;
 }
+
+NS_OBJECT_ENSURE_REGISTERED (BeaconVehicleApplication);
 
 }
 

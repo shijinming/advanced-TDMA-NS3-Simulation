@@ -13,6 +13,10 @@ TDMAApplication::GetTypeId ()
       DataRateValue (DataRate ("1Mb/s")),
       MakeDataRateAccessor (&TDMAApplication::dataRate),
       MakeDataRateChecker ())
+    .AddAttribute ("EnableMockTraffic", "Whether to enable mock traffic",
+      BooleanValue (true),
+      MakeBooleanAccessor (&TDMAApplication::enableMockTraffic),
+      MakeBooleanChecker ())
     .AddAttribute ("MockPacketSize", "Size of mock packets (in bytes)",
       UintegerValue (200),
       MakeUintegerAccessor (&TDMAApplication::mockPktSize),
@@ -95,6 +99,7 @@ TDMAApplication::CancelAllEvents (void)
 void
 TDMAApplication::SlotEnded (void) 
 {
+  LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " ended at " << Simulator::Now ().GetMicroSeconds ());
   if (!isAtOwnSlot) {
     LOG_UNCOND ("Fatal Error[1]: 时隙调度错误");
     exit (1);
@@ -109,6 +114,7 @@ TDMAApplication::SlotEnded (void)
 void
 TDMAApplication::SlotStarted (void) 
 {
+  LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " started at " << Simulator::Now ().GetMicroSeconds ());
   if (isAtOwnSlot) {
     // 已经开始了的时隙重复启动
     LOG_UNCOND ("Fatal Error[0]: 时隙调度错误");

@@ -10,12 +10,13 @@ SimulationConfig::Default () {
 }
 
 void 
-SimulationConfig::ParceCommandLineArguments (int argc, char **argv) 
+SimulationConfig::ParceCommandLineArguments (int argc, char **argv, bool doValidate) 
 {
     CommandLine cmd;
     ConfigureCommandLineParams (cmd);
     cmd.Parse (argc, argv);
-    Validate ();
+    if (doValidate)
+        Validate ();
 }
 
 void 

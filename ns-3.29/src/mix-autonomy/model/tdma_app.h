@@ -19,6 +19,15 @@
 namespace ns3 
 {
 
+/**
+ * @brief 时隙单元定义
+ */
+struct TDMASlot {
+  Time start; /**< 时隙开始时间，注意是相对时间 */
+  Time duration; /**< 时隙长度 */
+  uint64_t id; /**< 时隙ID，这个成员可以是Optional的，在本类中不会使用，可以供子类使用*/
+};
+
 class TDMAApplication: public Application
 {
 public:
@@ -28,15 +37,6 @@ public:
 
   void SetStartTime (Time start);
   void SetStopTime (Time stop);
-
-  /**
-   * @brief 时隙单元定义
-   */
-  struct TDMASlot {
-    Time start; /**< 时隙开始时间，注意是相对时间 */
-    Time duration; /**< 时隙长度 */
-    uint64_t id; /**< 时隙ID，这个成员可以是Optional的，在本类中不会使用，可以供子类使用*/
-  };
 
 protected:
   virtual void StartApplication (void);
@@ -142,14 +142,14 @@ protected:
    * 
    * @return TDMASlot 下一个时隙
    */
-  virtual TDMASlot GetNextSlotInterval (void) = 0;
+  virtual struct TDMASlot GetNextSlotInterval (void) = 0;
 
   /**
    * @brief 获取起始时隙
    * 
    * @return TDMASlot   起始时隙
    */
-  virtual TDMASlot GetInitalSlot (void) = 0;
+  virtual struct TDMASlot GetInitalSlot (void) = 0;
 
   /**
    * @brief 时隙开始的钩子函数

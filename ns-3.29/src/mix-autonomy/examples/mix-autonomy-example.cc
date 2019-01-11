@@ -267,7 +267,7 @@ using namespace ns3;
                                                                                                                        MMMMMMMMMMMMMMMMMMMMM
 */
 
-#include "ns3/entry-helper.h"
+#include "ns3/mix-autonomy-module.h"
 
 int 
 main (int argc, char *argv[])
@@ -283,7 +283,7 @@ main (int argc, char *argv[])
 
   // Simulator::Run ();
   // Simulator::Destroy ();
-  SimulationEntry simulator;
+  BeaconSimulationEntry simulator;
   simulator.Simulate (argc, argv);
   return 0;
 }
