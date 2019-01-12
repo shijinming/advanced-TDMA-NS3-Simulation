@@ -12,7 +12,7 @@
 #ifndef BEACON_VEHICLE_H
 #define BEACON_VEHICLE_H
 
-#include "ns3/tdma_app.h"
+#include "ns3/tdma-app.h"
 
 namespace ns3
 {

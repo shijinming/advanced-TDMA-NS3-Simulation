@@ -1,5 +1,5 @@
 #include "ns3/internet-module.h"
-#include "tdma_app.h"
+#include "tdma-app.h"
 
 
 namespace ns3 {

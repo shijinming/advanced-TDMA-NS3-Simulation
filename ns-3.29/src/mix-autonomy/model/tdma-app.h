@@ -1,5 +1,5 @@
 /**
- * @file tdma_app.h
+ * @file tdma-app.h
  * @author Woody Huang (woodyhuang1@gmail.com)
  * @brief 实现了TDMA功能的基础类，需要继承到子类使用
  * @version 0.1

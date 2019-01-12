@@ -1,7 +1,7 @@
 /**
  * @file beacon-entry-helper.h
  * @author Woody Huang (woodyhuang1@gmail.com)
- * @brief 这个类是用来测试tdma_app.h/c的工具类。
+ * @brief 这个类是用来测试tdma-app.h/c的工具类。
  * @version 0.1
  * @date 2019-01-11
  * 
@@ -19,7 +19,7 @@ namespace ns3
 class BeaconSimulationEntry: public SimulationEntry
 {
 public:
-  void Simulate (int argc, char **argv);
+  void Simulate (int argc, char **argv) override;
 protected:
   void OverrideDefaultConfig () override;
   void LoadMobilityData () override;
