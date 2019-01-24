@@ -19,10 +19,15 @@ public:
   virtual ~MyHeader ();
 
   struct FrameHeader {
-    bool identity; //judge leader or follower
-    uint32_t allocation;   //time slot allocation
+    bool isAP;
+    bool isMiddle;
+    uint16_t id;
+    uint32_t queueLen;   //length of send queue, if queueLen > 0, request for slot automatically
     uint32_t timestamp;
-    uint32_t location;   //the location of vehicle
+    uint32_t locLon;   //the longitude of vehicle
+    uint32_t locLat;   //the latitude of vehicle
+    uint16_t slotId;
+    uint16_t slotSize;
   };
 
   /**
