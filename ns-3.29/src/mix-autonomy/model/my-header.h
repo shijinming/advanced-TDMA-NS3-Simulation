@@ -18,7 +18,7 @@ public:
   MyHeader ();
   virtual ~MyHeader ();
 
-  struct FrameHeader {
+  typedef struct FrameHeader {
     bool isAP;
     bool isMiddle;
     uint16_t id;
@@ -28,7 +28,7 @@ public:
     uint32_t locLat;   //the latitude of vehicle
     uint16_t slotId;
     uint16_t slotSize;
-  };
+  } FrameHeader;
 
   /**
    * Set the header data.
