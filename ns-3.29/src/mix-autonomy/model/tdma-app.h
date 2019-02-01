@@ -16,6 +16,8 @@
 
 #include "ns3/sim-config.h"
 
+#include "my-header.h"
+
 namespace ns3 
 {
 
@@ -37,6 +39,8 @@ public:
 
   void SetStartTime (Time start);
   void SetStopTime (Time stop);
+
+  void SetHeader();
 
 protected:
   virtual void StartApplication (void);
@@ -80,6 +84,7 @@ protected:
   /** 全局仿真配置 */
   SimulationConfig &config;
 
+  PacketHeader pktHeader;
   /** 
    * 发送队列 
    * 

@@ -24,6 +24,9 @@ protected:
   void OverrideDefaultConfig () override;
   void LoadMobilityData () override;
   void ConfigureApplication () override;
+
+  void PrintSendPacket(Ptr<const Packet> packet, const Address &address);
+  void PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3::Application const>, const Address &address);
 };
 
 void
@@ -74,9 +77,24 @@ BeaconSimulationEntry::ConfigureApplication ()
   for (auto node = NodeList::Begin (); node != NodeList::End (); node ++)
     {
       auto app = factory.Create<Application> ();
+      std::cout<<app->GetTypeId ()<<std::endl;
+      // app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
+      app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
       (*node)->AddApplication (app);
     }
   LOG_UNCOND ("Done create application");
+}
+
+void 
+BeaconSimulationEntry::PrintSendPacket(Ptr<const Packet> packet, const Address &address)
+{
+  std::cout<<"Send a packet "<<packet<<" from "<<address<<std::endl;
+}
+
+void 
+BeaconSimulationEntry::PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3::Application const>, const Address &address)
+{
+  std::cout<<"Received a packet "<<packet<<" from "<<address<<std::endl;
 }
 
 }

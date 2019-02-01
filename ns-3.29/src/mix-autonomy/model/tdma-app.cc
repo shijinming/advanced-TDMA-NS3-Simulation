@@ -124,6 +124,7 @@ TDMAApplication::SlotStarted (void)
   slotCnt += 1;
   isAtOwnSlot = true;
   SlotWillStart ();
+  CreateSocket();
   WakeUpTxQueue ();
 }
 
@@ -131,6 +132,7 @@ void
 TDMAApplication::CreateSocket (void)
 {
   auto broadcastAddr = InetSocketAddress (Ipv4Address ("255.255.255.255"), config.socketPort);
+  socketTid = UdpSocketFactory::GetTypeId ();
   if (!socket) 
     {
       socket = Socket::CreateSocket (GetNode (), socketTid);
@@ -146,7 +148,7 @@ TDMAApplication::CreateSocket (void)
   if (!sink)
     {
       sink = Socket::CreateSocket (GetNode (), socketTid);
-      if (!sink->Bind ())
+      if (sink->Bind ())
         {
           LOG_UNCOND ("Fatal Error: Fail to bind socket");
           exit (1);
@@ -165,6 +167,10 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
       InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
       Address addr = inetAddr.GetIpv4 ();
       ReceivePacket (pkt, addr);
+      PacketHeader pHeader;
+      pkt->RemoveHeader(pHeader);
+      std::cout<<"Received a packet."<<std::endl;
+      pHeader.Print(std::cout);
       rxTrace (pkt, this, addr);
     }
 }
@@ -178,6 +184,8 @@ TDMAApplication::SendPacket (Ptr<Packet> pkt)
 void
 TDMAApplication::DoSendPacket (Ptr<Packet> pkt)
 {
+  SetHeader();
+  pkt->AddHeader(pktHeader);
   socket->Send (pkt);
   Ptr<Ipv4> ipv4 = GetNode ()->GetObject<Ipv4> ();
   txTrace (pkt, ipv4->GetAddress (1, 0).GetLocal ());
@@ -190,6 +198,7 @@ TDMAApplication::WakeUpTxQueue ()
   Ptr<Packet> pktToSend = NULL;
   if (!txq.empty ())
     {
+      std::cout<<"Send normal packet."<<std::endl;
       pktToSend = txq.front ();
       txq.pop ();
     }
@@ -209,6 +218,20 @@ TDMAApplication::WakeUpTxQueue ()
   
   // Schedule Next Tx
   txEvent = Simulator::Schedule (nextTxTime, &TDMAApplication::WakeUpTxQueue, this);
+}
+
+void
+TDMAApplication::SetHeader()
+{
+  pktHeader.setIsAP(1);
+  pktHeader.setIsMiddle(0);
+  pktHeader.setId(GetNode ()->GetId ());
+  pktHeader.setQueueLen(txq.size());
+  pktHeader.setTimestamp(Simulator::Now ().GetMicroSeconds ());
+  pktHeader.setLocLon(0);
+  pktHeader.setLocLat(0);
+  pktHeader.setSlotId(curSlot.id);
+  pktHeader.setSlotSize(curSlot.duration.GetMicroSeconds());
 }
 
 }

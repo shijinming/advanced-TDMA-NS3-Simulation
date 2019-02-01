@@ -8,90 +8,86 @@
 
 namespace ns3
 {
-MyHeader::MyHeader ()
+PacketHeader::PacketHeader ()
 {
-  // we must provide a public default constructor, 
-  // implicit or explicit, but never private.
-  memset (&m_data, 0, sizeof (FrameHeader));
-}
-MyHeader::~MyHeader ()
-{
+  m_headerSize = 26;
 }
 
-void 
-MyHeader::SetData (FrameHeader data)
+PacketHeader::~PacketHeader ()
 {
-  m_data = data;
-}
-
-MyHeader::FrameHeader
-MyHeader::GetData (void) const
-{
-  return m_data;
 }
 
 TypeId
-MyHeader::GetTypeId (void)
+PacketHeader::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::MyHeader")
+  static TypeId tid = TypeId ("ns3::PacketHeader")
     .SetParent<Header> ()
     .SetGroupName ("mix-autonomy")
-    .AddConstructor<MyHeader> ()
+    .AddConstructor<PacketHeader> ()
   ;
   return tid;
 }
 TypeId
-MyHeader::GetInstanceTypeId (void) const
+PacketHeader::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
 
 void
-MyHeader::Print (std::ostream &os) const
+PacketHeader::Print (std::ostream &os) const
 {
   // This method is invoked by the packet printing
   // routines to print the content of my header.
-  //os << "data=" << m_data << std::endl;
-  //os << "data=" << m_data;
-#define QUICK_PRINT(x) os << #x << ": " << m_data.x << std::endl
 
-  QUICK_PRINT (isAP);
-  QUICK_PRINT (isMiddle);
-  QUICK_PRINT (id);
-  QUICK_PRINT (queueLen);
-  QUICK_PRINT (timestamp);
-  QUICK_PRINT (locLon);
-  QUICK_PRINT (locLat);
-  QUICK_PRINT (slotId);
-  QUICK_PRINT (slotSize);
-
-#undef QUICK_PRINT
+  os<<m_isAP<<"\t"<<m_isMiddle<<"\t"<<m_id<<"\t"<<m_queueLen<<"\t";
+  os<<m_timestamp<<"\t"<<m_locLon<<"\t"<<m_locLon<<"\t"<<m_slotId<<"\t";
+  os<<m_slotSize<<std::endl;
 }
+
 uint32_t
-MyHeader::GetSerializedSize (void) const
+PacketHeader::GetSerializedSize (void) const
 {
   // we reserve 2 bytes for our header.
-  return sizeof (FrameHeader);
+  return m_headerSize;
 }
 void
-MyHeader::Serialize (Buffer::Iterator start) const
+PacketHeader::Serialize (Buffer::Iterator start) const
 {
   // we can serialize two bytes at the start of the buffer.
   // we write them in network byte order.
-  //start.WriteHtonU16 (m_data);
-  start.Write ((uint8_t *) &m_data, sizeof (FrameHeader));
+  Buffer::Iterator i = start;
+  i.WriteHtonU16(m_headerSize);
+  i.WriteU8(m_isAP);
+  i.WriteU8(m_isMiddle);
+  i.WriteHtonU16(m_id);
+  i.WriteHtonU16(m_queueLen);
+  i.WriteHtonU32(m_timestamp);
+  i.WriteHtonU32(m_locLon);
+  i.WriteHtonU32(m_locLat);
+  i.WriteHtonU16(m_slotId);
+  i.WriteHtonU32(m_slotSize);
+
 }
 uint32_t
-MyHeader::Deserialize (Buffer::Iterator start)
+PacketHeader::Deserialize (Buffer::Iterator start)
 {
   // we can deserialize two bytes from the start of the buffer.
   // we read them in network byte order and store them
   // in host byte order.
-  // m_data = start.ReadNtohU16 ();
-  start.Read ((uint8_t *) &m_data, sizeof (FrameHeader));
+  Buffer::Iterator i = start;
+  m_headerSize = i.ReadNtohU16();
+  m_isAP = i.ReadU8();
+  m_isMiddle = i.ReadU8();
+  m_id = i.ReadNtohU16();
+  m_queueLen = i.ReadNtohU16();
+  m_timestamp = i.ReadNtohU32();
+  m_locLon = i.ReadNtohU32();
+  m_locLat = i.ReadNtohU32();
+  m_slotId = i.ReadNtohU16();
+  m_slotSize = i.ReadNtohU16();
 
   // we return the number of bytes effectively read.
-  return sizeof (FrameHeader);
+  return m_headerSize;
 }
 
 }

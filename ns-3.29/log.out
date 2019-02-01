@@ -1,0 +1,5 @@
+Waf: Entering directory `/home/jinming/advanced-tdma-ns3-simulation/ns-3.29/build'
+[ 494/2773] Compiling install-ns3-header: ns3/tdma-app.h
+[1847/2773] Compiling src/mix-autonomy/model/tdma-app.cc
+[2319/2773] Compiling src/mix-autonomy/examples/mix-autonomy-example.cc
+Waf: Leaving directory `/home/jinming/advanced-tdma-ns3-simulation/ns-3.29/build'
