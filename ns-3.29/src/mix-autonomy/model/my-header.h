@@ -18,6 +18,18 @@ public:
   PacketHeader ();
   ~PacketHeader ();
 
+  typedef struct FrameHeader {
+    uint8_t type;
+    uint16_t id;
+    uint16_t queueLen;   //length of send queue, if queueLen > 0, request for slot automatically
+    uint32_t timestamp;
+    uint32_t locLon;   //the longitude of vehicle
+    uint32_t locLat;   //the latitude of vehicle
+    uint16_t slotId;
+    uint32_t slotSize;
+  } FrameHeader;
+
+
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
 
@@ -26,33 +38,26 @@ public:
   uint32_t Deserialize (Buffer::Iterator start);
   uint32_t GetSerializedSize (void) const;
   
-  void setType(uint8_t t) {m_type = t;}
-  uint8_t getType() {return m_type;}
-  void setId(uint16_t id) {m_id = id;}
-  uint16_t getId() {return m_id;}
-  void setQueueLen(uint32_t queueLen) {m_queueLen = queueLen;}
-  uint32_t getQueueLen() {return m_queueLen;}
-  void setTimestamp(uint32_t timestamp) {m_timestamp = timestamp;}
-  uint32_t getTimestamp() {return m_timestamp;}
-  void setLocLon(uint32_t locLon) {m_locLon = locLon;}
-  uint32_t getLocLon() {return m_locLon;}
-  void setLocLat(uint32_t locLat) {m_locLat = locLat;}
-  uint32_t getLocLat() {return m_locLat;}
-  void setSlotId(uint16_t slotId) {m_slotId = slotId;}
-  uint16_t getSlotId() {return m_slotId;}
-  void setSlotSize(uint16_t slotSize) {m_slotSize = slotSize;}
-  uint16_t getSlotSize() {return m_slotSize;}
+  void SetType(uint8_t t) {m_data.type = t;}
+  uint8_t GetType() {return m_data.type;}
+  void SetId(uint16_t id) {m_data.id = id;}
+  uint16_t GetId() {return m_data.id;}
+  void SetQueueLen(uint16_t queueLen) {m_data.queueLen = queueLen;}
+  uint16_t GetQueueLen() {return m_data.queueLen;}
+  void SetTimestamp(uint32_t timestamp) {m_data.timestamp = timestamp;}
+  uint32_t GetTimestamp() {return m_data.timestamp;}
+  void SetLocLon(uint32_t locLon) {m_data.locLon = locLon;}
+  uint32_t GetLocLon() {return m_data.locLon;}
+  void SetLocLat(uint32_t locLat) {m_data.locLat = locLat;}
+  uint32_t GetLocLat() {return m_data.locLat;}
+  void SetSlotId(uint16_t slotId) {m_data.slotId = slotId;}
+  uint16_t GetSlotId() {return m_data.slotId;}
+  void SetSlotSize(uint32_t slotSize) {m_data.slotSize = slotSize;}
+  uint32_t GetSlotSize() {return m_data.slotSize;}
 
 private:
+  FrameHeader m_data;  //!< Header data
   uint16_t m_headerSize;
-  uint8_t m_type;
-  uint16_t m_id;
-  uint16_t m_queueLen;   //length of send queue, if queueLen > 0, request for slot automatically
-  uint32_t m_timestamp;
-  uint32_t m_locLon;   //the longitude of vehicle
-  uint32_t m_locLat;   //the latitude of vehicle
-  uint16_t m_slotId;
-  uint32_t m_slotSize;
 };
 
 }

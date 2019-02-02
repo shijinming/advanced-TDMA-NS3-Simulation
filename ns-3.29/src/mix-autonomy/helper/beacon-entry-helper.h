@@ -78,7 +78,6 @@ BeaconSimulationEntry::ConfigureApplication ()
   for (auto node = NodeList::Begin (); node != NodeList::End (); node ++)
     {
       auto app = factory.Create<Application> ();
-      std::cout<<app->GetTypeId ()<<std::endl;
       app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
       app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
       (*node)->AddApplication (app);

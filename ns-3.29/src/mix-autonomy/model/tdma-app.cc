@@ -223,14 +223,14 @@ TDMAApplication::WakeUpTxQueue ()
 void
 TDMAApplication::SetHeader()
 {
-  pktHeader.setType(1);
-  pktHeader.setId(GetNode ()->GetId ());
-  pktHeader.setQueueLen(txq.size());
-  pktHeader.setTimestamp(Simulator::Now ().GetMicroSeconds ());
-  pktHeader.setLocLon(0);
-  pktHeader.setLocLat(0);
-  pktHeader.setSlotId(curSlot.id);
-  pktHeader.setSlotSize(curSlot.duration.GetMicroSeconds());
+  pktHeader.SetType(1);
+  pktHeader.SetId(GetNode ()->GetId ());
+  pktHeader.SetQueueLen(txq.size());
+  pktHeader.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
+  pktHeader.SetLocLon(0);
+  pktHeader.SetLocLat(0);
+  pktHeader.SetSlotId(curSlot.id);
+  pktHeader.SetSlotSize(curSlot.duration.GetMicroSeconds());
 }
 
 }

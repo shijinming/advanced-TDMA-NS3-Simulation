@@ -10,7 +10,7 @@ namespace ns3
 {
 PacketHeader::PacketHeader ()
 {
-  m_headerSize = 25;
+  m_headerSize = sizeof(FrameHeader);
 }
 
 PacketHeader::~PacketHeader ()
@@ -39,9 +39,18 @@ PacketHeader::Print (std::ostream &os) const
   // This method is invoked by the packet printing
   // routines to print the content of my header.
 
-  os<<int(m_type)<<","<<m_id<<","<<m_queueLen<<",";
-  os<<m_timestamp<<","<<m_locLon<<","<<m_locLat<<","<<m_slotId<<",";
-  os<<m_slotSize<<std::endl;
+#define QUICK_PRINT(x) os << #x << ": " << m_data.x << std::endl
+
+  QUICK_PRINT (type);
+  QUICK_PRINT (id);
+  QUICK_PRINT (queueLen);
+  QUICK_PRINT (timestamp);
+  QUICK_PRINT (locLon);
+  QUICK_PRINT (locLat);
+  QUICK_PRINT (slotId);
+  QUICK_PRINT (slotSize);
+
+#undef QUICK_PRINT
 }
 
 uint32_t
@@ -55,16 +64,8 @@ PacketHeader::Serialize (Buffer::Iterator start) const
 {
   // we can serialize two bytes at the start of the buffer.
   // we write them in network byte order.
-  Buffer::Iterator i = start;
-  i.WriteHtonU16(m_headerSize);
-  i.WriteU8(m_type);
-  i.WriteHtonU16(m_id);
-  i.WriteHtonU16(m_queueLen);
-  i.WriteHtonU32(m_timestamp);
-  i.WriteHtonU32(m_locLon);
-  i.WriteHtonU32(m_locLat);
-  i.WriteHtonU16(m_slotId);
-  i.WriteHtonU32(m_slotSize);
+
+  start.Write ((uint8_t *) &m_data, sizeof (FrameHeader));
 
 }
 uint32_t
@@ -73,16 +74,7 @@ PacketHeader::Deserialize (Buffer::Iterator start)
   // we can deserialize two bytes from the start of the buffer.
   // we read them in network byte order and store them
   // in host byte order.
-  Buffer::Iterator i = start;
-  m_headerSize = i.ReadNtohU16();
-  m_type = i.ReadU8();
-  m_id = i.ReadNtohU16();
-  m_queueLen = i.ReadNtohU16();
-  m_timestamp = i.ReadNtohU32();
-  m_locLon = i.ReadNtohU32();
-  m_locLat = i.ReadNtohU32();
-  m_slotId = i.ReadNtohU16();
-  m_slotSize = i.ReadNtohU16();
+  start.Read ((uint8_t *) &m_data, sizeof (FrameHeader));
 
   // we return the number of bytes effectively read.
   return m_headerSize;
