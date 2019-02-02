@@ -12,6 +12,7 @@
 #include "ns3/network-module.h"
 #include "ns3/beacon-vehicle.h"
 #include "entry-helper.h"
+#include "ns3/internet-module.h"
 
 namespace ns3
 {
@@ -26,7 +27,7 @@ protected:
   void ConfigureApplication () override;
 
   void PrintSendPacket(Ptr<const Packet> packet, const Address &address);
-  void PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3::Application const>, const Address &address);
+  void PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3::Application const> app, const Address &address);
 };
 
 void
@@ -73,12 +74,12 @@ BeaconSimulationEntry::ConfigureApplication ()
   LOG_UNCOND ("Create Application");
   factory.SetTypeId ("ns3::BeaconVehicleApplication");
   factory.Set ("SlotSize", TimeValue (MilliSeconds (20)));
-  factory.Set ("EnableMockTraffic", BooleanValue (false));
+  factory.Set ("EnableMockTraffic", BooleanValue (true));
   for (auto node = NodeList::Begin (); node != NodeList::End (); node ++)
     {
       auto app = factory.Create<Application> ();
       std::cout<<app->GetTypeId ()<<std::endl;
-      // app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
+      app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
       app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
       (*node)->AddApplication (app);
     }
@@ -92,9 +93,10 @@ BeaconSimulationEntry::PrintSendPacket(Ptr<const Packet> packet, const Address &
 }
 
 void 
-BeaconSimulationEntry::PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3::Application const>, const Address &address)
+BeaconSimulationEntry::PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3::Application const> app, const Address &address)
 {
-  std::cout<<"Received a packet "<<packet<<" from "<<address<<std::endl;
+  Ptr<Ipv4> ipv4 = app->GetNode ()->GetObject<Ipv4> ();
+  std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<" Received a packet "<<packet<<" from "<<address<<std::endl;
 }
 
 }

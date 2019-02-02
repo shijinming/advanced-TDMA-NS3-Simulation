@@ -148,11 +148,13 @@ TDMAApplication::CreateSocket (void)
   if (!sink)
     {
       sink = Socket::CreateSocket (GetNode (), socketTid);
-      if (sink->Bind ())
+      if (sink->Bind (Address (InetSocketAddress (Ipv4Address::GetAny (), config.socketPort))))
         {
           LOG_UNCOND ("Fatal Error: Fail to bind socket");
           exit (1);
         }
+      sink->Listen ();
+      sink->ShutdownSend ();
       sink->SetRecvCallback (MakeCallback (&TDMAApplication::OnReceivePacket, this));
     }
 }
@@ -169,8 +171,6 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
       ReceivePacket (pkt, addr);
       PacketHeader pHeader;
       pkt->RemoveHeader(pHeader);
-      std::cout<<"Received a packet."<<std::endl;
-      pHeader.Print(std::cout);
       rxTrace (pkt, this, addr);
     }
 }
@@ -223,8 +223,7 @@ TDMAApplication::WakeUpTxQueue ()
 void
 TDMAApplication::SetHeader()
 {
-  pktHeader.setIsAP(1);
-  pktHeader.setIsMiddle(0);
+  pktHeader.setType(1);
   pktHeader.setId(GetNode ()->GetId ());
   pktHeader.setQueueLen(txq.size());
   pktHeader.setTimestamp(Simulator::Now ().GetMicroSeconds ());

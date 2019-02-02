@@ -26,10 +26,8 @@ public:
   uint32_t Deserialize (Buffer::Iterator start);
   uint32_t GetSerializedSize (void) const;
   
-  void setIsAP(uint8_t isAP) {m_isAP = isAP;}
-  uint8_t getIsAP() {return m_isAP;}
-  void setIsMiddle(uint8_t isMiddle) {m_isMiddle = isMiddle;}
-  uint8_t getIsMiddle() {return m_isMiddle;}
+  void setType(uint8_t t) {m_type = t;}
+  uint8_t getType() {return m_type;}
   void setId(uint16_t id) {m_id = id;}
   uint16_t getId() {return m_id;}
   void setQueueLen(uint32_t queueLen) {m_queueLen = queueLen;}
@@ -47,8 +45,7 @@ public:
 
 private:
   uint16_t m_headerSize;
-  uint8_t m_isAP;
-  uint8_t m_isMiddle;
+  uint8_t m_type;
   uint16_t m_id;
   uint16_t m_queueLen;   //length of send queue, if queueLen > 0, request for slot automatically
   uint32_t m_timestamp;

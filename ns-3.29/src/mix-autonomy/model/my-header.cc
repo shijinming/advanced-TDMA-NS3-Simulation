@@ -10,7 +10,7 @@ namespace ns3
 {
 PacketHeader::PacketHeader ()
 {
-  m_headerSize = 26;
+  m_headerSize = 25;
 }
 
 PacketHeader::~PacketHeader ()
@@ -39,8 +39,8 @@ PacketHeader::Print (std::ostream &os) const
   // This method is invoked by the packet printing
   // routines to print the content of my header.
 
-  os<<m_isAP<<"\t"<<m_isMiddle<<"\t"<<m_id<<"\t"<<m_queueLen<<"\t";
-  os<<m_timestamp<<"\t"<<m_locLon<<"\t"<<m_locLon<<"\t"<<m_slotId<<"\t";
+  os<<int(m_type)<<","<<m_id<<","<<m_queueLen<<",";
+  os<<m_timestamp<<","<<m_locLon<<","<<m_locLat<<","<<m_slotId<<",";
   os<<m_slotSize<<std::endl;
 }
 
@@ -57,8 +57,7 @@ PacketHeader::Serialize (Buffer::Iterator start) const
   // we write them in network byte order.
   Buffer::Iterator i = start;
   i.WriteHtonU16(m_headerSize);
-  i.WriteU8(m_isAP);
-  i.WriteU8(m_isMiddle);
+  i.WriteU8(m_type);
   i.WriteHtonU16(m_id);
   i.WriteHtonU16(m_queueLen);
   i.WriteHtonU32(m_timestamp);
@@ -76,8 +75,7 @@ PacketHeader::Deserialize (Buffer::Iterator start)
   // in host byte order.
   Buffer::Iterator i = start;
   m_headerSize = i.ReadNtohU16();
-  m_isAP = i.ReadU8();
-  m_isMiddle = i.ReadU8();
+  m_type = i.ReadU8();
   m_id = i.ReadNtohU16();
   m_queueLen = i.ReadNtohU16();
   m_timestamp = i.ReadNtohU32();
