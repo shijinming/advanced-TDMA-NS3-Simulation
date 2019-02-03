@@ -57,7 +57,7 @@ uint32_t
 PacketHeader::GetSerializedSize (void) const
 {
   // we reserve 2 bytes for our header.
-  return m_headerSize;
+  return sizeof (FrameHeader);
 }
 void
 PacketHeader::Serialize (Buffer::Iterator start) const
@@ -77,7 +77,7 @@ PacketHeader::Deserialize (Buffer::Iterator start)
   start.Read ((uint8_t *) &m_data, sizeof (FrameHeader));
 
   // we return the number of bytes effectively read.
-  return m_headerSize;
+  return sizeof (FrameHeader);
 }
 
 }

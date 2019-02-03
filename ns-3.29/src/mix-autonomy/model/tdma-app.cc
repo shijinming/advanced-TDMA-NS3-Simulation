@@ -61,6 +61,7 @@ TDMAApplication::SetStopTime (Time stop) {
 void 
 TDMAApplication::DoInitialize (void) 
 {
+  CreateSocket ();
   curSlot = GetInitalSlot ();
   m_startTime = curSlot.start;
   m_stopTime = Seconds (config.simTime);
@@ -124,7 +125,6 @@ TDMAApplication::SlotStarted (void)
   slotCnt += 1;
   isAtOwnSlot = true;
   SlotWillStart ();
-  CreateSocket();
   WakeUpTxQueue ();
 }
 
@@ -169,8 +169,9 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
       InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
       Address addr = inetAddr.GetIpv4 ();
       ReceivePacket (pkt, addr);
-      PacketHeader pHeader;
-      pkt->RemoveHeader(pHeader);
+      // 取出帧头的操作应该放在ReceivePacket函数中，由子类进行。
+      // PacketHeader pHeader;
+      // pkt->RemoveHeader(pHeader);
       rxTrace (pkt, this, addr);
     }
 }
@@ -184,8 +185,10 @@ TDMAApplication::SendPacket (Ptr<Packet> pkt)
 void
 TDMAApplication::DoSendPacket (Ptr<Packet> pkt)
 {
-  SetHeader();
-  pkt->AddHeader(pktHeader);
+  PacketHeader pktHdr;
+  SetupHeader (pktHdr);
+  
+  pkt->AddHeader(pktHdr);
   socket->Send (pkt);
   Ptr<Ipv4> ipv4 = GetNode ()->GetObject<Ipv4> ();
   txTrace (pkt, ipv4->GetAddress (1, 0).GetLocal ());
@@ -221,16 +224,16 @@ TDMAApplication::WakeUpTxQueue ()
 }
 
 void
-TDMAApplication::SetHeader()
+TDMAApplication::SetupHeader(PacketHeader &hdr)
 {
-  pktHeader.SetType(1);
-  pktHeader.SetId(GetNode ()->GetId ());
-  pktHeader.SetQueueLen(txq.size());
-  pktHeader.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
-  pktHeader.SetLocLon(0);
-  pktHeader.SetLocLat(0);
-  pktHeader.SetSlotId(curSlot.id);
-  pktHeader.SetSlotSize(curSlot.duration.GetMicroSeconds());
+  hdr.SetType(1);
+  hdr.SetId(GetNode ()->GetId ());
+  hdr.SetQueueLen(txq.size());
+  hdr.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
+  hdr.SetLocLon(0);
+  hdr.SetLocLat(0);
+  hdr.SetSlotId(curSlot.id);
+  hdr.SetSlotSize(curSlot.duration.GetMicroSeconds());
 }
 
 }

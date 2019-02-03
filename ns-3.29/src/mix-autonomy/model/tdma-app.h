@@ -40,8 +40,6 @@ public:
   void SetStartTime (Time start);
   void SetStopTime (Time stop);
 
-  void SetHeader();
-
 protected:
   virtual void StartApplication (void);
   virtual void StopApplication (void);
@@ -84,7 +82,6 @@ protected:
   /** 全局仿真配置 */
   SimulationConfig &config;
 
-  PacketHeader pktHeader;
   /** 
    * 发送队列 
    * 
@@ -97,6 +94,13 @@ protected:
    * @brief 唤醒发送队列
    */
   void WakeUpTxQueue (void);
+
+  /**
+   * @brief 根据当前状态初始化发送包的帧头
+   * 
+   * @param hdr 
+   */
+  void SetupHeader(PacketHeader &hdr);
 
 private:
 
