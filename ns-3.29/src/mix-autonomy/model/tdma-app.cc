@@ -171,6 +171,7 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
       ReceivePacket (pkt, addr);
       PacketHeader pHeader;
       pkt->RemoveHeader(pHeader);
+      pHeader.Print(std::cout);
       rxTrace (pkt, this, addr);
     }
 }

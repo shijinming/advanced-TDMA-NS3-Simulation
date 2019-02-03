@@ -41,7 +41,7 @@ PacketHeader::Print (std::ostream &os) const
 
 #define QUICK_PRINT(x) os << #x << ": " << m_data.x << std::endl
 
-  QUICK_PRINT (type);
+  os << "type" << ": " << int(m_data.type) << std::endl;
   QUICK_PRINT (id);
   QUICK_PRINT (queueLen);
   QUICK_PRINT (timestamp);
