@@ -40,17 +40,27 @@ PacketHeader::Print (std::ostream &os) const
   // routines to print the content of my header.
 
 #define QUICK_PRINT(x) os << #x << ": " << m_data.x << std::endl
+#define PRINT_NAME(x) os << #x << '\t'
+#define PRINT_VALUE(x) os << m_data.x << '\t'
 
-  os << "type" << ": " << int(m_data.type) << std::endl;
-  QUICK_PRINT (id);
-  QUICK_PRINT (queueLen);
-  QUICK_PRINT (timestamp);
-  QUICK_PRINT (locLon);
-  QUICK_PRINT (locLat);
-  QUICK_PRINT (slotId);
-  QUICK_PRINT (slotSize);
-
-#undef QUICK_PRINT
+  PRINT_NAME (type);
+  PRINT_NAME (id);
+  PRINT_NAME (queueLen);
+  PRINT_NAME (timestamp);
+  PRINT_NAME (locLon);
+  PRINT_NAME (locLat);
+  PRINT_NAME (slotId);
+  PRINT_NAME (slotSize);
+  os << std::endl;
+  os << int(m_data.type) << '\t';
+  PRINT_VALUE (id);
+  PRINT_VALUE (queueLen);
+  PRINT_VALUE (timestamp);
+  PRINT_VALUE (locLon);
+  PRINT_VALUE (locLat);
+  PRINT_VALUE (slotId);
+  PRINT_VALUE (slotSize);
+  os << std::endl;
 }
 
 uint32_t
