@@ -65,6 +65,7 @@ TDMAApplication::DoInitialize (void)
   curSlot = GetInitalSlot ();
   m_startTime = curSlot.start;
   m_stopTime = Seconds (config.simTime);
+  CreateSocket();
   // 在基类函数中，会根据m_startTime设置一个定时器来调用StartApplication
   Application::DoInitialize ();
 }
