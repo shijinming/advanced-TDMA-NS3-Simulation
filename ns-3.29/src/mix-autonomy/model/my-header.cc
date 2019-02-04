@@ -39,28 +39,23 @@ PacketHeader::Print (std::ostream &os) const
   // This method is invoked by the packet printing
   // routines to print the content of my header.
 
-#define QUICK_PRINT(x) os << #x << ": " << m_data.x << std::endl
-#define PRINT_NAME(x) os << #x << '\t'
-#define PRINT_VALUE(x) os << m_data.x << '\t'
+  std::ostringstream oss1;
+  std::ostringstream oss2;
 
-  PRINT_NAME (type);
-  PRINT_NAME (id);
-  PRINT_NAME (queueLen);
-  PRINT_NAME (timestamp);
-  PRINT_NAME (locLon);
-  PRINT_NAME (locLat);
-  PRINT_NAME (slotId);
-  PRINT_NAME (slotSize);
-  os << std::endl;
-  os << int(m_data.type) << '\t';
-  PRINT_VALUE (id);
-  PRINT_VALUE (queueLen);
-  PRINT_VALUE (timestamp);
-  PRINT_VALUE (locLon);
-  PRINT_VALUE (locLat);
-  PRINT_VALUE (slotId);
-  PRINT_VALUE (slotSize);
-  os << std::endl;
+#define QUICK_PRINT(x) oss1 << #x << "\t"; oss2 << m_data.x << "\t"
+
+  QUICK_PRINT (type);
+  QUICK_PRINT (id);
+  QUICK_PRINT (queueLen);
+  QUICK_PRINT (locLon);
+  QUICK_PRINT (locLat);
+  QUICK_PRINT (slotId);
+  QUICK_PRINT (slotSize);
+  QUICK_PRINT (timestamp);  // 时间戳长度最长，放在后面
+
+#undef QUICK_PRINT
+
+  os << oss1.str () << std::endl << oss2.str () << std::endl;
 }
 
 uint32_t
