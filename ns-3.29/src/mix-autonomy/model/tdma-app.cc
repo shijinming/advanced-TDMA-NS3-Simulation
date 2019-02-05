@@ -61,6 +61,7 @@ TDMAApplication::SetStopTime (Time stop) {
 void 
 TDMAApplication::DoInitialize (void) 
 {
+  CreateSocket ();
   curSlot = GetInitalSlot ();
   m_startTime = curSlot.start;
   m_stopTime = Seconds (config.simTime);
@@ -131,6 +132,7 @@ void
 TDMAApplication::CreateSocket (void)
 {
   auto broadcastAddr = InetSocketAddress (Ipv4Address ("255.255.255.255"), config.socketPort);
+  socketTid = UdpSocketFactory::GetTypeId ();
   if (!socket) 
     {
       socket = Socket::CreateSocket (GetNode (), socketTid);
@@ -146,11 +148,13 @@ TDMAApplication::CreateSocket (void)
   if (!sink)
     {
       sink = Socket::CreateSocket (GetNode (), socketTid);
-      if (!sink->Bind ())
+      if (sink->Bind (Address (InetSocketAddress (Ipv4Address::GetAny (), config.socketPort))))
         {
           LOG_UNCOND ("Fatal Error: Fail to bind socket");
           exit (1);
         }
+      sink->Listen ();
+      sink->ShutdownSend ();
       sink->SetRecvCallback (MakeCallback (&TDMAApplication::OnReceivePacket, this));
     }
 }
@@ -165,6 +169,9 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
       InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
       Address addr = inetAddr.GetIpv4 ();
       ReceivePacket (pkt, addr);
+      // 取出帧头的操作应该放在ReceivePacket函数中，由子类进行。
+      // PacketHeader pHeader;
+      // pkt->RemoveHeader(pHeader);
       rxTrace (pkt, this, addr);
     }
 }
@@ -178,6 +185,10 @@ TDMAApplication::SendPacket (Ptr<Packet> pkt)
 void
 TDMAApplication::DoSendPacket (Ptr<Packet> pkt)
 {
+  PacketHeader pktHdr;
+  SetupHeader (pktHdr);
+  
+  pkt->AddHeader(pktHdr);
   socket->Send (pkt);
   Ptr<Ipv4> ipv4 = GetNode ()->GetObject<Ipv4> ();
   txTrace (pkt, ipv4->GetAddress (1, 0).GetLocal ());
@@ -190,6 +201,7 @@ TDMAApplication::WakeUpTxQueue ()
   Ptr<Packet> pktToSend = NULL;
   if (!txq.empty ())
     {
+      std::cout<<"Send normal packet."<<std::endl;
       pktToSend = txq.front ();
       txq.pop ();
     }
@@ -209,6 +221,19 @@ TDMAApplication::WakeUpTxQueue ()
   
   // Schedule Next Tx
   txEvent = Simulator::Schedule (nextTxTime, &TDMAApplication::WakeUpTxQueue, this);
+}
+
+void
+TDMAApplication::SetupHeader(PacketHeader &hdr)
+{
+  hdr.SetType(1);
+  hdr.SetId(GetNode ()->GetId ());
+  hdr.SetQueueLen(txq.size());
+  hdr.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
+  hdr.SetLocLon(0);
+  hdr.SetLocLat(0);
+  hdr.SetSlotId(curSlot.id);
+  hdr.SetSlotSize(curSlot.duration.GetMicroSeconds());
 }
 
 }

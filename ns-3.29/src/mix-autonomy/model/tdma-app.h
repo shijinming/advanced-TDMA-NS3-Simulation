@@ -16,6 +16,8 @@
 
 #include "ns3/sim-config.h"
 
+#include "my-header.h"
+
 namespace ns3 
 {
 
@@ -92,6 +94,13 @@ protected:
    * @brief 唤醒发送队列
    */
   void WakeUpTxQueue (void);
+
+  /**
+   * @brief 根据当前状态初始化发送包的帧头
+   * 
+   * @param hdr 
+   */
+  void SetupHeader(PacketHeader &hdr);
 
 private:
 
