@@ -5,21 +5,25 @@
 
 # def configure(conf):
 #     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
+import os
+
+def _list_sources(bld, suffix):
+    root_dir = bld.path.abspath()
+    res = [
+        x for x in 
+            [os.path.join("model", y) for y in os.listdir(os.path.join(root_dir, "model"))] 
+        if x.endswith(suffix)
+    ]
+    res += [
+        x for x in 
+            [os.path.join("helper", y) for y in os.listdir(os.path.join(root_dir, "helper"))] 
+        if x.endswith(suffix)
+    ]
+    return res
 
 def build(bld):
     module = bld.create_ns3_module('mix-autonomy', ['internet', "mobility", "wifi", "wave", "network", "applications"])
-    module.source = [
-        'model/tdma-mac.cc',
-        'model/slot-manager.cc',
-        'model/my-header.cc',
-        'model/mix-autonomy.cc',
-        'model/hdv.cc',
-        'model/ap.cc',
-        'helper/tdma-mac-helper.cc',
-        'helper/mix-autonomy-helper.cc',
-        'helper/hdv-helper.cc',
-        'helper/ap-helper.cc',
-        ]
+    module.source = _list_sources(bld, ".cc")
 
     module_test = bld.create_ns3_module_test_library('mix-autonomy')
     module_test.source = [
@@ -28,19 +32,7 @@ def build(bld):
 
     headers = bld(features='ns3header')
     headers.module = 'mix-autonomy'
-    headers.source = [
-        'model/tdma-mac.h',
-        'model/slot-manager.h',
-        'model/my-header.h',
-        'model/mix-autonomy.h',
-        'model/hdv.h',
-        'model/ap.h',
-        'helper/tdma-mac-helper.h',
-        'helper/mix-autonomy-helper.h',
-        'helper/mix-autonomy-common.h',
-        'helper/hdv-helper.h',
-        'helper/ap-helper.h',
-        ]
+    headers.source = _list_sources(bld, ".h")
 
     if bld.env.ENABLE_EXAMPLES:
         bld.recurse('examples')

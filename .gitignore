@@ -12,4 +12,7 @@ build
 *.sqlite3
 
 .lock-waf_darwin_build
+.lock-waf_linux2_build
 .waf-2.0.9*
+
+*.out
