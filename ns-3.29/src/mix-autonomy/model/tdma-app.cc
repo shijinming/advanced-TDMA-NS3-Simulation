@@ -1,4 +1,5 @@
 #include "ns3/internet-module.h"
+#include"ns3/wave-module.h"
 #include "tdma-app.h"
 
 
@@ -234,6 +235,60 @@ TDMAApplication::SetupHeader(PacketHeader &hdr)
   hdr.SetLocLat(0);
   hdr.SetSlotId(curSlot.id);
   hdr.SetSlotSize(curSlot.duration.GetMicroSeconds());
+}
+
+ void
+ TDMAApplication::SwitchToNextChannel (uint32_t curChannelNumber, uint32_t nextChannelNumber)
+ {
+  Ptr<WaveNetDevice> m_device;
+  Ptr<WifiPhy> m_phy;
+  if (m_phy->GetChannelNumber () == nextChannelNumber)
+    {
+      return;
+    }
+  Ptr<OcbWifiMac> curMacEntity = m_device->GetMac (curChannelNumber);
+  Ptr<OcbWifiMac> nextMacEntity = m_device->GetMac (nextChannelNumber);
+  curMacEntity->Suspend ();
+  curMacEntity->ResetWifiPhy ();
+  m_phy->SetChannelNumber (nextChannelNumber);
+  Time switchTime = m_phy->GetChannelSwitchDelay ();
+  nextMacEntity->MakeVirtualBusy (switchTime);
+  nextMacEntity->SetWifiPhy (m_phy);
+  nextMacEntity->Resume ();
+}
+
+bool
+TDMAApplication::IsCch (uint32_t channelNumber)
+{
+  return channelNumber == CCH;
+}
+
+bool
+TDMAApplication::IsSch (uint32_t channelNumber)
+{
+  if (channelNumber < SCH1 || channelNumber > SCH6)
+    {
+      return false;
+    }
+  if (channelNumber % 2 == 1)
+    {
+      return false;
+    }
+  return (channelNumber != CCH);
+}
+
+bool
+TDMAApplication::IsWaveChannel (uint32_t channelNumber)
+{
+  if (channelNumber < SCH1 || channelNumber > SCH6)
+    {
+      return false;
+    }
+  if (channelNumber % 2 == 1)
+    {
+      return false;
+    }
+  return true;
 }
 
 }

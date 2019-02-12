@@ -13,6 +13,7 @@
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
+#include "ns3/wave-module.h"
 
 #include "ns3/sim-config.h"
 
@@ -30,6 +31,17 @@ struct TDMASlot {
   uint64_t id; /**< 时隙ID，这个成员可以是Optional的，在本类中不会使用，可以供子类使用*/
 };
 
+/**
+ * @brief 控制信道服务信道定义
+ */
+#define SCH1 172
+#define SCH2 174
+#define SCH3 176
+#define CCH  178
+#define SCH4 180
+#define SCH5 182
+#define SCH6 184
+
 class TDMAApplication: public Application
 {
 public:
@@ -39,6 +51,24 @@ public:
 
   void SetStartTime (Time start);
   void SetStopTime (Time stop);
+
+  /**
+   * 判断当前是否为控制信道
+   *
+   */
+  static bool IsCch (uint32_t channelNumber);
+
+  /**
+   * 判断当前是否为服务信道
+   * 
+   */
+  static bool IsSch (uint32_t channelNumber);
+
+  /**
+   * 判断当前是否为有效wave信道
+   * 
+   */
+  static bool IsWaveChannel (uint32_t channelNumber);
 
 protected:
   virtual void StartApplication (void);
@@ -81,6 +111,9 @@ protected:
 
   /** 全局仿真配置 */
   SimulationConfig &config;
+
+  /** 信道编号 */
+  uint32_t m_channelNumber;
 
   /** 
    * 发送队列 
@@ -137,6 +170,12 @@ private:
   void CancelAllEvents (void);
 
   void DoSendPacket (Ptr<Packet> pkt);
+
+  /**
+   * @brief 信道切换
+   * 
+   */
+  void SwitchToNextChannel (uint32_t curChannelNumber, uint32_t nextChannelNumber); 
 
 protected:
 
