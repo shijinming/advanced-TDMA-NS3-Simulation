@@ -227,6 +227,7 @@ TDMAApplication::WakeUpTxQueue ()
 void
 TDMAApplication::SetupHeader(PacketHeader &hdr)
 {
+	Ptr<Packet> pktToSend;
   hdr.SetType(1);
   hdr.SetId(GetNode ()->GetId ());
   hdr.SetQueueLen(txq.size());
@@ -235,6 +236,10 @@ TDMAApplication::SetupHeader(PacketHeader &hdr)
   hdr.SetLocLat(0);
   hdr.SetSlotId(curSlot.id);
   hdr.SetSlotSize(curSlot.duration.GetMicroSeconds());
+	hdr.SetPriority(0);
+  hdr.SetSendDuration(
+        (pktToSend->GetSize () * 8) / static_cast<double>(dataRate.GetBitRate ())
+      );
 }
 
  void
@@ -289,6 +294,33 @@ TDMAApplication::IsWaveChannel (uint32_t channelNumber)
       return false;
     }
   return true;
+}
+
+void
+TDMAApplication::PeriodicSwitch (Frame curFrame)
+{
+  if (curFrame == Frame::CCHFrame)
+    {
+      if (slotCnt == CCHSlotNum)
+        {
+          SwitchToNextChannel (CCH, SCH1);
+          slotCnt=0;
+        };
+    }
+  if (curFrame == Frame::SCHFrame) 
+    {
+      if (slotCnt == SCHSlotNum)
+        {
+          SwitchToNextChannel (SCH1, CCH);
+          slotCnt=0;
+        };
+    }
+}
+
+void
+TDMAApplication::SetapNum (uint32_t N)
+{
+  apNum = N;
 }
 
 }

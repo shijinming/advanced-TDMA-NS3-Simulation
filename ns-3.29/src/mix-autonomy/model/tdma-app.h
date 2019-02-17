@@ -115,6 +115,19 @@ protected:
   /** 信道编号 */
   uint32_t m_channelNumber;
 
+  /** 自动驾驶车辆数量 */
+  uint64_t apNum; 
+
+  /**  控制帧时隙数 */
+  uint64_t CCHSlotNum; // apNum + 1 ;
+
+  /**  数据帧时隙数 */
+  uint64_t SCHSlotNum; //apNum * 2;
+
+  /** 当前帧状态 */
+  enum Frame {CCHFrame, SCHFrame};
+  Frame curFrame;
+
   /** 
    * 发送队列 
    * 
@@ -176,6 +189,18 @@ private:
    * 
    */
   void SwitchToNextChannel (uint32_t curChannelNumber, uint32_t nextChannelNumber); 
+
+  /**
+   * @brief 周期性的在控制信道和服务信道中切换，从而发送控制帧和数据帧
+   * 
+   */
+  void PeriodicSwitch (Frame curFrame);
+
+  /**
+   * @brief 设置自动驾驶编队中车辆数
+   * 
+   */
+  void SetapNum (uint32_t N);
 
 protected:
 

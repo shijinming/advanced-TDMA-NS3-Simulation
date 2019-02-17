@@ -6,6 +6,7 @@
 #include "ns3/ptr.h"
 #include "ns3/packet.h"
 #include "ns3/header.h"
+
 #include <iostream>
 
 namespace ns3
@@ -27,6 +28,8 @@ public:
     uint32_t locLat;   //the latitude of vehicle
     uint16_t slotId;
     uint32_t slotSize;
+    uint32_t priority; //发送类型优先级，决定所分配时隙的先后
+    uint32_t sendDuration; //预计发送时长
   } FrameHeader;
 
 
@@ -54,6 +57,10 @@ public:
   uint16_t GetSlotId() {return m_data.slotId;}
   void SetSlotSize(uint32_t slotSize) {m_data.slotSize = slotSize;}
   uint32_t GetSlotSize() {return m_data.slotSize;}
+  void SetPriority(uint32_t priority) {m_data.priority = priority;}
+  uint32_t GetPriority() {return m_data.priority;}
+  void SetSendDuration(uint32_t sendDuration) {m_data.sendDuration = sendDuration;}
+  uint32_t GetSendDuration() {return m_data.sendDuration;}
 
 private:
   FrameHeader m_data;  //!< Header data
