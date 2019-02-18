@@ -4,17 +4,6 @@
 
 namespace ns3
 {
-void
-APLeader::SlotAllocation()
-  {
-
-  }
-
-void
-APLeader::WriteAllocationToPacket(uint32_t* slotAllocation)
-  {
-
-  }
 
 
 }

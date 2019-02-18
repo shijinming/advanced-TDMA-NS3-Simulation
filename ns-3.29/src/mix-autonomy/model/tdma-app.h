@@ -116,14 +116,18 @@ protected:
   uint32_t m_channelNumber;
 
   /** 自动驾驶车辆数量 */
-  uint64_t apNum; 
+  uint64_t apNum;
 
   /**  控制帧时隙数 */
-  uint64_t CCHSlotNum; // apNum + 1 ;
-
+  uint64_t CCHSlotNum;
   /**  数据帧时隙数 */
-  uint64_t SCHSlotNum; //apNum * 2;
+  uint64_t SCHSlotNum;
 
+  uint64_t apCCHSlotNum; //内核层控制帧时隙数，等于apNum+1
+  uint64_t apSCHSlotNum; //内核层数据帧时隙数
+  uint64_t hdvCCHSlotNum; //中间层控制帧时隙数，该层的控制帧位于内核层控制帧之后
+  uint64_t hdvSCHSlotNum; //中间层数据帧时隙数，该层的数据帧位于内核层数据帧之后
+  
   /** 当前帧状态 */
   enum Frame {CCHFrame, SCHFrame};
   Frame curFrame;
@@ -141,7 +145,7 @@ protected:
    */
   void WakeUpTxQueue (void);
 
-  /**
+    /**
    * @brief 根据当前状态初始化发送包的帧头
    * 
    * @param hdr 

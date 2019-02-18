@@ -17,9 +17,7 @@ namespace ns3
 class APFollower : public TDMAApplication
 {
 public:
-  void AddToAP();  //新的自动驾驶汽车加入AP,发送信息告诉leader
-  void QuitFromAP(); //自动驾驶汽车离开AP
-
+void ReceivePacket (Ptr<const Packet> pkt, const Address & srcAddr); //对接收到的leader的控制包进行处理解析
 private:
 
 };
@@ -27,12 +25,22 @@ private:
 class APLeader : public TDMAApplication
 {
 public:
-  void SlotAllocation(); //为AP和中间层分配时隙
-  void WriteAllocationToPacket(uint32_t* slotAllocation); //将时隙分配信息写入payload并加入发送队列
+  void ReceivePacket (Ptr<const Packet> pkt, const Address & srcAddr); //对接收到的follower的控制包进行处理解析
+  void SSHSlotAllocation(); //为AP和中间层分配数据帧时隙
+  void CCHSlotAllocation(); //AP内控制帧时隙管理
+  //void WriteAllocationToPacket(uint32_t* slotAllocation); //将时隙分配信息写入payload并加入发送队列
+  
+  /**
+   * @brief 根据当前状态初始化发送包的帧头
+   * 
+   * @param hdr 
+   */
+  void SetupHeader(AllocationHeader &hdr); //将时隙分配信息写入报头
 
 private:
-  std::vector <struct FrameHeader> followerList;
-  uint32_t* m_slotAllocation; //时隙分配数组，每个元素对应一个时隙，值为车辆id
+  std::vector <struct FrameHeader> followerList; //收到的follower控制包报头
+  std::vector <uint32_t> m_CCHslotAllocation; //时隙分配数组，每个元素对应一个控制帧时隙，值为车辆id
+  std::vector <uint32_t> m_SCHslotAllocation; //时隙分配数组，每个元素对应一个数据帧时隙，值为车辆id
 };
 
 }
