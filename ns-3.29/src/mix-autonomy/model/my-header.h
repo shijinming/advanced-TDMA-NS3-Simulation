@@ -26,14 +26,12 @@ public:
     uint32_t headerLen; //报头长度
     uint8_t type;     //车子类型，无人驾驶车or有人驾驶车
     uint16_t id;      //车辆编号
-    uint16_t queueLen; //发送队列长度 if queueLen > 0, request for slot automatically
+    uint16_t queueLen; //预计发送时长，决定数据帧中所分配时隙的个数if queueLen > 0, request for slot automatically
     uint32_t timestamp; //当前仿真时间
     uint32_t locLon;   //车辆位置经度
     uint32_t locLat;   //车辆位置纬度
     uint16_t slotId;   //当前为仿真第几个时隙
     uint32_t slotSize; //仿真时隙的长度，tdma中为恒定值
-    uint32_t priority; //发送类型优先级，决定数据帧中所分配时隙的先后
-    uint32_t sendDuration; //预计发送时长，决定数据帧中所分配时隙的个数
     bool connect; //true表示在编队中，false表示不在编队中
     bool change; //true表示希望希望改变当前连接状态，即离开队列或加入队列；false表示保持状态
   } FrameHeader;
@@ -65,10 +63,6 @@ public:
   uint16_t GetSlotId() {return m_data.slotId;}
   void SetSlotSize(uint32_t slotSize) {m_data.slotSize = slotSize;}
   uint32_t GetSlotSize() {return m_data.slotSize;}
-  void SetPriority(uint32_t priority) {m_data.priority = priority;}
-  uint32_t GetPriority() {return m_data.priority;}
-  void SetSendDuration(uint32_t sendDuration) {m_data.sendDuration = sendDuration;}
-  uint32_t GetSendDuration() {return m_data.sendDuration;}
   void SetConnect(bool connect) {m_data.connect = connect;}
   bool GetConnect() {return m_data.connect;}
   void SetChange(bool change) {m_data.change = change;}
@@ -94,14 +88,12 @@ public:
     uint32_t headerLen; //报头长度
     uint8_t type;     //车子类型，无人驾驶车or有人驾驶车
     uint16_t id;      //车辆编号
-    uint16_t queueLen; //发送队列长度 if queueLen > 0, request for slot automatically
+    uint16_t queueLen; //预计发送时长，决定数据帧中所分配时隙的个数 if queueLen > 0, request for slot automatically
     uint32_t timestamp; //当前仿真时间
     uint32_t locLon;   //车辆位置经度
     uint32_t locLat;   //车辆位置纬度
     uint16_t slotId;   //当前为仿真第几个时隙
     uint32_t slotSize; //仿真时隙的长度，tdma中为恒定值
-    uint32_t priority; //发送类型优先级，决定数据帧中所分配时隙的先后
-    uint32_t sendDuration; //预计发送时长，决定数据帧中所分配时隙的个数
     std::vector <uint32_t> CCHslotAllocation; //分配控制帧时隙，值为车辆id
     std::vector <uint32_t> SCHslotAllocation; //分配数据帧时隙，值为车辆id
   } LeaderHeader;
@@ -133,10 +125,6 @@ public:
   uint16_t GetSlotId() {return m_data.slotId;}
   void SetSlotSize(uint32_t slotSize) {m_data.slotSize = slotSize;}
   uint32_t GetSlotSize() {return m_data.slotSize;}
-  void SetPriority(uint32_t priority) {m_data.priority = priority;}
-  uint32_t GetPriority() {return m_data.priority;}
-  void SetSendDuration(uint32_t sendDuration) {m_data.sendDuration = sendDuration;}
-  uint32_t GetSendDuration() {return m_data.sendDuration;}
   void SetCCHslotAllocation(std::vector <uint32_t> CCHslotAllocation) {m_data.CCHslotAllocation = CCHslotAllocation;}
   std::vector <uint32_t> GetCCHslotAllocation() {return m_data.CCHslotAllocation;}
   void SetSCHslotAllocation(std::vector <uint32_t> SCHslotAllocation) {m_data.SCHslotAllocation = SCHslotAllocation;}

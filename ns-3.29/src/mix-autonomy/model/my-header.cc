@@ -52,8 +52,6 @@ PacketHeader::Print (std::ostream &os) const
   QUICK_PRINT (locLat);
   QUICK_PRINT (slotId);
   QUICK_PRINT (slotSize);
-  QUICK_PRINT (priority);
-  QUICK_PRINT (sendDuration);
   QUICK_PRINT (connect);
   QUICK_PRINT (change);
   QUICK_PRINT (timestamp);  // 时间戳长度最长，放在后面
@@ -135,8 +133,6 @@ AllocationHeader::Print (std::ostream &os) const
   QUICK_PRINT (locLat);
   QUICK_PRINT (slotId);
   QUICK_PRINT (slotSize);
-  QUICK_PRINT (priority);
-  QUICK_PRINT (sendDuration);
   //QUICK_PRINT (CCHslotAllocation);
   //QUICK_PRINT (SCHslotAllocation);
   QUICK_PRINT (timestamp);  // 时间戳长度最长，放在后面

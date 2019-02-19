@@ -127,7 +127,7 @@ protected:
   uint64_t apSCHSlotNum; //内核层数据帧时隙数
   uint64_t hdvCCHSlotNum; //中间层控制帧时隙数，该层的控制帧位于内核层控制帧之后
   uint64_t hdvSCHSlotNum; //中间层数据帧时隙数，该层的数据帧位于内核层数据帧之后
-  
+
   /** 当前帧状态 */
   enum Frame {CCHFrame, SCHFrame};
   Frame curFrame;
@@ -211,7 +211,7 @@ protected:
   /**
    * 对接收到的数据包进行处理，子类必须实现
    */
-  virtual void ReceivePacket (Ptr<const Packet> pkt, const Address & srcAddr) = 0;
+  virtual void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr) = 0;
 
   /**
    * @brief 获取下一个时隙的间隔，TDMAApplication会按照这个函数返回的间隔来设定定时器
