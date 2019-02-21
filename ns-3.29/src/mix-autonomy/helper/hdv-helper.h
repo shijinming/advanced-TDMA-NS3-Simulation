@@ -20,7 +20,7 @@ public:
 private:
   Ptr<Application> InstallPriv (Ptr<Node> node) const;
   ObjectFactory m_factory;
-}
+};
 
 }
 
