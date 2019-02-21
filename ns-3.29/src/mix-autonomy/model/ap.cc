@@ -34,6 +34,20 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 }
 
 void
+APFollower::SetupHeader (PacketHeader &hdr)
+{
+  hdr.SetIsLeader(false);
+  hdr.SetType(1);
+  hdr.SetId(GetNode ()->GetId ());
+  hdr.SetQueueLen(txq.size());
+  hdr.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
+  hdr.SetLocLon(0);
+  hdr.SetLocLat(0);
+  hdr.SetSlotId(curSlot.id);
+  hdr.SetSlotSize(curSlot.duration.GetMicroSeconds());
+}
+
+void
 APLeader::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 {
   PacketHeader pHeader;
@@ -52,17 +66,8 @@ APLeader::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 void
 APLeader::SetupHeader(PacketHeader &hdr)
 {
-	Ptr<Packet> pktToSend;
-  std::vector <uint32_t> m_CCHslotAllocation;
-  std::vector <uint32_t> m_SCHslotAllocation;
-  hdr.SetType(1);
-  hdr.SetId(GetNode ()->GetId ());
-  hdr.SetQueueLen(txq.size());
-  hdr.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
-  hdr.SetLocLon(0);
-  hdr.SetLocLat(0);
-  hdr.SetSlotId(curSlot.id);
-  hdr.SetSlotSize(curSlot.duration.GetMicroSeconds());
+  APFollower::SetupHeader(hdr);
+  hdr.SetIsLeader(true);
   hdr.SetCCHslotAllocation(m_CCHslotAllocation);
   hdr.SetSCHslotAllocation(m_SCHslotAllocation);
 }

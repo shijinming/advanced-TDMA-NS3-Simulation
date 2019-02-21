@@ -5,6 +5,7 @@
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
+#include "my-header.h"
 
 namespace ns3
 {
@@ -22,9 +23,12 @@ public:
     void SetTDMAEnable (bool val);
 
     void ListenChannel(); //侦听信道
-    void ParseHeader();  //解析packet header，确定接收的包是否来自内核层
+    void ParseHeader();  //解析内核层packet header
     void AddToMiddle(); //如果收到内核层包，更新状态信息
     void QuitFromMiddle(); //如果在一帧时间内的内核层时隙没有收到任何一个内核层的包，则离开中间层，更新状态信息
+
+    void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr);
+    void ReceiveFromAP (Ptr<Packet> pkt, Address & srcAddr);
 
 protected:
     virtual void DoDispose ();

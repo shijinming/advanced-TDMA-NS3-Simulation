@@ -19,13 +19,15 @@ class APFollower : public TDMAApplication
 {
 public:
 void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr); //对接收到的leader的控制包进行处理解析
+void ReceiveFromAP (Ptr<Packet> pkt, Address & srcAddr);
+void SetupHeader(PacketHeader &hdr);
 
 private:
 uint64_t CCHSendSlot;
 std::vector <uint64_t> SCHSendSlot;
 };
 
-class APLeader : public TDMAApplication
+class APLeader : public APFollower
 {
 public:
   void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr); //对接收到的follower的控制包进行处理解析

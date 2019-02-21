@@ -59,4 +59,20 @@ HumanApplication::SetTDMAEnable (bool val)
     m_tdmaEnabled = val;
 }
 
+void
+HumanApplication::ReceiveFromAP (Ptr<Packet> pkt, Address & srcAddr)
+{
+    PacketHeader pHeader;
+    pkt->RemoveHeader(pHeader);
+    if(pHeader.GetIsLeader())
+    {
+
+    }
+    else
+    {
+        m_status = Middle;
+    }
+    
+}
+
 }
