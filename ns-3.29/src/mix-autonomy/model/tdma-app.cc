@@ -228,7 +228,6 @@ void
 TDMAApplication::SetupHeader(PacketHeader &hdr)
 {
 	Ptr<Packet> pktToSend;
-  hdr.SetHeaderLen(0);
   hdr.SetType(1);
   hdr.SetId(GetNode ()->GetId ());
   hdr.SetQueueLen(txq.size());
@@ -237,8 +236,6 @@ TDMAApplication::SetupHeader(PacketHeader &hdr)
   hdr.SetLocLat(0);
   hdr.SetSlotId(curSlot.id);
   hdr.SetSlotSize(curSlot.duration.GetMicroSeconds());
-  hdr.SetConnect(true);
-  hdr.SetChange(false);
 }
 
  void

@@ -44,7 +44,6 @@ PacketHeader::Print (std::ostream &os) const
 
 #define QUICK_PRINT(x) oss1 << #x << "\t"; oss2 << m_data.x << "\t"
   
-  QUICK_PRINT (headerLen);
   QUICK_PRINT (type);
   QUICK_PRINT (id);
   QUICK_PRINT (queueLen);
@@ -52,8 +51,6 @@ PacketHeader::Print (std::ostream &os) const
   QUICK_PRINT (locLat);
   QUICK_PRINT (slotId);
   QUICK_PRINT (slotSize);
-  QUICK_PRINT (connect);
-  QUICK_PRINT (change);
   QUICK_PRINT (timestamp);  // 时间戳长度最长，放在后面
 
 #undef QUICK_PRINT
@@ -65,14 +62,14 @@ uint32_t
 PacketHeader::GetSerializedSize (void) const
 {
   // we reserve 2 bytes for our header.
-  return sizeof (FrameHeader);
+  return m_headerSize + sizeof(m_headerSize);
 }
 void
 PacketHeader::Serialize (Buffer::Iterator start) const
 {
   // we can serialize two bytes at the start of the buffer.
   // we write them in network byte order.
-
+  start.WriteU16(m_headerSize);
   start.Write ((uint8_t *) &m_data, sizeof (FrameHeader));
 
 }
@@ -82,10 +79,11 @@ PacketHeader::Deserialize (Buffer::Iterator start)
   // we can deserialize two bytes from the start of the buffer.
   // we read them in network byte order and store them
   // in host byte order.
+  m_headerSize =  start.ReadU16();
   start.Read ((uint8_t *) &m_data, sizeof (FrameHeader));
 
   // we return the number of bytes effectively read.
-  return sizeof (FrameHeader);
+  return GetSerializedSize ();
 }
 
 
@@ -125,7 +123,6 @@ AllocationHeader::Print (std::ostream &os) const
 
 #define QUICK_PRINT(x) oss1 << #x << "\t"; oss2 << m_data.x << "\t"
   
-  QUICK_PRINT (headerLen);
   QUICK_PRINT (type);
   QUICK_PRINT (id);
   QUICK_PRINT (queueLen);
@@ -146,16 +143,15 @@ uint32_t
 AllocationHeader::GetSerializedSize (void) const
 {
   // we reserve 2 bytes for our header.
-  return sizeof (LeaderHeader);
+  return m_headerSize + sizeof (uint16_t);
 }
 void
 AllocationHeader::Serialize (Buffer::Iterator start) const
 {
   // we can serialize two bytes at the start of the buffer.
   // we write them in network byte order.
-
-  start.Write ((uint8_t *) &m_data, sizeof (LeaderHeader));
-
+  start.WriteU16(m_headerSize);
+  start.Write ((uint8_t *) &m_data, m_headerSize);
 }
 uint32_t
 AllocationHeader::Deserialize (Buffer::Iterator start)
@@ -163,9 +159,10 @@ AllocationHeader::Deserialize (Buffer::Iterator start)
   // we can deserialize two bytes from the start of the buffer.
   // we read them in network byte order and store them
   // in host byte order.
-  start.Read ((uint8_t *) &m_data, sizeof (LeaderHeader));
+  m_headerSize = start.ReadU16();
+  start.Read ((uint8_t *) &m_data, m_headerSize);
 
   // we return the number of bytes effectively read.
-  return sizeof (LeaderHeader);
+  return GetSerializedSize();
 }
 }
