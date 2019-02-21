@@ -21,6 +21,7 @@ class BeaconVehicleApplication : public TDMAApplication {
 public:
   static TypeId GetTypeId (void);
   BeaconVehicleApplication () {};
+  virtual void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr) {};
 private:
   Time slotSize;
 

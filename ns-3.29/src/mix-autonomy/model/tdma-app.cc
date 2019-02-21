@@ -241,20 +241,20 @@ TDMAApplication::SetupHeader(PacketHeader &hdr)
  void
  TDMAApplication::SwitchToNextChannel (uint32_t curChannelNumber, uint32_t nextChannelNumber)
  {
-  Ptr<WaveNetDevice> m_device;
-  Ptr<WifiPhy> m_phy;
-  if (m_phy->GetChannelNumber () == nextChannelNumber)
+  Ptr<WaveNetDevice> device = GetNode ()->GetObject<WaveNetDevice> ();
+  Ptr<WifiPhy> phy = device->GetPhy (0);;
+  if (phy->GetChannelNumber () == nextChannelNumber)
     {
       return;
     }
-  Ptr<OcbWifiMac> curMacEntity = m_device->GetMac (curChannelNumber);
-  Ptr<OcbWifiMac> nextMacEntity = m_device->GetMac (nextChannelNumber);
+  Ptr<OcbWifiMac> curMacEntity = device->GetMac (curChannelNumber);
+  Ptr<OcbWifiMac> nextMacEntity = device->GetMac (nextChannelNumber);
   curMacEntity->Suspend ();
   curMacEntity->ResetWifiPhy ();
-  m_phy->SetChannelNumber (nextChannelNumber);
-  Time switchTime = m_phy->GetChannelSwitchDelay ();
+  phy->SetChannelNumber (nextChannelNumber);
+  Time switchTime = phy->GetChannelSwitchDelay ();
   nextMacEntity->MakeVirtualBusy (switchTime);
-  nextMacEntity->SetWifiPhy (m_phy);
+  nextMacEntity->SetWifiPhy (phy);
   nextMacEntity->Resume ();
 }
 

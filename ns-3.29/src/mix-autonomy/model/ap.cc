@@ -16,7 +16,7 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
   pkt->RemoveHeader(pHeader);
   std::vector <uint32_t> m_CCHslotAllocation = pHeader.GetCCHslotAllocation();
   std::vector <uint32_t> m_SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
-  for(int i=0; i<CCHSlotNum; i++) //查找下次发控制包的时隙
+  for(uint32_t i=0; i<CCHSlotNum; i++) //查找下次发控制包的时隙
   {
     if(GetNode ()->GetId () == m_CCHslotAllocation[i])
       {
@@ -24,7 +24,7 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
       }
   }
 
-  for(int i=0; i<SCHSlotNum; i++) //查找发数据包的时隙
+  for(uint32_t i=0; i<SCHSlotNum; i++) //查找发数据包的时隙
   {
     if(GetNode ()->GetId () == m_CCHslotAllocation[i])
       {
@@ -55,7 +55,6 @@ APLeader::SetupHeader(AllocationHeader &hdr)
 	Ptr<Packet> pktToSend;
   std::vector <uint32_t> m_CCHslotAllocation;
   std::vector <uint32_t> m_SCHslotAllocation;
-  hdr.SetHeaderLen(0);
   hdr.SetType(1);
   hdr.SetId(GetNode ()->GetId ());
   hdr.SetQueueLen(txq.size());
