@@ -12,7 +12,7 @@ namespace ns3
 void
 APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 { 
-  AllocationHeader pHeader;
+  PacketHeader pHeader;
   pkt->RemoveHeader(pHeader);
   std::vector <uint32_t> m_CCHslotAllocation = pHeader.GetCCHslotAllocation();
   std::vector <uint32_t> m_SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
@@ -50,7 +50,7 @@ APLeader::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 }
 
 void
-APLeader::SetupHeader(AllocationHeader &hdr)
+APLeader::SetupHeader(PacketHeader &hdr)
 {
 	Ptr<Packet> pktToSend;
   std::vector <uint32_t> m_CCHslotAllocation;
