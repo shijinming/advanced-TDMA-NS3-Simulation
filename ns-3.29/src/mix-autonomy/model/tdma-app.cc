@@ -200,6 +200,7 @@ TDMAApplication::WakeUpTxQueue ()
 {
   if (!isAtOwnSlot) return; 
   Ptr<Packet> pktToSend = NULL;
+  SlotAllocation ();
   if (!txq.empty ())
     {
       std::cout<<"Send normal packet."<<std::endl;
@@ -222,20 +223,6 @@ TDMAApplication::WakeUpTxQueue ()
   
   // Schedule Next Tx
   txEvent = Simulator::Schedule (nextTxTime, &TDMAApplication::WakeUpTxQueue, this);
-}
-
-void
-TDMAApplication::SetupHeader(PacketHeader &hdr)
-{
-	Ptr<Packet> pktToSend;
-  hdr.SetType(1);
-  hdr.SetId(GetNode ()->GetId ());
-  hdr.SetQueueLen(txq.size());
-  hdr.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
-  hdr.SetLocLon(0);
-  hdr.SetLocLat(0);
-  hdr.SetSlotId(curSlot.id);
-  hdr.SetSlotSize(curSlot.duration.GetMicroSeconds());
 }
 
  void

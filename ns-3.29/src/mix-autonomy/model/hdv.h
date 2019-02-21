@@ -27,8 +27,10 @@ public:
     void AddToMiddle(); //如果收到内核层包，更新状态信息
     void QuitFromMiddle(); //如果在一帧时间内的内核层时隙没有收到任何一个内核层的包，则离开中间层，更新状态信息
 
-    void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr);
-    void ReceiveFromAP (Ptr<Packet> pkt, Address & srcAddr);
+    void ReceivePacket (Ptr<Socket> socket);
+    void ReceiveFromAP (Ptr<Packet> pkt, Ptr<Node> node);
+    Ptr<Node> GetNodeFromAddress (Ipv4Address & address);
+    bool IsAPApplicationInstalled (Ptr<Node> node);
 
 protected:
     virtual void DoDispose ();
@@ -40,6 +42,10 @@ private:
     bool                m_tdmaEnabled;  //只对中间层节点有效,true时意味着此节点可以在tdma时隙发送数据包
     Status              m_status;
 
+    /** 发送的trace */
+    TracedCallback<Ptr<const Packet>, const Address & > m_txTrace;
+    /** 接收的trace */
+    TracedCallback<Ptr<const Packet>, Ptr<const Application>, const Address & > m_rxTrace;
 };
 
 }

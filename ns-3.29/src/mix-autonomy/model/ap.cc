@@ -47,6 +47,21 @@ APFollower::SetupHeader (PacketHeader &hdr)
   hdr.SetSlotSize(curSlot.duration.GetMicroSeconds());
 }
 
+bool
+APFollower::IsAPApplicationInstalled (Ptr<Node> node)
+{
+  uint32_t nApps = node->GetNApplications ();
+  for (uint32_t idx = 0; idx < nApps; idx ++)
+  {
+    Ptr<Application> app = node->GetApplication (idx);
+    if (dynamic_cast <APFollower*> (PeekPointer (app)) || dynamic_cast <APLeader*> (PeekPointer (app)))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 void
 APLeader::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 {

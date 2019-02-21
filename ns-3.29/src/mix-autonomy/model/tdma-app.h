@@ -150,7 +150,7 @@ protected:
    * 
    * @param hdr 
    */
-  void SetupHeader(PacketHeader &hdr);
+  virtual void SetupHeader(PacketHeader &hdr) = 0;
 
 private:
 
@@ -245,6 +245,8 @@ protected:
    * @param pkt 
    */
   virtual void WillSendMockPacket (Ptr<const Packet> pkt) {};
+
+  virtual void SlotAllocation () = 0;
 };
 
 }

@@ -21,6 +21,8 @@ public:
 void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr); //对接收到的leader的控制包进行处理解析
 void ReceiveFromAP (Ptr<Packet> pkt, Address & srcAddr);
 void SetupHeader(PacketHeader &hdr);
+bool IsAPApplicationInstalled (Ptr<Node> node);
+virtual void SlotAllocation () = 0;
 
 private:
 uint64_t CCHSendSlot;
@@ -31,9 +33,6 @@ class APLeader : public APFollower
 {
 public:
   void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr); //对接收到的follower的控制包进行处理解析
-  //void SSHSlotAllocation(); //为AP和中间层分配数据帧时隙，直接在ReceivePacket中实现
-  //void CCHSlotAllocation(); //AP内控制帧时隙管理，，直接在ReceivePacket中实现
-  //void WriteAllocationToPacket(uint32_t* slotAllocation); //将时隙分配信息写入payload并加入发送队列
   
   /**
    * @brief 根据当前状态初始化发送包的帧头
@@ -41,11 +40,13 @@ public:
    * @param hdr 
    */
   void SetupHeader(PacketHeader &hdr); //将时隙分配信息写入报头
+  virtual void SlotAllocation ();
 
 private:
   //std::vector <struct PacketHeader::FrameHeader> followerList; //收到的follower控制包报头
   std::vector <uint32_t> m_CCHslotAllocation; //时隙分配数组，每个元素对应一个控制帧时隙，值为车辆id
   std::vector <uint32_t> m_SCHslotAllocation; //时隙分配数组，每个元素对应一个数据帧时隙，值为车辆id
+  std::vector <uint32_t> m_queueLen;
 };
 
 }
