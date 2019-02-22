@@ -51,8 +51,8 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
   pkt->RemoveHeader(pHeader);
   if(!pHeader.GetIsLeader())
     return;
-  std::vector <uint16_t> CCHslotAllocation = pHeader.GetCCHslotAllocation();
-  std::vector <uint16_t> SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
+  uint16_t *CCHslotAllocation = pHeader.GetCCHslotAllocation();
+  uint16_t *SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
   for(uint32_t i=0; i<CCHSlotNum; i++) //查找下次发控制包的时隙
   {
     if(GetNode ()->GetId () == CCHslotAllocation[i])
@@ -80,8 +80,6 @@ APFollower::SetupHeader (PacketHeader &hdr)
   hdr.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
   hdr.SetLocLon(0);
   hdr.SetLocLat(0);
-  hdr.SetSlotId(curSlot.id);
-  hdr.SetSlotSize(curSlot.duration.GetMicroSeconds());
 }
 
 bool

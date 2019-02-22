@@ -98,6 +98,7 @@ public:
 
 private:
   LeaderHeader m_data;  //!< Header data
+  uint16_t m_headerSize;
   uint16_t *m_CCHslotAllocation; //分配控制帧时隙，值为车辆id
   uint16_t *m_SCHslotAllocation; //分配数据帧时隙，值为车辆id
   bool m_isLeader;
