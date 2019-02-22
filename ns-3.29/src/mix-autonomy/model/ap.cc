@@ -14,11 +14,11 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 { 
   PacketHeader pHeader;
   pkt->RemoveHeader(pHeader);
-  std::vector <uint32_t> m_CCHslotAllocation = pHeader.GetCCHslotAllocation();
-  std::vector <uint32_t> m_SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
+  std::vector <uint16_t> CCHslotAllocation = pHeader.GetCCHslotAllocation();
+  std::vector <uint16_t> SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
   for(uint32_t i=0; i<CCHSlotNum; i++) //查找下次发控制包的时隙
   {
-    if(GetNode ()->GetId () == m_CCHslotAllocation[i])
+    if(GetNode ()->GetId () == CCHslotAllocation[i])
       {
         CCHSendSlot = CCHSlotNum-1-i;   //可加上break跳出循环
       }
@@ -26,7 +26,7 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 
   for(uint32_t i=0; i<SCHSlotNum; i++) //查找发数据包的时隙
   {
-    if(GetNode ()->GetId () == m_CCHslotAllocation[i])
+    if(GetNode ()->GetId () == CCHslotAllocation[i])
       {
         SCHSendSlot.insert(SCHSendSlot.begin(), SCHSlotNum-1-i); //将i插入到向量起始位置前
       } 
@@ -67,15 +67,16 @@ APLeader::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 {
   PacketHeader pHeader;
   pkt->RemoveHeader(pHeader);
-  if(pHeader.GetId() == 0)
+  std::map <uint16_t, uint32_t>::iterator iter;
+  iter = m_queueLen.find(pHeader.GetId());
+  if(iter != m_queueLen.end())
     {
-      m_CCHslotAllocation.clear();
-      m_SCHslotAllocation.clear();
-    } 
-  //控制帧配置
-  m_CCHslotAllocation.insert(m_CCHslotAllocation.begin(),pHeader.GetId());
-  //数据帧配置，这里Queue估计要除以速率，并上取整
-  m_SCHslotAllocation.insert(m_SCHslotAllocation.begin(),pHeader.GetQueueLen(),pHeader.GetId());
+      m_queueLen[iter->first] = pHeader.GetQueueLen();
+    }
+  else
+  {
+    m_queueLen.insert(std::pair<uint16_t, uint16_t> (pHeader.GetId(), pHeader.GetQueueLen()));
+  }
 }
 
 void
@@ -85,6 +86,27 @@ APLeader::SetupHeader(PacketHeader &hdr)
   hdr.SetIsLeader(true);
   hdr.SetCCHslotAllocation(m_CCHslotAllocation);
   hdr.SetSCHslotAllocation(m_SCHslotAllocation);
+}
+
+void 
+APLeader::SlotAllocation ()
+{
+  std::map <uint16_t, uint32_t>::iterator iter;
+  int totalLen = 0;
+  for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
+  {
+    totalLen+=iter->second;
+  }
+  int index1 = 0, index2 = 0;
+  for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
+  {
+    m_CCHslotAllocation[index1] = iter->first;
+    index1++;
+    for(uint32_t i = 0; i < iter->second * SCHSlotNum / totalLen; i++){
+      m_SCHslotAllocation[index2] = iter->first;
+      index2++;
+    } 
+  }
 }
 
 }

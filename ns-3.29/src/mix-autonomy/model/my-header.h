@@ -42,8 +42,8 @@ public:
     uint32_t locLat;   //车辆位置纬度
     uint16_t slotId;   //当前为仿真第几个时隙
     uint32_t slotSize; //仿真时隙的长度，tdma中为恒定值
-    std::vector <uint32_t> CCHslotAllocation; //分配控制帧时隙，值为车辆id
-    std::vector <uint32_t> SCHslotAllocation; //分配数据帧时隙，值为车辆id
+    std::vector <uint16_t> CCHslotAllocation; //分配控制帧时隙，值为车辆id
+    std::vector <uint16_t> SCHslotAllocation; //分配数据帧时隙，值为车辆id
   };
 
   static TypeId GetTypeId (void);
@@ -71,10 +71,10 @@ public:
   uint16_t GetSlotId() {return m_data.slotId;}
   void SetSlotSize(uint32_t slotSize) {m_data.slotSize = slotSize;}
   uint32_t GetSlotSize() {return m_data.slotSize;}
-  void SetCCHslotAllocation(std::vector <uint32_t> &CCHslotAllocation) {m_data.CCHslotAllocation = CCHslotAllocation;}
-  std::vector <uint32_t> GetCCHslotAllocation() {return m_data.CCHslotAllocation;}
-  void SetSCHslotAllocation(std::vector <uint32_t> &SCHslotAllocation) {m_data.SCHslotAllocation = SCHslotAllocation;}
-  std::vector <uint32_t> GetSCHslotAllocation() {return m_data.SCHslotAllocation;}
+  void SetCCHslotAllocation(std::vector <uint16_t> &CCHslotAllocation) {m_data.CCHslotAllocation = CCHslotAllocation;}
+  std::vector <uint16_t> GetCCHslotAllocation() {return m_data.CCHslotAllocation;}
+  void SetSCHslotAllocation(std::vector <uint16_t> &SCHslotAllocation) {m_data.SCHslotAllocation = SCHslotAllocation;}
+  std::vector <uint16_t> GetSCHslotAllocation() {return m_data.SCHslotAllocation;}
   void SetIsLeader(bool isLeader) 
   {
     m_isLeader = isLeader;
