@@ -80,4 +80,30 @@ SimulationEntry::LoadMobilityData ()
   LOG_UNCOND ("Load finished");
 }
 
+void
+SimulationEntry::CourseChange (std::ostream *os, std::string context, Ptr<const MobilityModel> mobility)
+{
+  Vector pos = mobility->GetPosition (); // Get position
+
+  int nodeId = mobility->GetObject<Node> ()->GetId ();
+  double t = (Simulator::Now ()).GetSeconds ();
+
+  //NS_LOG_UNCOND ("Changing pos for node=" << nodeId << " at " << Simulator::Now () );
+  *os << t <<" node:"<<nodeId<< " POS: x=" << pos.x << ", y=" << pos.y << ", z=" << pos.z << std::endl;
+}
+
+void
+SimulationEntry::ConfigureTracing ()
+{
+  m_mobilityTraceFile.open (config.mobilityTraceFile);
+  Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange",
+                   MakeBoundCallback (&SimulationEntry::CourseChange, &m_mobilityTraceFile));
+}
+
+void 
+SimulationEntry::ProcessOutputs ()
+{
+  m_mobilityTraceFile.close ();
+}
+
 } // namespace ns3

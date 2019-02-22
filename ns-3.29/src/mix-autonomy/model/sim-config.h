@@ -27,6 +27,7 @@ public:
     std::string packetTraceFile = "";
     std::string eventTraceFile = "";
     std::string throughputTraceFile = "";
+    std::string mobilityTraceFile = "";
 
     /** 全局队列属性 */
     uint32_t txqCapacity = 100; // 发送队列大小

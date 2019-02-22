@@ -30,6 +30,7 @@ SimulationConfig::ConfigureCommandLineParams (CommandLine &cmd) {
     cmd.AddValue ("packet-trace", "Path to packet trace file", packetTraceFile);
     cmd.AddValue ("event-trace", "Path to event trace file", eventTraceFile);
     cmd.AddValue ("throughput-trace", "Path to throughput file", throughputTraceFile);
+    cmd.AddValue ("mobility-trace", "Path to mobility file", mobilityTraceFile);
 }
 
 void 
@@ -46,6 +47,7 @@ SimulationConfig::PrintConfiguration () {
     SHOW_CONF (packetTraceFile);
     SHOW_CONF (eventTraceFile);
     SHOW_CONF (throughputTraceFile);
+    SHOW_CONF (mobilityTraceFile);
     LOG_UNCOND ("====================");
 #undef SHOW_CONF
 }

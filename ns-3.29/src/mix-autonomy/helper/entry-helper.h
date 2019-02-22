@@ -1,6 +1,8 @@
 #ifndef MIX_AUTONOMY_ENTRY_HELPER
 #define MIX_AUTONOMY_ENTRY_HELPER
 
+#include<fstream>
+
 #include "ns3/mobility-module.h"
 #include "ns3/sim-config.h"
 
@@ -18,6 +20,8 @@ protected:
     double txPower = 35;
     bool doValidate = true;
 
+    std::ofstream m_mobilityTraceFile;
+
     /**
      * @brief 一个钩子函数，可以在这里面覆盖config中的设置
      */
@@ -31,7 +35,7 @@ protected:
     /**
      * @brief 配置tracing监听系统
      */ 
-    virtual void ConfigureTracing () {};
+    virtual void ConfigureTracing ();
 
     /**
      * @brief 配置应用信息
@@ -42,6 +46,10 @@ protected:
      * @brief 一个周期性（每秒）调用的函数，可以在这里面输出统计信息
      */
     virtual void PeriodicCheck ();
+
+    virtual void ProcessOutputs ();
+
+    static void CourseChange (std::ostream *os, std::string context, Ptr<const MobilityModel> mobility);
 };
 
 }

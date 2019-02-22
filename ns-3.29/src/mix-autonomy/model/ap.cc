@@ -78,8 +78,9 @@ APFollower::SetupHeader (PacketHeader &hdr)
   hdr.SetId(GetNode ()->GetId ());
   hdr.SetQueueLen(txq.size());
   hdr.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
-  hdr.SetLocLon(0);
-  hdr.SetLocLat(0);
+  Vector pos = GetNode ()->GetObject<MobilityModel> ()->GetPosition ();
+  hdr.SetLocLat(pos.x);
+  hdr.SetLocLon(pos.y);
 }
 
 bool
