@@ -18,9 +18,10 @@ class APFollower : public TDMAApplication
 {
 public:
   void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr); //对接收到的leader的控制包进行处理解析
-  void ReceiveFromAP (Ptr<Packet> pkt, Address & srcAddr);
+  void ReceivePacketFromAP (Ptr<Packet> pkt);
   void SetupHeader(PacketHeader &hdr);
   bool IsAPApplicationInstalled (Ptr<Node> node);
+  Ptr<Node> GetNodeFromAddress (Ipv4Address & address);
   virtual void SlotAllocation () = 0;
 
 private:
@@ -31,8 +32,7 @@ private:
 class APLeader : public APFollower
 {
 public:
-  void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr); //对接收到的follower的控制包进行处理解析
-  
+  void ReceivePacketFromAP (Ptr<Packet> pkt); //对接收到的follower的控制包进行处理解析
   /**
    * @brief 根据当前状态初始化发送包的帧头
    * 

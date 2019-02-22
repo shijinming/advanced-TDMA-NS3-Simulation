@@ -9,26 +9,43 @@
 
 namespace ns3
 {
+
 void
 APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
+{
+  InetSocketAddress addr = InetSocketAddress::ConvertFrom (srcAddr);
+  Ipv4Address ipv4Addr = addr.GetIpv4 ();
+  // 获取发送该数据包的节点
+  Ptr<Node> node = GetNodeFromAddress (ipv4Addr);
+  if (IsAPApplicationInstalled (node))
+  {
+    // 收到了来自内核层的数据包
+    ReceivePacketFromAP (pkt);
+  }
+}
+
+void
+APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
 { 
   PacketHeader pHeader;
   pkt->RemoveHeader(pHeader);
+  if(!pHeader.GetIsLeader())
+    return;
   std::vector <uint16_t> CCHslotAllocation = pHeader.GetCCHslotAllocation();
   std::vector <uint16_t> SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
   for(uint32_t i=0; i<CCHSlotNum; i++) //查找下次发控制包的时隙
   {
     if(GetNode ()->GetId () == CCHslotAllocation[i])
       {
-        CCHSendSlot = CCHSlotNum-1-i;   //可加上break跳出循环
+        CCHSendSlot = i;   //可加上break跳出循环
       }
   }
-
+  SCHSendSlot.clear();
   for(uint32_t i=0; i<SCHSlotNum; i++) //查找发数据包的时隙
   {
-    if(GetNode ()->GetId () == CCHslotAllocation[i])
+    if(GetNode ()->GetId () == SCHslotAllocation[i])
       {
-        SCHSendSlot.insert(SCHSendSlot.begin(), SCHSlotNum-1-i); //将i插入到向量起始位置前
+        SCHSendSlot.push_back(i); //将i插入到向量起始位置前
       } 
   }
 }
@@ -62,11 +79,30 @@ APFollower::IsAPApplicationInstalled (Ptr<Node> node)
   return false;
 }
 
+Ptr<Node>
+APFollower::GetNodeFromAddress (Ipv4Address & address)
+{
+    for (NodeList::Iterator n = NodeList::Begin (); 
+        n != NodeList::End (); n++)
+    {
+        Ptr<Node> node = *n;
+        Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> ();
+        NS_ASSERT (ipv4);
+        if (ipv4->GetInterfaceForAddress (address) != -1)
+        {
+            return node;
+        }
+    }
+    return NULL;
+}
+
 void
-APLeader::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
+APLeader::ReceivePacketFromAP (Ptr<Packet> pkt)
 {
   PacketHeader pHeader;
   pkt->RemoveHeader(pHeader);
+  if(pHeader.GetIsLeader())
+    return;
   std::map <uint16_t, uint32_t>::iterator iter;
   iter = m_queueLen.find(pHeader.GetId());
   if(iter != m_queueLen.end())
