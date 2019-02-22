@@ -16,6 +16,8 @@ PacketHeader::PacketHeader ()
 
 PacketHeader::~PacketHeader ()
 {
+  delete [] m_CCHslotAllocation;
+  delete [] m_SCHslotAllocation;
 }
 
 TypeId
@@ -50,8 +52,6 @@ PacketHeader::Print (std::ostream &os) const
   QUICK_PRINT (queueLen);
   QUICK_PRINT (locLon);
   QUICK_PRINT (locLat);
-  QUICK_PRINT (slotId);
-  QUICK_PRINT (slotSize);
   QUICK_PRINT (timestamp);  // 时间戳长度最长，放在后面
 
 #undef QUICK_PRINT
@@ -69,8 +69,19 @@ PacketHeader::Serialize (Buffer::Iterator start) const
 {
   // we can serialize two bytes at the start of the buffer.
   // we write them in network byte order.
-  start.WriteU16(m_headerSize);
-  start.Write ((uint8_t *) &m_data, m_headerSize);
+  if(m_isLeader)
+  {
+    start.WriteU16(sizeof(LeaderHeader) + (m_data.CCHSlotNum + m_data.SCHSlotNum) * sizeof(uint16_t));
+    start.Write ((uint8_t *) &m_data, sizeof(LeaderHeader));
+    start.Write ((uint8_t *) m_CCHslotAllocation, m_data.CCHSlotNum * sizeof(uint16_t));
+    start.Write ((uint8_t *) m_SCHslotAllocation, m_data.SCHSlotNum * sizeof(uint16_t));
+  }
+  else
+  {
+    start.WriteU16 (sizeof(FollowerHeader));
+    start.Write ((uint8_t *) &m_data, sizeof(FollowerHeader));
+  }
+  
 
 }
 uint32_t
@@ -80,9 +91,20 @@ PacketHeader::Deserialize (Buffer::Iterator start)
   // we read them in network byte order and store them
   // in host byte order.
   m_headerSize =  start.ReadU16();
-  start.Read ((uint8_t *) &m_data, m_headerSize);
-  if(m_headerSize == sizeof(LeaderHeader))
+  if(m_headerSize == sizeof(FollowerHeader))
+  {
+    m_isLeader = false;
+    start.Read ((uint8_t *) &m_data, sizeof(FollowerHeader));
+  }
+  else
+  {
     m_isLeader = true;
+    start.Read ((uint8_t *) &m_data, sizeof(LeaderHeader));
+    m_CCHslotAllocation = new uint16_t [m_data.CCHSlotNum];
+    m_SCHslotAllocation = new uint16_t [m_data.SCHSlotNum];
+    start.Read ((uint8_t *) m_CCHslotAllocation, m_data.CCHSlotNum * sizeof(uint16_t));
+    start.Read ((uint8_t *) m_SCHslotAllocation, m_data.SCHSlotNum * sizeof(uint16_t));
+  }
 
   // we return the number of bytes effectively read.
   return GetSerializedSize ();
