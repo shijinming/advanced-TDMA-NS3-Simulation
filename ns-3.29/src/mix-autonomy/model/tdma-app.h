@@ -219,17 +219,17 @@ protected:
    * 
    * @return TDMASlot 下一个时隙
    */
-  virtual struct TDMASlot GetNextSlotInterval (void) = 0;
+  struct TDMASlot GetNextSlotInterval (void) {return TDMASlot();};
 
   /**
    * @brief 获取起始时隙
    * 
    * @return TDMASlot   起始时隙
    */
-  virtual struct TDMASlot GetInitalSlot (void) = 0;
+  struct TDMASlot GetInitalSlot (void) {return TDMASlot();};
 
   /**
-   * @brief 时隙开始的钩子函数
+   * @brief 时隙开始的钩子函数Ptr<Packet> pkt, Address & srcAddr
    */
   virtual void SlotWillStart (void) {};
 

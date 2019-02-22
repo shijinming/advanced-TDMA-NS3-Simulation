@@ -229,7 +229,7 @@ TDMAApplication::WakeUpTxQueue ()
  TDMAApplication::SwitchToNextChannel (uint32_t curChannelNumber, uint32_t nextChannelNumber)
  {
   Ptr<WaveNetDevice> device = GetNode ()->GetObject<WaveNetDevice> ();
-  Ptr<WifiPhy> phy = device->GetPhy (0);;
+  Ptr<WifiPhy> phy = device->GetPhy (0);
   if (phy->GetChannelNumber () == nextChannelNumber)
     {
       return;

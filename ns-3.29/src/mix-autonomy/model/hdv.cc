@@ -13,7 +13,7 @@ TypeId
 HumanApplication::GetTypeId ()
 {
     static TypeId tid = TypeId ("ns3::HumanApplication")
-        .SetParent <Application> ()
+        .SetParent <TDMAApplication> ()
         .AddConstructor <HumanApplication> ()
     ;
     return tid;
@@ -60,45 +60,37 @@ HumanApplication::SetTDMAEnable (bool val)
     m_tdmaEnabled = val;
 }
 
-void 
-HumanApplication::ReceivePacket (Ptr<Socket> socket)
+void
+HumanApplication::AddToMiddle ()
 {
-    Ptr<Packet> packet;
-    Address srcAddr;
-    Address localAddr;
-    // 获取接收数据包的本地地址
-    socket->GetSockName (localAddr);
-    // 接收数据包，srcAddr中会记录这个包的发送者
-    while ((packet = socket->RecvFrom (srcAddr)))
-    {
-        InetSocketAddress addr = InetSocketAddress::ConvertFrom (srcAddr);
-        Ipv4Address ipv4Addr = addr.GetIpv4 ();
-        // 获取发送该数据包的节点
-        Ptr<Node> node = GetNodeFromAddress (ipv4Addr);
-        if (IsAPApplicationInstalled (node))
-        {
-            // 收到了来自内核层的数据包
-            ReceiveFromAP (packet, node);
-        }
-        m_rxTrace (packet, this, ipv4Addr);
-    }
+    m_status = Middle;
+} 
+
+void 
+HumanApplication::QuitFromMiddle ()
+{
+
 }
 
-void
-HumanApplication::ReceiveFromAP (Ptr<Packet> pkt, Ptr<Node> node)
+void 
+HumanApplication::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 {
-    PacketHeader pHeader;
-    pkt->RemoveHeader(pHeader);
-    if(pHeader.GetIsLeader())
+    InetSocketAddress addr = InetSocketAddress::ConvertFrom (srcAddr);
+    Ipv4Address ipv4Addr = addr.GetIpv4 ();
+    // 获取发送该数据包的节点
+    Ptr<Node> node = GetNodeFromAddress (ipv4Addr);
+    if (IsAPApplicationInstalled (node))
     {
-
+        // 收到了来自内核层的数据包
+        AddToMiddle ();
     }
     else
     {
-        m_status = Middle;
+        
     }
     
 }
+
 
 Ptr<Node>
 HumanApplication::GetNodeFromAddress (Ipv4Address & address)

@@ -10,6 +10,26 @@
 namespace ns3
 {
 
+TypeId
+APFollower::GetTypeId ()
+{
+    static TypeId tid = TypeId ("ns3::APFollower")
+        .SetParent <TDMAApplication> ()
+        .AddConstructor <APFollower> ()
+    ;
+    return tid;
+}
+
+APFollower::APFollower ()
+{
+
+}
+
+APFollower::~APFollower ()
+{
+  
+}
+
 void
 APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 {
@@ -94,6 +114,26 @@ APFollower::GetNodeFromAddress (Ipv4Address & address)
         }
     }
     return NULL;
+}
+
+TypeId
+APLeader::GetTypeId ()
+{
+    static TypeId tid = TypeId ("ns3::APLeader")
+        .SetParent <TDMAApplication> ()
+        .AddConstructor <APLeader> ()
+    ;
+    return tid;
+}
+
+APLeader::APLeader ()
+{
+  
+}
+
+APLeader::~APLeader ()
+{
+  
 }
 
 void

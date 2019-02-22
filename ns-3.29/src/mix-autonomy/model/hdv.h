@@ -6,11 +6,12 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "my-header.h"
+#include "tdma-app.h"
 
 namespace ns3
 {
 
-class HumanApplication : public Application
+class HumanApplication : public TDMAApplication
 {
 public:
     static TypeId GetTypeId (void);
@@ -22,15 +23,17 @@ public:
     Status GetStatus ();
     void SetTDMAEnable (bool val);
 
-    void ListenChannel(); //侦听信道
-    void ParseHeader();  //解析内核层packet header
     void AddToMiddle(); //如果收到内核层包，更新状态信息
     void QuitFromMiddle(); //如果在一帧时间内的内核层时隙没有收到任何一个内核层的包，则离开中间层，更新状态信息
 
-    void ReceivePacket (Ptr<Socket> socket);
+    void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr);
     void ReceiveFromAP (Ptr<Packet> pkt, Ptr<Node> node);
     Ptr<Node> GetNodeFromAddress (Ipv4Address & address);
     bool IsAPApplicationInstalled (Ptr<Node> node);
+
+    virtual void SetupHeader(PacketHeader &hdr) {};
+    virtual void SlotAllocation () {};
+
 
 protected:
     virtual void DoDispose ();

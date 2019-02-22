@@ -17,12 +17,15 @@ namespace ns3
 class APFollower : public TDMAApplication
 {
 public:
+  static TypeId GetTypeId (void);
+  APFollower ();
+  virtual ~APFollower ();
   void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr); //对接收到的leader的控制包进行处理解析
   void ReceivePacketFromAP (Ptr<Packet> pkt);
   void SetupHeader(PacketHeader &hdr);
   bool IsAPApplicationInstalled (Ptr<Node> node);
   Ptr<Node> GetNodeFromAddress (Ipv4Address & address);
-  virtual void SlotAllocation () = 0;
+  void SlotAllocation () {};
 
 private:
   uint64_t CCHSendSlot;
@@ -32,6 +35,9 @@ private:
 class APLeader : public APFollower
 {
 public:
+  static TypeId GetTypeId (void);
+  APLeader ();
+  virtual ~APLeader ();
   void ReceivePacketFromAP (Ptr<Packet> pkt); //对接收到的follower的控制包进行处理解析
   /**
    * @brief 根据当前状态初始化发送包的帧头
@@ -39,7 +45,7 @@ public:
    * @param hdr 
    */
   void SetupHeader(PacketHeader &hdr); //将时隙分配信息写入报头
-  virtual void SlotAllocation ();
+  void SlotAllocation ();
 
 private:
   //std::vector <struct PacketHeader::FrameHeader> followerList; //收到的follower控制包报头
