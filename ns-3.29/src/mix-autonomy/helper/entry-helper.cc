@@ -95,9 +95,12 @@ SimulationEntry::CourseChange (std::ostream *os, std::string context, Ptr<const 
 void
 SimulationEntry::ConfigureTracing ()
 {
-  m_mobilityTraceFile.open (config.mobilityTraceFile);
-  Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange",
+  if (config.mobilityTraceFile != "")
+  {
+    m_mobilityTraceFile.open (config.mobilityTraceFile);
+    Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange",
                    MakeBoundCallback (&SimulationEntry::CourseChange, &m_mobilityTraceFile));
+  }
 }
 
 void 
