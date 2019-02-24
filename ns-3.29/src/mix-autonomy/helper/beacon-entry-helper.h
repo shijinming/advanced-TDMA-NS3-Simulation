@@ -86,9 +86,9 @@ BeaconSimulationEntry::ConfigureApplication ()
         apfollowerHelper.Install(*node);
       else
         hdvHelper.Install(*node);
-      app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
-      app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
-      (*node)->AddApplication (app);
+      //app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
+      //app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
+      //(*node)->AddApplication (app);
     }
   LOG_UNCOND ("Done create application");
 }
