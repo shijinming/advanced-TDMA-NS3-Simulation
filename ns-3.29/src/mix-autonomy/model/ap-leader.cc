@@ -74,14 +74,16 @@ APLeader::SlotAllocation ()
   {
     totalLen+=iter->second;
   }
-  int index1 = 0, index2 = 0;
+  m_CCHslotAllocation.clear();
+  m_SCHslotAllocation.clear();
   for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
   {
-    m_CCHslotAllocation[index1] = iter->first;
-    index1++;
-    for(uint32_t i = 0; i < iter->second * curSlot.SCHSlotNum / totalLen; i++){
-      m_SCHslotAllocation[index2] = iter->first;
-      index2++;
+    m_CCHslotAllocation.push_back(iter->first);
+    if(totalLen > 0)
+    {
+      for(uint32_t i = 0; i < iter->second * curSlot.SCHSlotNum / totalLen; i++){
+        m_SCHslotAllocation.push_back(iter->first);
+      }
     } 
   }
   if(curSlot.frameId == curSlot.apCCHSlotNum - 1 && curSlot.curFrame == CCH_apFrame)

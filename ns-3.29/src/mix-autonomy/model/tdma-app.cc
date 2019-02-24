@@ -169,7 +169,7 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
     {
       InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
       Address addr = inetAddr.GetIpv4 ();
-      ReceivePacket (pkt, addr);
+      ReceivePacket (pkt, srcAddr);
       // 取出帧头的操作应该放在ReceivePacket函数中，由子类进行。
       // PacketHeader pHeader;
       // pkt->RemoveHeader(pHeader);

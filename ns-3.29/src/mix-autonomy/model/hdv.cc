@@ -50,10 +50,10 @@ HumanApplication::QuitFromMiddle ()
 void 
 HumanApplication::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 {
-    InetSocketAddress addr = InetSocketAddress::ConvertFrom (srcAddr);
-    Ipv4Address ipv4Addr = addr.GetIpv4 ();
+  InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
+  Ipv4Address addr = inetAddr.GetIpv4 ();
     // 获取发送该数据包的节点
-    Ptr<Node> node = GetNodeFromAddress (ipv4Addr);
+    Ptr<Node> node = GetNodeFromAddress (addr);
     if (IsAPApplicationInstalled (node))
     {
         // 收到了来自内核层的数据包
