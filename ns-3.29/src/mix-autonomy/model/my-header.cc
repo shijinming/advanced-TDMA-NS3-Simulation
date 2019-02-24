@@ -16,8 +16,11 @@ PacketHeader::PacketHeader ()
 
 PacketHeader::~PacketHeader ()
 {
-  delete [] m_CCHslotAllocation;
-  delete [] m_SCHslotAllocation;
+  if (m_isLeader)
+  {
+    delete [] m_CCHslotAllocation;
+    delete [] m_SCHslotAllocation;
+  }
 }
 
 TypeId

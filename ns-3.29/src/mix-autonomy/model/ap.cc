@@ -184,6 +184,15 @@ bool
 APLeader::SlotAllocation ()
 {
   std::map <uint16_t, uint32_t>::iterator iter;
+  iter = m_queueLen.find(GetNode () -> GetId());
+  if(iter != m_queueLen.end())
+    {
+      m_queueLen[iter->first] = txq.size();
+    }
+  else
+  {
+    m_queueLen.insert(std::pair<uint16_t, uint16_t> (GetNode ()->GetId(), txq.size ()));
+  }
   int totalLen = 0;
   for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
   {
