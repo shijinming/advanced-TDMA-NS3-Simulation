@@ -14,6 +14,7 @@ HumanApplication::GetTypeId ()
 {
     static TypeId tid = TypeId ("ns3::HumanApplication")
         .SetParent <TDMAApplication> ()
+        .SetGroupName ("mix-autonomy")
         .AddConstructor <HumanApplication> ()
     ;
     return tid;

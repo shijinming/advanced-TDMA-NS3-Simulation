@@ -79,15 +79,15 @@ BeaconSimulationEntry::ConfigureApplication ()
   HumanApplicationHelper hdvHelper;
   //8辆自动驾驶车辆，其中一个为leader
   for (auto node = NodeList::Begin (); node != NodeList::End (); node ++) 
-    { 
+    { Ptr<Application> app;
       if ((*node)->GetId() == 0) 
-        apleaderHelper.Install(*node);
+        app = apleaderHelper.Install(*node);
       else if ((*node)->GetId() <= 7) 
-        apfollowerHelper.Install(*node);
+        app = apfollowerHelper.Install(*node);
       else
-        hdvHelper.Install(*node);
-      //app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
-      //app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
+        app = hdvHelper.Install(*node);
+      app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
+      app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
       //(*node)->AddApplication (app);
     }
   LOG_UNCOND ("Done create application");

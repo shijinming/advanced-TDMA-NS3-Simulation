@@ -15,6 +15,7 @@ APFollower::GetTypeId ()
 {
     static TypeId tid = TypeId ("ns3::APFollower")
         .SetParent <TDMAApplication> ()
+        .SetGroupName ("mix-autonomy")
         .AddConstructor <APFollower> ()
     ;
     return tid;
@@ -137,6 +138,7 @@ APLeader::GetTypeId ()
 {
     static TypeId tid = TypeId ("ns3::APLeader")
         .SetParent <APFollower> ()
+        .SetGroupName ("mix-autonomy")
         .AddConstructor <APLeader> ()
     ;
     return tid;
