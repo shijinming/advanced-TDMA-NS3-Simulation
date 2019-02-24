@@ -17,6 +17,8 @@ public:
     uint32_t nNodes = 0;
     /** 仿真时间 */
     uint32_t simTime = 600;
+    /** 自动驾驶车辆数量 */
+    uint64_t apNum = 0;
     /** Socket使用的端口 */
     uint32_t socketPort = 9;
     /** 物理层设置 */

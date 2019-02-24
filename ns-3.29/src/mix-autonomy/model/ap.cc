@@ -53,7 +53,7 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
     return;
   uint16_t *CCHslotAllocation = pHeader.GetCCHslotAllocation();
   uint16_t *SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
-  for(uint32_t i=0; i<CCHSlotNum; i++) //查找下次发控制包的时隙
+  for(uint32_t i=0; i<curSlot.CCHSlotNum; i++) //查找下次发控制包的时隙
   {
     if(GetNode ()->GetId () == CCHslotAllocation[i])
       {
@@ -61,7 +61,7 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
       }
   }
   SCHSendSlot.clear();
-  for(uint32_t i=0; i<SCHSlotNum; i++) //查找发数据包的时隙
+  for(uint32_t i=0; i<curSlot.SCHSlotNum; i++) //查找发数据包的时隙
   {
     if(GetNode ()->GetId () == SCHslotAllocation[i])
       {
@@ -177,7 +177,7 @@ APLeader::SlotAllocation ()
   {
     m_CCHslotAllocation[index1] = iter->first;
     index1++;
-    for(uint32_t i = 0; i < iter->second * SCHSlotNum / totalLen; i++){
+    for(uint32_t i = 0; i < iter->second * curSlot.SCHSlotNum / totalLen; i++){
       m_SCHslotAllocation[index2] = iter->first;
       index2++;
     } 

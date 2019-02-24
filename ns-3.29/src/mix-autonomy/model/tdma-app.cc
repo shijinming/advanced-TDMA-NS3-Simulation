@@ -245,65 +245,61 @@ TDMAApplication::WakeUpTxQueue ()
   nextMacEntity->Resume ();
 }
 
-bool
-TDMAApplication::IsCch (uint32_t channelNumber)
-{
-  return channelNumber == CCH;
-}
-
-bool
-TDMAApplication::IsSch (uint32_t channelNumber)
-{
-  if (channelNumber < SCH1 || channelNumber > SCH6)
-    {
-      return false;
-    }
-  if (channelNumber % 2 == 1)
-    {
-      return false;
-    }
-  return (channelNumber != CCH);
-}
-
-bool
-TDMAApplication::IsWaveChannel (uint32_t channelNumber)
-{
-  if (channelNumber < SCH1 || channelNumber > SCH6)
-    {
-      return false;
-    }
-  if (channelNumber % 2 == 1)
-    {
-      return false;
-    }
-  return true;
-}
-
 void
-TDMAApplication::PeriodicSwitch (Frame curFrame)
+TDMAApplication::PeriodicSwitch (struct TDMASlot curSlot)
 {
-  if (curFrame == Frame::CCHFrame)
+  if (curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
     {
-      if (slotCnt == CCHSlotNum)
+      if (slotCnt == curSlot.CCHSlotNum)
         {
-          SwitchToNextChannel (CCH, SCH1);
+          SwitchToNextChannel (tdma_CCH, tdma_SCH1);
           slotCnt=0;
         };
     }
-  if (curFrame == Frame::SCHFrame) 
+  if (curSlot.curFrame == Frame::SCH_apFrame || curSlot.curFrame == Frame::SCH_hdvFrame)
     {
-      if (slotCnt == SCHSlotNum)
+      if (slotCnt == curSlot.SCHSlotNum)
         {
-          SwitchToNextChannel (SCH1, CCH);
+          SwitchToNextChannel (tdma_SCH1, tdma_CCH);
           slotCnt=0;
         };
     }
 }
 
-void
-TDMAApplication::SetapNum (uint32_t N)
-{
-  apNum = N;
-}
-
+ struct TDMASlot 
+ TDMAApplication:: GetNextSlotInterval (void)
+ {
+  curSlot.id = slotCnt;
+  curSlot.CCHSlotNum = 2*(apNum+1);
+  curSlot.SCHSlotNum = 2*(apNum+1); 
+  curSlot.apCCHSlotNum = apNum+1;  
+  curSlot.apSCHSlotNum = apNum+1;  
+  curSlot.hdvCCHSlotNum = apNum+1; 
+  curSlot.hdvSCHSlotNum = apNum+1;  
+  if(slotCnt/(curSlot.CCHSlotNum + curSlot.SCHSlotNum) == 0) 
+    {
+     curSlot.frameNum = curSlot.frameNum +1;
+    }
+  if(slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < curSlot.apCCHSlotNum )
+    {
+      curSlot.curFrame = CCH_apFrame;
+      curSlot.frameId = slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum);
+    }
+  else if(slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < (curSlot.apCCHSlotNum+curSlot.hdvCCHSlotNum))
+         {
+            curSlot.curFrame = CCH_hdvFrame;
+            curSlot.frameId = slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum;
+         }
+  else if(slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < (curSlot.apCCHSlotNum+curSlot.hdvCCHSlotNum+curSlot.SCHSlotNum))
+         {
+            curSlot.curFrame = SCH_apFrame;
+            curSlot.frameId = slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum-curSlot.hdvCCHSlotNum;
+         }
+  else 
+      {
+        curSlot.curFrame = SCH_hdvFrame;
+        curSlot.frameId = slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum-curSlot.hdvCCHSlotNum-curSlot.apSCHSlotNum;
+      }
+  return curSlot;
+ }
 }

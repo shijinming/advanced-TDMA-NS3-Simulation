@@ -21,26 +21,37 @@
 
 namespace ns3 
 {
+/** 当前帧状态 */
+enum Frame {CCH_apFrame, SCH_apFrame,CCH_hdvFrame,SCH_hdvFrame};
 
 /**
- * @brief 时隙单元定义
+ * @brief 时隙单元定义  时隙数后续调试可改
  */
 struct TDMASlot {
   Time start; /**< 时隙开始时间，注意是相对时间 */
   Time duration; /**< 时隙长度 */
   uint64_t id; /**< 时隙ID，这个成员可以是Optional的，在本类中不会使用，可以供子类使用*/
+  Frame curFrame;
+  uint64_t frameId; /**< 处于当前帧内的第几个时隙 */
+  uint64_t frameNum;  /**< 当前为仿真开始后的第几个帧（此帧为4帧的总和） */
+  uint64_t CCHSlotNum; /**  控制帧时隙数 2*（apNum+1）*/
+  uint64_t SCHSlotNum; /**  数据帧时隙数 2*（apNum+1）*/ 
+  uint64_t apCCHSlotNum; //内核层控制帧时隙数，等于apNum+1
+  uint64_t apSCHSlotNum; //内核层数据帧时隙数，等于apNum+1
+  uint64_t hdvCCHSlotNum; //中间层控制帧时隙数，该层的控制帧位于内核层控制帧之后，等于apNum+1
+  uint64_t hdvSCHSlotNum; //中间层数据帧时隙数，该层的数据帧位于内核层数据帧之后，apNum+1
 };
 
 /**
  * @brief 控制信道服务信道定义
  */
-#define SCH1 172
-#define SCH2 174
-#define SCH3 176
-#define CCH  178
-#define SCH4 180
-#define SCH5 182
-#define SCH6 184
+#define tdma_SCH1 172
+#define tdma_SCH2 174
+#define tdma_SCH3 176
+#define tdma_CCH  178
+#define tdma_SCH4 180
+#define tdma_SCH5 182
+#define tdma_SCH6 184
 
 class TDMAApplication: public Application
 {
@@ -51,24 +62,6 @@ public:
 
   void SetStartTime (Time start);
   void SetStopTime (Time stop);
-
-  /**
-   * 判断当前是否为控制信道
-   *
-   */
-  static bool IsCch (uint32_t channelNumber);
-
-  /**
-   * 判断当前是否为服务信道
-   * 
-   */
-  static bool IsSch (uint32_t channelNumber);
-
-  /**
-   * 判断当前是否为有效wave信道
-   * 
-   */
-  static bool IsWaveChannel (uint32_t channelNumber);
 
 protected:
   virtual void StartApplication (void);
@@ -102,6 +95,9 @@ protected:
   /** slotCount, 本节点经过的时隙计数  */
   uint64_t slotCnt = 0;
 
+  /** 自动驾驶车辆数量 */
+  uint64_t apNum;
+
   Time minTxInterval = MicroSeconds (100);
 
   /** 发送的trace */
@@ -111,26 +107,6 @@ protected:
 
   /** 全局仿真配置 */
   SimulationConfig &config;
-
-  /** 信道编号 */
-  uint32_t m_channelNumber;
-
-  /** 自动驾驶车辆数量 */
-  uint64_t apNum;
-
-  /**  控制帧时隙数 */
-  uint64_t CCHSlotNum;
-  /**  数据帧时隙数 */
-  uint64_t SCHSlotNum;
-
-  uint64_t apCCHSlotNum; //内核层控制帧时隙数，等于apNum+1
-  uint64_t apSCHSlotNum; //内核层数据帧时隙数
-  uint64_t hdvCCHSlotNum; //中间层控制帧时隙数，该层的控制帧位于内核层控制帧之后
-  uint64_t hdvSCHSlotNum; //中间层数据帧时隙数，该层的数据帧位于内核层数据帧之后
-
-  /** 当前帧状态 */
-  enum Frame {CCHFrame, SCHFrame};
-  Frame curFrame;
 
   /** 
    * 发送队列 
@@ -198,7 +174,7 @@ private:
    * @brief 周期性的在控制信道和服务信道中切换，从而发送控制帧和数据帧
    * 
    */
-  void PeriodicSwitch (Frame curFrame);
+  void PeriodicSwitch (TDMASlot curSlot);
 
   /**
    * @brief 设置自动驾驶编队中车辆数
@@ -214,12 +190,12 @@ protected:
   virtual void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr) = 0;
 
   /**
-   * @brief 获取下一个时隙的间隔，TDMAApplication会按照这个函数返回的间隔来设定定时器
+   * @brief 获取下一个时隙的信息，TDMAApplication会按照这个函数返回的间隔来设定定时器
    * 以在对应的时间唤醒发送队列
-   * 
+   * @brief  配置当前时隙信息 TDMASlot curSlot
    * @return TDMASlot 下一个时隙
    */
-  struct TDMASlot GetNextSlotInterval (void) {return TDMASlot();};
+  struct TDMASlot GetNextSlotInterval (void);
 
   /**
    * @brief 获取起始时隙

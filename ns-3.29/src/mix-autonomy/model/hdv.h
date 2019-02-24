@@ -30,7 +30,7 @@ public:
     void ReceiveFromAP (Ptr<Packet> pkt, Ptr<Node> node);
     Ptr<Node> GetNodeFromAddress (Ipv4Address & address);
     bool IsAPApplicationInstalled (Ptr<Node> node);
-
+  
     virtual void SetupHeader(PacketHeader &hdr) {};
     virtual void SlotAllocation () {};
 

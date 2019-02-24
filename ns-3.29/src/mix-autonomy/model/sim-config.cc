@@ -23,6 +23,7 @@ void
 SimulationConfig::ConfigureCommandLineParams (CommandLine &cmd) {
     cmd.AddValue ("task-id", "ID of this task", taskId);
     cmd.AddValue ("nnodes", "Number of nodes", nNodes);
+    cmd.AddValue ("ap-num", "Number of autonomous vehicles", apNum);
     cmd.AddValue ("port", "Port number used by socket", socketPort);
     cmd.AddValue ("sim-time", "Simulation duration", simTime);
     cmd.AddValue ("phy-mode", "Working mode of phy layer", phyMode);
@@ -41,6 +42,7 @@ SimulationConfig::PrintConfiguration () {
     SHOW_CONF (taskId);
     SHOW_CONF (nNodes);
     SHOW_CONF (simTime);
+    SHOW_CONF (apNum);
     SHOW_CONF (socketPort);
     SHOW_CONF (phyMode);
     SHOW_CONF (mobilityInput);
