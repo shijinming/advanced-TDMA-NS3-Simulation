@@ -6,8 +6,6 @@ namespace ns3
 APFollowerHelper::APFollowerHelper ()
 {
   m_factory.SetTypeId("ns3::APFollower");
-  m_factory.Set("Protocol", StringValue ("ns3::UdpSocketFactory"));
-  m_factory.Set("Remote", AddressValue (Address ()));
 }
 
 void
@@ -44,8 +42,6 @@ APFollowerHelper::InstallPriv (Ptr<Node> node) const
 APLeaderHelper::APLeaderHelper ()
 {
   m_factory.SetTypeId("ns3::APLeader");
-  m_factory.Set("Protocol", StringValue ("ns3::UdpSocketFactory"));
-  m_factory.Set("Remote", AddressValue (Address ()));
 }
 
 void

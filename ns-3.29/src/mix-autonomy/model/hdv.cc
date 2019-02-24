@@ -1,7 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include "hdv.h"
-#include "ap.h"
+#include "ap-leader.h"
 
 namespace ns3
 {
@@ -14,7 +14,6 @@ HumanApplication::GetTypeId ()
 {
     static TypeId tid = TypeId ("ns3::HumanApplication")
         .SetParent <TDMAApplication> ()
-        .SetGroupName ("mix-autonomy")
         .AddConstructor <HumanApplication> ()
     ;
     return tid;

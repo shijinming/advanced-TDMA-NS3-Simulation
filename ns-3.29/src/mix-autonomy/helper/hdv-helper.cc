@@ -6,8 +6,6 @@ namespace ns3
 HumanApplicationHelper::HumanApplicationHelper ()
 {
     m_factory.SetTypeId ("ns3::HumanApplication");
-    m_factory.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-    m_factory.Set ("Remote", AddressValue (Address ()));
 }
 
 void

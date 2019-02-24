@@ -1,21 +1,18 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
-#include "ap.h"
-#include "ns3/internet-module.h"
-#include "ns3/network-module.h"
-#include "ns3/my-header.h"
-#include "ns3/packet.h"
-#include <vector>
+#include "ap-leader.h"
 
 namespace ns3
 {
+
+NS_LOG_COMPONENT_DEFINE ("APFollower");
+NS_OBJECT_ENSURE_REGISTERED (APFollower);
 
 TypeId
 APFollower::GetTypeId ()
 {
     static TypeId tid = TypeId ("ns3::APFollower")
         .SetParent <TDMAApplication> ()
-        .SetGroupName ("mix-autonomy")
         .AddConstructor <APFollower> ()
     ;
     return tid;
@@ -130,90 +127,6 @@ APFollower::SlotAllocation ()
         if(curSlot.frameId == SCHSendSlot[i]) return true;
       }
     }
-  return false;
-}
-
-TypeId
-APLeader::GetTypeId ()
-{
-    static TypeId tid = TypeId ("ns3::APLeader")
-        .SetParent <APFollower> ()
-        .SetGroupName ("mix-autonomy")
-        .AddConstructor <APLeader> ()
-    ;
-    return tid;
-}
-
-APLeader::APLeader ()
-{
-  
-}
-
-APLeader::~APLeader ()
-{
-  
-}
-
-void
-APLeader::ReceivePacketFromAP (Ptr<Packet> pkt)
-{
-  PacketHeader pHeader;
-  pkt->RemoveHeader(pHeader);
-  if(pHeader.GetIsLeader())
-    return;
-  std::map <uint16_t, uint32_t>::iterator iter;
-  iter = m_queueLen.find(pHeader.GetId());
-  if(iter != m_queueLen.end())
-    {
-      m_queueLen[iter->first] = pHeader.GetQueueLen();
-    }
-  else
-  {
-    m_queueLen.insert(std::pair<uint16_t, uint16_t> (pHeader.GetId(), pHeader.GetQueueLen()));
-  }
-}
-
-void
-APLeader::SetupHeader(PacketHeader &hdr)
-{
-  APFollower::SetupHeader(hdr);
-  hdr.SetIsLeader(true);
-  hdr.SetCCHslotAllocation(m_CCHslotAllocation);
-  hdr.SetSCHslotAllocation(m_SCHslotAllocation);
-}
-
-bool
-APLeader::SlotAllocation ()
-{
-  std::map <uint16_t, uint32_t>::iterator iter;
-  iter = m_queueLen.find(GetNode () -> GetId());
-  if(iter != m_queueLen.end())
-    {
-      m_queueLen[iter->first] = txq.size();
-    }
-  else
-  {
-    m_queueLen.insert(std::pair<uint16_t, uint16_t> (GetNode ()->GetId(), txq.size ()));
-  }
-  int totalLen = 0;
-  for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
-  {
-    totalLen+=iter->second;
-  }
-  int index1 = 0, index2 = 0;
-  for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
-  {
-    m_CCHslotAllocation[index1] = iter->first;
-    index1++;
-    for(uint32_t i = 0; i < iter->second * curSlot.SCHSlotNum / totalLen; i++){
-      m_SCHslotAllocation[index2] = iter->first;
-      index2++;
-    } 
-  }
-  if(curSlot.frameId == curSlot.apCCHSlotNum - 1 && curSlot.curFrame == CCH_apFrame)
-     {
-       return true;
-     } 
   return false;
 }
 

@@ -48,7 +48,8 @@ BeaconSimulationEntry::OverrideDefaultConfig ()
 
 /**
  * @brief 创建简单的拓扑
- 
+*/ 
+/*
 void
 BeaconSimulationEntry::LoadMobilityData ()
 {
