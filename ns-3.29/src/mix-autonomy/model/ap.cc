@@ -136,7 +136,7 @@ TypeId
 APLeader::GetTypeId ()
 {
     static TypeId tid = TypeId ("ns3::APLeader")
-        .SetParent <TDMAApplication> ()
+        .SetParent <APFollower> ()
         .AddConstructor <APLeader> ()
     ;
     return tid;
