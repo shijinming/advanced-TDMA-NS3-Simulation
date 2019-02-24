@@ -10,8 +10,8 @@
  */
 
 #include "ns3/network-module.h"
-#include "ns3/ap.h"
-#include "ns3/hdv.h"
+#include "ap-helper.h"
+#include "hdv-helper.h"
 #include "entry-helper.h"
 #include "ns3/internet-module.h"
 
@@ -74,21 +74,18 @@ BeaconSimulationEntry::LoadMobilityData ()
 void
 BeaconSimulationEntry::ConfigureApplication ()
 {
-  ObjectFactory leaderFactory;
-  ObjectFactory followerFactory;
-  ObjectFactory hdvFactory;
-  LOG_UNCOND ("Create Application");
-  leaderFactory.SetTypeId ("ns3::APLeader");
-  followerFactory.SetTypeId ("ns3::APFollower");
-  hdvFactory.SetTypeId ("ns3::HumanApplication");
+  APLeaderHelper apleaderHelper;
+  APFollowerHelper apfollowerHelper;
+  HumanApplicationHelper hdvHelper;
   //8辆自动驾驶车辆，其中一个为leader
   for (auto node = NodeList::Begin (); node != NodeList::End (); node ++) 
     { 
-      auto app = hdvFactory.Create<Application> ();
       if ((*node)->GetId() == 0) 
-        app = leaderFactory.Create<Application> ();
+        apleaderHelper.Install(*node);
       else if ((*node)->GetId() <= 7) 
-        app = followerFactory.Create<Application> ();
+        apfollowerHelper.Install(*node);
+      else
+        hdvHelper.Install(*node);
       app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
       app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
       (*node)->AddApplication (app);
