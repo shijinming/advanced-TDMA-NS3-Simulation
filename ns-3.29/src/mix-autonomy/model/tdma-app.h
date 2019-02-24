@@ -99,6 +99,7 @@ protected:
   uint64_t apNum;
 
   Time minTxInterval = MicroSeconds (100);
+  Time slotSize = MilliSeconds (20);
 
   /** 发送的trace */
   TracedCallback<Ptr<const Packet>, const Address & > txTrace;
@@ -202,7 +203,7 @@ protected:
    * 
    * @return TDMASlot   起始时隙
    */
-  struct TDMASlot GetInitalSlot (void) {return TDMASlot();};
+  struct TDMASlot GetInitalSlot (void);
 
   /**
    * @brief 时隙开始的钩子函数Ptr<Packet> pkt, Address & srcAddr

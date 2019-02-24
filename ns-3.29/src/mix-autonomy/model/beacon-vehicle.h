@@ -23,13 +23,13 @@ public:
   BeaconVehicleApplication () {};
   virtual void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr) {};
   void SetupHeader (PacketHeader &hdr) {};
-  void SlotAllocation () {};
+  bool SlotAllocation () {return true;}
 private:
-  Time slotSize;
+  //Time slotSize;
 
   virtual void ReceivePacket (Ptr<const Packet> pkt, const Address & srcAddr) {};
-  virtual struct TDMASlot GetNextSlotInterval (void);
-  virtual struct TDMASlot GetInitalSlot (void);
+  //virtual struct TDMASlot GetNextSlotInterval (void);
+  //virtual struct TDMASlot GetInitalSlot (void);
 };
 
 TypeId
@@ -45,7 +45,7 @@ BeaconVehicleApplication::GetTypeId ()
   return tid;
 }
 
-struct TDMASlot 
+/*struct TDMASlot 
 BeaconVehicleApplication::GetNextSlotInterval (void)
 {
   struct TDMASlot slot;
@@ -64,7 +64,7 @@ BeaconVehicleApplication::GetInitalSlot (void)
   slot.duration =  slotSize - minTxInterval;
   return slot;
 }
-
+*/
 NS_OBJECT_ENSURE_REGISTERED (BeaconVehicleApplication);
 
 }
