@@ -22,8 +22,8 @@ class BeaconSimulationEntry: public SimulationEntry
 public:
   void Simulate (int argc, char **argv) override;
 protected:
-  void OverrideDefaultConfig () override;
-  void LoadMobilityData () override;
+  //void OverrideDefaultConfig () override;
+  // void LoadMobilityData () override;
   void ConfigureApplication () override;
 
   void PrintSendPacket(Ptr<const Packet> packet, const Address &address);
@@ -37,15 +37,17 @@ BeaconSimulationEntry::Simulate (int argc, char **argv)
   SimulationEntry::Simulate (argc, argv);
 }
 
+/*
 void
 BeaconSimulationEntry::OverrideDefaultConfig ()
 {
   config.nNodes = 3;
 }
+*/
 
 /**
  * @brief 创建简单的拓扑
- */
+ 
 void
 BeaconSimulationEntry::LoadMobilityData ()
 {
@@ -66,18 +68,26 @@ BeaconSimulationEntry::LoadMobilityData ()
     }
   LOG_UNCOND ("Done set mobility");
 }
+*/
 
 void
 BeaconSimulationEntry::ConfigureApplication ()
 {
-  ObjectFactory factory;
+  ObjectFactory leaderFactory;
+  ObjectFactory followerFactory;
+  ObjectFactory hdvFactory;
   LOG_UNCOND ("Create Application");
-  factory.SetTypeId ("ns3::BeaconVehicleApplication");
-  factory.Set ("SlotSize", TimeValue (MilliSeconds (20)));
-  factory.Set ("EnableMockTraffic", BooleanValue (true));
-  for (auto node = NodeList::Begin (); node != NodeList::End (); node ++)
-    {
-      auto app = factory.Create<Application> ();
+  leaderFactory.SetTypeId ("ns3::APLeader");
+  followerFactory.SetTypeId ("ns3::APFollower");
+  hdvFactory.SetTypeId ("ns3::HumanApplication");
+  //8辆自动驾驶车辆，其中一个为leader
+  for (auto node = NodeList::Begin (); node != NodeList::End (); node ++) 
+    { 
+      auto app = hdvFactory.Create<Application> ();
+      if ((*node)->GetId() == 0) 
+        app = leaderFactory.Create<Application> ();
+      else if ((*node)->GetId() <= 7) 
+        app = followerFactory.Create<Application> ();
       app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
       app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
       (*node)->AddApplication (app);

@@ -14,17 +14,17 @@ public:
     /** 任务id */
     uint32_t taskId = 0;
     /** 节点数量 */
-    uint32_t nNodes = 0;
+    uint32_t nNodes = 143;
     /** 仿真时间 */
     uint32_t simTime = 600;
     /** 自动驾驶车辆数量 */
-    uint64_t apNum = 0;
+    uint64_t apNum = 8;
     /** Socket使用的端口 */
     uint32_t socketPort = 9;
     /** 物理层设置 */
     std::string phyMode = "OfdmRate6MbpsBW10MHz";
     /** 运动文件输入 */
-    std::string mobilityInput = "";
+    std::string mobilityInput = "/home/vehicle/mobility/fcd-trace-1.ns2.output.xml";
     /** 日志文件 */
     std::string packetTraceFile = "";
     std::string eventTraceFile = "";
