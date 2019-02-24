@@ -29,35 +29,10 @@ HumanApplication::~HumanApplication ()
     NS_LOG_FUNCTION (this);
 }
 
-void
-HumanApplication::DoDispose ()
-{
-    NS_LOG_FUNCTION (this);
-}
-
-void 
-HumanApplication::StartApplication ()
-{
-    NS_LOG_FUNCTION (this);
-}
-
-
-void 
-HumanApplication::StopApplication ()
-{
-    NS_LOG_FUNCTION (this);
-}
-
 HumanApplication::Status
 HumanApplication::GetStatus ()
 {
     return m_status;
-}
-
-void
-HumanApplication::SetTDMAEnable (bool val)
-{
-    m_tdmaEnabled = val;
 }
 
 void
@@ -69,7 +44,7 @@ HumanApplication::AddToMiddle ()
 void 
 HumanApplication::QuitFromMiddle ()
 {
-
+    m_status = Outter;
 }
 
 void 
@@ -83,12 +58,12 @@ HumanApplication::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
     {
         // 收到了来自内核层的数据包
         AddToMiddle ();
+        receiveAPId = curSlot.id;
     }
-    else
-    {
-        
-    }
-    
+    else if (curSlot.id-receiveAPId > (curSlot.CCHSlotNum + curSlot.SCHSlotNum)) //一个总帧内未收到内核层的包
+            {
+              QuitFromMiddle();
+            }
 }
 
 
@@ -121,6 +96,16 @@ HumanApplication::IsAPApplicationInstalled (Ptr<Node> node)
       return true;
     }
   }
+  return false;
+}
+
+bool
+HumanApplication::SlotAllocation ()
+{
+  if(curSlot.curFrame == CCH_hdvFrame || curSlot.curFrame == SCH_hdvFrame) 
+    {
+      return true;
+    }
   return false;
 }
 

@@ -32,18 +32,11 @@ public:
     bool IsAPApplicationInstalled (Ptr<Node> node);
   
     virtual void SetupHeader(PacketHeader &hdr) {};
-    virtual void SlotAllocation () {};
-
-
-protected:
-    virtual void DoDispose ();
+    bool SlotAllocation ();
 
 private:
-    virtual void StartApplication ();
-    virtual void StopApplication ();
-
-    bool                m_tdmaEnabled;  //只对中间层节点有效,true时意味着此节点可以在tdma时隙发送数据包
     Status              m_status;
+    uint64_t            receiveAPId;
 
     /** 发送的trace */
     TracedCallback<Ptr<const Packet>, const Address & > m_txTrace;

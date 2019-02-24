@@ -200,7 +200,7 @@ TDMAApplication::WakeUpTxQueue ()
 {
   if (!isAtOwnSlot) return; 
   Ptr<Packet> pktToSend = NULL;
-  SlotAllocation ();
+  if (!SlotAllocation ()) return;
   if (!txq.empty ())
     {
       std::cout<<"Send normal packet."<<std::endl;

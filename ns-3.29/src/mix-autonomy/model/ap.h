@@ -20,12 +20,12 @@ public:
   static TypeId GetTypeId (void);
   APFollower ();
   virtual ~APFollower ();
-  void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr); //对接收到的leader的控制包进行处理解析
-  void ReceivePacketFromAP (Ptr<Packet> pkt);
+  void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr); //判断接收到的包是否来自内核层
+  void ReceivePacketFromAP (Ptr<Packet> pkt); //对接收到的leader的控制包进行处理解析
   void SetupHeader(PacketHeader &hdr);
   bool IsAPApplicationInstalled (Ptr<Node> node);
   Ptr<Node> GetNodeFromAddress (Ipv4Address & address);
-  void SlotAllocation () {};
+  bool SlotAllocation ();
 
 private:
   uint64_t CCHSendSlot;
@@ -38,14 +38,14 @@ public:
   static TypeId GetTypeId (void);
   APLeader ();
   virtual ~APLeader ();
-  void ReceivePacketFromAP (Ptr<Packet> pkt); //对接收到的follower的控制包进行处理解析
+  void ReceivePacketFromAP (Ptr<Packet> pkt); //对接收到的follower的控制包进行处理解析，写入m_queueLen中
   /**
    * @brief 根据当前状态初始化发送包的帧头
    * 
    * @param hdr 
    */
   void SetupHeader(PacketHeader &hdr); //将时隙分配信息写入报头
-  void SlotAllocation ();
+  bool SlotAllocation ();
 
 private:
   //std::vector <struct PacketHeader::FrameHeader> followerList; //收到的follower控制包报头

@@ -222,7 +222,7 @@ protected:
    */
   virtual void WillSendMockPacket (Ptr<const Packet> pkt) {};
 
-  virtual void SlotAllocation () = 0;
+  virtual bool SlotAllocation () = 0;
 };
 
 }

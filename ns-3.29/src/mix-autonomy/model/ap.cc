@@ -65,7 +65,7 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
   {
     if(GetNode ()->GetId () == SCHslotAllocation[i])
       {
-        SCHSendSlot.push_back(i); //将i插入到向量起始位置前
+        SCHSendSlot.push_back(i); //将i插入到向量最后面
       } 
   }
 }
@@ -113,6 +113,23 @@ APFollower::GetNodeFromAddress (Ipv4Address & address)
         }
     }
     return NULL;
+}
+
+bool
+APFollower::SlotAllocation ()
+{
+  if(curSlot.frameId == CCHSendSlot && curSlot.curFrame == CCH_apFrame)
+     {
+       return true;
+     } 
+  if(curSlot.curFrame == SCH_apFrame)
+    {
+      for (uint64_t i = 0; i < SCHSendSlot.size(); i++)
+      {
+        if(curSlot.frameId == SCHSendSlot[i]) return true;
+      }
+    }
+  return false;
 }
 
 TypeId
@@ -163,7 +180,7 @@ APLeader::SetupHeader(PacketHeader &hdr)
   hdr.SetSCHslotAllocation(m_SCHslotAllocation);
 }
 
-void 
+bool
 APLeader::SlotAllocation ()
 {
   std::map <uint16_t, uint32_t>::iterator iter;
@@ -182,6 +199,11 @@ APLeader::SlotAllocation ()
       index2++;
     } 
   }
+  if(curSlot.frameId == curSlot.apCCHSlotNum - 1 && curSlot.curFrame == CCH_apFrame)
+     {
+       return true;
+     } 
+  return false;
 }
 
 }
