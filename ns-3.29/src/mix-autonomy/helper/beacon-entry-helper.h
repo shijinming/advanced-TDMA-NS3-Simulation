@@ -10,7 +10,8 @@
  */
 
 #include "ns3/network-module.h"
-#include "ns3/beacon-vehicle.h"
+#include "ns3/ap.h"
+#include "ns3/hdv.h"
 #include "entry-helper.h"
 #include "ns3/internet-module.h"
 
