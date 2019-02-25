@@ -97,7 +97,18 @@ APLeader::SlotAllocation ()
       }
     } 
   }
-  
+  std::cout<<'CCH slot allocation:'<<std::endl;
+  for(int i=0;i<m_CCHslotAllocation.size();i++)
+  {
+    std::cout<<i<<':'<<m_CCHslotAllocation[i]<<' ';
+  }
+  std::cout<<std::endl;
+  std::cout<<'SCH slot allocation:'<<std::endl;
+  for(int i=0;i<m_CCHslotAllocation.size();i++)
+  {
+    std::cout<<i<<':'<<m_SCHslotAllocation[i]<<' ';
+  }
+  std::cout<<std::endl;
   //查找leader给自己分配的数据帧发包时隙
   std::vector <uint64_t> mySendSlot;
   for(uint32_t i=0; i<curSlot.SCHSlotNum; i++) //查找发数据包的时隙
