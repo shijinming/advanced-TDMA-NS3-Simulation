@@ -270,8 +270,9 @@ TDMAApplication::PeriodicSwitch (struct TDMASlot curSlot)
  TDMAApplication:: GetInitalSlot (void)
  {
   struct TDMASlot slot;
-  LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
-  slot.start = slotSize * GetNode ()->GetId () + minTxInterval;
+  // LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
+  // slot.start = slotSize * GetNode ()->GetId () + minTxInterval;
+  slot.start = minTxInterval;
   slot.duration =  slotSize - minTxInterval;
   slot.CCHSlotNum = 2*(config.apNum+1);
   slot.SCHSlotNum = 2*(config.apNum+1); 
@@ -285,8 +286,9 @@ TDMAApplication::PeriodicSwitch (struct TDMASlot curSlot)
  struct TDMASlot 
  TDMAApplication:: GetNextSlotInterval (void)
  {
-  LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
-  curSlot.start = slotSize * (config.nNodes - 1) + minTxInterval;
+  // LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
+  // curSlot.start = slotSize * (config.nNodes - 1) + minTxInterval;
+  curSlot.start = slotCnt *slotSize + minTxInterval;
   curSlot.duration = slotSize - minTxInterval;
   curSlot.id = slotCnt;
   curSlot.CCHSlotNum = 2*(config.apNum+1);
