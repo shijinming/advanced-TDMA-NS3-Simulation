@@ -62,7 +62,7 @@ APLeader::SlotAllocation ()
   if (m_CCHslotAllocation.size() == 0)
   {
       for(uint32_t i=0; i < curSlot.CCHSlotNum; i++)
-        m_CCHslotAllocation.push_back(0);
+        m_CCHslotAllocation.push_back(i);
   }
   if (m_SCHslotAllocation.size() == 0)
   {
