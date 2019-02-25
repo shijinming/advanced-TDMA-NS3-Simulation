@@ -20,7 +20,7 @@ APLeader::GetTypeId ()
 
 APLeader::APLeader ()
 {
-  
+
 }
 
 APLeader::~APLeader ()
@@ -59,6 +59,16 @@ APLeader::SetupHeader(PacketHeader &hdr)
 bool
 APLeader::SlotAllocation ()
 {
+  if (m_CCHslotAllocation.size() == 0)
+  {
+      for(uint32_t i=0; i < curSlot.CCHSlotNum; i++)
+        m_CCHslotAllocation.push_back(0);
+  }
+  if (m_SCHslotAllocation.size() == 0)
+  {
+      for(uint32_t i=0; i < curSlot.SCHSlotNum; i++)
+        m_SCHslotAllocation.push_back(0);
+  }
   std::map <uint16_t, uint32_t>::iterator iter;
   iter = m_queueLen.find(GetNode () -> GetId());
   if(iter != m_queueLen.end())
@@ -74,15 +84,16 @@ APLeader::SlotAllocation ()
   {
     totalLen+=iter->second;
   }
-  m_CCHslotAllocation.clear();
-  m_SCHslotAllocation.clear();
+  int index1 = 0, index2 = 0;
   for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
   {
-    m_CCHslotAllocation.push_back(iter->first);
+    m_CCHslotAllocation[index1] = iter->first;
+    index1++;
     if(totalLen > 0)
     {
       for(uint32_t i = 0; i < iter->second * curSlot.SCHSlotNum / totalLen; i++){
-        m_SCHslotAllocation.push_back(iter->first);
+        m_SCHslotAllocation[index2] = iter->first;
+        index2++;
       }
     } 
   }
