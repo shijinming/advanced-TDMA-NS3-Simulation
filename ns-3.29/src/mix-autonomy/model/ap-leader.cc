@@ -86,10 +86,29 @@ APLeader::SlotAllocation ()
       }
     } 
   }
+
+  //查找leader给自己分配的数据帧发包时隙
+  std::vector <uint64_t> mySendSlot;
+  for(uint32_t i=0; i<curSlot.SCHSlotNum; i++) //查找发数据包的时隙
+  {
+    if(GetNode ()->GetId () == m_SCHslotAllocation[i])
+      {
+        mySendSlot.push_back(i); //将i插入到向量最后面
+      } 
+  }
+
+  //判断此时是否为leader发包的时隙
   if(curSlot.frameId == curSlot.apCCHSlotNum - 1 && curSlot.curFrame == CCH_apFrame)
      {
        return true;
      } 
+  if(curSlot.curFrame == SCH_apFrame)
+    {
+      for (uint64_t i = 0; i < mySendSlot.size(); i++)
+      {
+        if(curSlot.frameId == mySendSlot[i]) return true;
+      }
+    }
   return false;
 }
 
