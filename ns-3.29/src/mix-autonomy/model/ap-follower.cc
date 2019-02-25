@@ -1,5 +1,5 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-
+#include<cstdlib>
 #include "ap-leader.h"
 
 namespace ns3
@@ -74,7 +74,7 @@ APFollower::SetupHeader (PacketHeader &hdr)
   hdr.SetIsLeader(false);
   hdr.SetType(1);
   hdr.SetId(GetNode ()->GetId ());
-  hdr.SetQueueLen(txq.size());
+  hdr.SetQueueLen(rand()%100);
   hdr.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
   Vector pos = GetNode ()->GetObject<MobilityModel> ()->GetPosition ();
   hdr.SetLocLat(pos.x);
