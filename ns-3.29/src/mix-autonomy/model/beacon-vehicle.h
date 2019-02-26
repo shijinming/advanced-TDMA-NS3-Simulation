@@ -28,7 +28,7 @@ private:
   //Time slotSize;
 
   virtual void ReceivePacket (Ptr<const Packet> pkt, const Address & srcAddr) {};
-  //virtual struct TDMASlot GetNextSlotInterval (void);
+  virtual struct TDMASlot GetNextSlotInterval (void) {return TDMASlot();}
   //virtual struct TDMASlot GetInitalSlot (void);
 };
 
@@ -44,8 +44,8 @@ BeaconVehicleApplication::GetTypeId ()
       MakeTimeChecker ());
   return tid;
 }
-
-/*struct TDMASlot 
+/*
+struct TDMASlot 
 BeaconVehicleApplication::GetNextSlotInterval (void)
 {
   struct TDMASlot slot;

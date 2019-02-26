@@ -127,6 +127,8 @@ TDMAApplication::SlotStarted (void)
     exit (1);
   }
   slotEndEvt = Simulator::Schedule (curSlot.duration, &TDMAApplication::SlotEnded, this);
+  SetCurSlot();
+  PeriodicSwitch (curSlot);
   if(curSlot.curFrame == SCH_apFrame)  curSlot.duration = slotSize - minTxInterval;
   slotCnt += 1;
   isAtOwnSlot = true;

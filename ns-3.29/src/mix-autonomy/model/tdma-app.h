@@ -195,7 +195,7 @@ protected:
    * 
    * @return TDMASlot 下一个时隙
    */
-  virtual struct TDMASlot GetNextSlotInterval (void);
+  virtual struct TDMASlot GetNextSlotInterval (void) = 0;
 
   /**
    * @brief 获取起始时隙
