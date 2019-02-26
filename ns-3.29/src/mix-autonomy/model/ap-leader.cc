@@ -29,6 +29,20 @@ APLeader::~APLeader ()
 }
 
 void
+APLeader::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
+{
+  InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
+  Ipv4Address addr = inetAddr.GetIpv4 ();
+  // 获取发送该数据包的节点
+  Ptr<Node> node = GetNodeFromAddress (addr);
+  if (IsAPApplicationInstalled (node))
+  {
+    // 收到了来自内核层的数据包
+    ReceivePacketFromAP (pkt);
+  }
+}
+
+void
 APLeader::ReceivePacketFromAP (Ptr<Packet> pkt)
 {
   PacketHeader pHeader;
@@ -119,8 +133,9 @@ APLeader::SlotAllocation ()
   }
   if(!mySendSlot.size())
     {
-     curSlot.duration = mySendSlot.size()* slotSize - minTxInterval;
-     slotStartEvt = Simulator::Schedule (mySendSlot[0] * slotSize + minTxInterval, &APLeader::SlotStarted, this);
+      curSlot.duration = mySendSlot.size()* slotSize - minTxInterval;
+      slotStartEvt = Simulator::Schedule (mySendSlot[0] * slotSize + minTxInterval, &APLeader::SlotStarted, this);
+      curSlot.duration = slotSize - minTxInterval;
     }
 }
 

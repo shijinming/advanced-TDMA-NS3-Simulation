@@ -20,6 +20,7 @@ public:
   static TypeId GetTypeId (void);
   APLeader ();
   virtual ~APLeader ();
+  void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr);
   void ReceivePacketFromAP (Ptr<Packet> pkt); //对接收到的follower的控制包进行处理解析，写入m_queueLen中
   /**
    * @brief 根据当前状态初始化发送包的帧头
