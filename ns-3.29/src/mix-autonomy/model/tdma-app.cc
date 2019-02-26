@@ -270,25 +270,33 @@ TDMAApplication::PeriodicSwitch (struct TDMASlot curSlot)
  TDMAApplication:: GetInitalSlot (void)
  {
   struct TDMASlot slot;
-  LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
-  slot.start = slotSize * GetNode ()->GetId () + minTxInterval;
+  // LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
+  // slot.start = slotSize * GetNode ()->GetId () + minTxInterval;
+  slot.start = minTxInterval;
   slot.duration =  slotSize - minTxInterval;
+  slot.CCHSlotNum = 2*(config.apNum+1);
+  slot.SCHSlotNum = 2*(config.apNum+1); 
+  slot.apCCHSlotNum = config.apNum+1;  
+  slot.apSCHSlotNum = config.apNum+1;  
+  slot.hdvCCHSlotNum = config.apNum+1; 
+  slot.hdvSCHSlotNum = config.apNum+1;
   return slot;
  }
 
  struct TDMASlot 
  TDMAApplication:: GetNextSlotInterval (void)
  {
-  LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
-  curSlot.start = slotSize * (config.nNodes - 1) + minTxInterval;
+  // LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
+  // curSlot.start = slotSize * (config.nNodes - 1) + minTxInterval;
+  curSlot.start = slotCnt *slotSize + minTxInterval;
   curSlot.duration = slotSize - minTxInterval;
   curSlot.id = slotCnt;
-  curSlot.CCHSlotNum = 2*(apNum+1);
-  curSlot.SCHSlotNum = 2*(apNum+1); 
-  curSlot.apCCHSlotNum = apNum+1;  
-  curSlot.apSCHSlotNum = apNum+1;  
-  curSlot.hdvCCHSlotNum = apNum+1; 
-  curSlot.hdvSCHSlotNum = apNum+1;  
+  curSlot.CCHSlotNum = 2*(config.apNum+1);
+  curSlot.SCHSlotNum = 2*(config.apNum+1); 
+  curSlot.apCCHSlotNum = config.apNum+1;  
+  curSlot.apSCHSlotNum = config.apNum+1;  
+  curSlot.hdvCCHSlotNum = config.apNum+1; 
+  curSlot.hdvSCHSlotNum = config.apNum+1;  
   if(slotCnt/(curSlot.CCHSlotNum + curSlot.SCHSlotNum) == 0) 
     {
      curSlot.frameNum = curSlot.frameNum +1;

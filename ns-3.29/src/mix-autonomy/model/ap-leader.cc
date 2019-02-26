@@ -20,7 +20,7 @@ APLeader::GetTypeId ()
 
 APLeader::APLeader ()
 {
-  
+
 }
 
 APLeader::~APLeader ()
@@ -59,6 +59,16 @@ APLeader::SetupHeader(PacketHeader &hdr)
 bool
 APLeader::SlotAllocation ()
 {
+  if (m_CCHslotAllocation.size() == 0)
+  {
+      for(uint32_t i=0; i < curSlot.CCHSlotNum; i++)
+        m_CCHslotAllocation.push_back(i);
+  }
+  if (m_SCHslotAllocation.size() == 0)
+  {
+      for(uint32_t i=0; i < curSlot.SCHSlotNum; i++)
+        m_SCHslotAllocation.push_back(0);
+  }
   std::map <uint16_t, uint32_t>::iterator iter;
   iter = m_queueLen.find(GetNode () -> GetId());
   if(iter != m_queueLen.end())
@@ -74,19 +84,31 @@ APLeader::SlotAllocation ()
   {
     totalLen+=iter->second;
   }
-  m_CCHslotAllocation.clear();
-  m_SCHslotAllocation.clear();
+  int index1 = 0, index2 = 0;
   for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
   {
-    m_CCHslotAllocation.push_back(iter->first);
+    m_CCHslotAllocation[index1] = iter->first;
+    index1++;
     if(totalLen > 0)
     {
       for(uint32_t i = 0; i < iter->second * curSlot.SCHSlotNum / totalLen; i++){
-        m_SCHslotAllocation.push_back(iter->first);
+        m_SCHslotAllocation[index2] = iter->first;
+        index2++;
       }
     } 
   }
-
+  std::cout<<"CCH slot allocation:"<<std::endl;
+  for(uint32_t i=0;i<m_CCHslotAllocation.size();i++)
+  {
+    std::cout<<i<<':'<<m_CCHslotAllocation[i]<<' ';
+  }
+  std::cout<<std::endl;
+  std::cout<<"SCH slot allocation:"<<std::endl;
+  for(uint32_t i=0;i<m_CCHslotAllocation.size();i++)
+  {
+    std::cout<<i<<':'<<m_SCHslotAllocation[i]<<' ';
+  }
+  std::cout<<std::endl;
   //查找leader给自己分配的数据帧发包时隙
   std::vector <uint64_t> mySendSlot;
   for(uint32_t i=0; i<curSlot.SCHSlotNum; i++) //查找发数据包的时隙
@@ -96,7 +118,6 @@ APLeader::SlotAllocation ()
         mySendSlot.push_back(i); //将i插入到向量最后面
       } 
   }
-
   //判断此时是否为leader发包的时隙
   if(curSlot.frameId == curSlot.apCCHSlotNum - 1 && curSlot.curFrame == CCH_apFrame)
      {
@@ -110,6 +131,7 @@ APLeader::SlotAllocation ()
       }
     }
   return false;
+
 }
 
 }

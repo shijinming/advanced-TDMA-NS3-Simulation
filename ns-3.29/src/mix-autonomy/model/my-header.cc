@@ -11,7 +11,6 @@ namespace ns3
 PacketHeader::PacketHeader ()
 {
   m_isLeader = false;
-  m_headerSize = sizeof(FollowerHeader);
 }
 
 PacketHeader::~PacketHeader ()
@@ -56,6 +55,8 @@ PacketHeader::Print (std::ostream &os) const
   QUICK_PRINT (locLon);
   QUICK_PRINT (locLat);
   QUICK_PRINT (timestamp);  // 时间戳长度最长，放在后面
+  QUICK_PRINT (CCHSlotNum);
+  QUICK_PRINT (SCHSlotNum);
 
 #undef QUICK_PRINT
   os << oss1.str () << std::endl << oss2.str () << std::endl;
@@ -65,7 +66,14 @@ uint32_t
 PacketHeader::GetSerializedSize (void) const
 {
   // we reserve 2 bytes for our header.
-  return m_headerSize + sizeof(m_headerSize);
+  if(m_isLeader)
+  {
+    return sizeof(LeaderHeader) + (m_data.CCHSlotNum + m_data.SCHSlotNum) * sizeof(uint16_t) + sizeof(uint16_t);
+  }
+  else
+  {
+    return sizeof(FollowerHeader) + sizeof(uint16_t);
+  }
 }
 void
 PacketHeader::Serialize (Buffer::Iterator start) const
@@ -93,8 +101,8 @@ PacketHeader::Deserialize (Buffer::Iterator start)
   // we can deserialize two bytes from the start of the buffer.
   // we read them in network byte order and store them
   // in host byte order.
-  m_headerSize =  start.ReadU16();
-  if(m_headerSize == sizeof(FollowerHeader))
+  uint16_t headerSize =  start.ReadU16();
+  if(headerSize == sizeof(FollowerHeader))
   {
     m_isLeader = false;
     start.Read ((uint8_t *) &m_data, sizeof(FollowerHeader));
