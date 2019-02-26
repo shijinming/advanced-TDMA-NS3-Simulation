@@ -101,7 +101,8 @@ TDMAApplication::CancelAllEvents (void)
 void
 TDMAApplication::SlotEnded (void) 
 {
-  LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " ended at " << Simulator::Now ().GetMicroSeconds ());
+  // std::cout<<GetNode()->GetId()<<" SlotEnded"<<std::endl;
+  // LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " ended at " << Simulator::Now ().GetMicroSeconds ());
   if (!isAtOwnSlot) {
     LOG_UNCOND ("Fatal Error[1]: 时隙调度错误");
     exit (1);
@@ -110,8 +111,7 @@ TDMAApplication::SlotEnded (void)
   curSlot = GetNextSlotInterval ();
   if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == CCH_hdvFrame)
      {
-       slotStartEvt = Simulator::Schedule (curSlot.start, &TDMAApplication::SlotStarted, this);
-      
+       slotStartEvt = Simulator::Schedule (curSlot.start, &TDMAApplication::SlotStarted, this);     
      }
   isAtOwnSlot = false;
   SlotDidEnd ();
@@ -120,19 +120,19 @@ TDMAApplication::SlotEnded (void)
 void
 TDMAApplication::SlotStarted (void) 
 {
-  LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " started at " << Simulator::Now ().GetMicroSeconds ());
+  // std::cout<<GetNode()->GetId()<<" SlotStarted"<<std::endl;
+  // LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " started at " << Simulator::Now ().GetMicroSeconds ());
   if (isAtOwnSlot) {
     // 已经开始了的时隙重复启动
     LOG_UNCOND ("Fatal Error[0]: 时隙调度错误");
     exit (1);
   }
   slotEndEvt = Simulator::Schedule (curSlot.duration, &TDMAApplication::SlotEnded, this);
-  SetCurSlot();
-  PeriodicSwitch (curSlot);
   if(curSlot.curFrame == SCH_apFrame)  curSlot.duration = slotSize - minTxInterval;
   slotCnt += 1;
   isAtOwnSlot = true;
   SlotWillStart ();
+  SlotAllocation();
   WakeUpTxQueue ();
 }
 
@@ -207,10 +207,9 @@ TDMAApplication::WakeUpTxQueue ()
 {
   if (!isAtOwnSlot) return; 
   Ptr<Packet> pktToSend = NULL;
-  SlotAllocation();
   if (!txq.empty ())
     {
-      std::cout<<"Send normal packet."<<std::endl;
+      // std::cout<<"Send normal packet."<<std::endl;
       pktToSend = txq.front ();
       txq.pop ();
     }

@@ -225,7 +225,7 @@ protected:
    * 
    * @param pkt 
    */
-  virtual void WillSendMockPacket (Ptr<const Packet> pkt) {};
+  virtual void WillSendMockPacket (Ptr<Packet> pkt) {SendPacket(pkt);};
 
   virtual void SlotAllocation (void) {};
 };

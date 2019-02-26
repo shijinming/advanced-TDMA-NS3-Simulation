@@ -31,6 +31,7 @@ public:
 private:
   uint64_t CCHSendSlot;
   std::vector <uint64_t> SCHSendSlot;
+  uint32_t leaderPacketCnt;
 };
 
 }

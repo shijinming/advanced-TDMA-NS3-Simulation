@@ -1,5 +1,5 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-//#include<cstdlib>
+#include<cstdlib>
 #include "ap-leader.h"
 
 namespace ns3
@@ -38,14 +38,20 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
   if (IsAPApplicationInstalled (node))
   {
     // 收到了来自内核层的数据包
+    leaderPacketCnt++;
     ReceivePacketFromAP (pkt);
-    if(SCHSendSlot.size()>0)
+    if(SCHSendSlot.size() > 0 && leaderPacketCnt == 1)
     {
-     curSlot.duration = SCHSendSlot.size()* slotSize - minTxInterval;
-     slotStartEvt = Simulator::Schedule (SCHSendSlot[0] * slotSize + minTxInterval, &APFollower::SlotStarted, this);
-    }
-    
+      curSlot.duration = SCHSendSlot.size()* slotSize - minTxInterval;
+      slotStartEvt = Simulator::Schedule (SCHSendSlot[0] * slotSize + minTxInterval, &APFollower::SlotStarted, this);
+      curSlot.duration = slotSize - minTxInterval;
+    } 
   }
+  else
+  {
+    leaderPacketCnt = 0;
+  }
+  
 }
 
 void
@@ -81,6 +87,7 @@ APFollower::SetupHeader (PacketHeader &hdr)
   hdr.SetType(1);
   hdr.SetId(GetNode ()->GetId ());
   hdr.SetQueueLen(txq.size());
+  // hdr.SetQueueLen(rand()%100);
   hdr.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
   Vector pos = GetNode ()->GetObject<MobilityModel> ()->GetPosition ();
   hdr.SetLocLat(pos.x);
