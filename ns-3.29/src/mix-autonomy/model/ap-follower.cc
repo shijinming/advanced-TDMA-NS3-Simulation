@@ -39,7 +39,7 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
   {
     // 收到了来自内核层的数据包
     ReceivePacketFromAP (pkt);
-    if(!SCHSendSlot.size())
+    if(SCHSendSlot.size()>0)
     {
      curSlot.duration = SCHSendSlot.size()* slotSize - minTxInterval;
      slotStartEvt = Simulator::Schedule (SCHSendSlot[0] * slotSize + minTxInterval, &APFollower::SlotStarted, this);

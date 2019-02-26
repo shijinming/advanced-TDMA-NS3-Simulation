@@ -24,7 +24,7 @@ public:
   void Simulate (int argc, char **argv) override;
 protected:
   //void OverrideDefaultConfig () override;
-  // void LoadMobilityData () override;
+  void LoadMobilityData () override;
   void ConfigureApplication () override;
 
   void PrintSendPacket(Ptr<const Packet> packet, const Address &address);
@@ -49,7 +49,6 @@ BeaconSimulationEntry::OverrideDefaultConfig ()
 /**
  * @brief 创建简单的拓扑
 */ 
-/*
 void
 BeaconSimulationEntry::LoadMobilityData ()
 {
@@ -70,7 +69,6 @@ BeaconSimulationEntry::LoadMobilityData ()
     }
   LOG_UNCOND ("Done set mobility");
 }
-*/
 
 void
 BeaconSimulationEntry::ConfigureApplication ()
@@ -87,7 +85,7 @@ BeaconSimulationEntry::ConfigureApplication ()
         app = apfollowerHelper.Install(*node);
       else
         app = hdvHelper.Install(*node);
-      // app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
+        app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
       // app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
       //(*node)->AddApplication (app);
     }
