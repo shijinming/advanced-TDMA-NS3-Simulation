@@ -32,7 +32,8 @@ public:
     bool IsAPApplicationInstalled (Ptr<Node> node);
   
     virtual void SetupHeader(PacketHeader &hdr) {};
-    bool SlotAllocation ();
+    void SlotAllocation () {};
+    struct TDMASlot GetNextSlotInterval (void);
 
 private:
     Status              m_status;

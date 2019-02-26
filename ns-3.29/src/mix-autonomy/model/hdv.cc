@@ -99,14 +99,13 @@ HumanApplication::IsAPApplicationInstalled (Ptr<Node> node)
   return false;
 }
 
-bool
-HumanApplication::SlotAllocation ()
+struct TDMASlot 
+HumanApplication::GetNextSlotInterval (void)
 {
-  if(curSlot.curFrame == CCH_hdvFrame || curSlot.curFrame == SCH_hdvFrame) 
-    {
-      return true;
-    }
-  return false;
+  LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
+  SetCurSlot();
+  curSlot.start = curSlot.apCCHSlotNum *slotSize + minTxInterval;
+  curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval;
+  return curSlot;
 }
-
 }

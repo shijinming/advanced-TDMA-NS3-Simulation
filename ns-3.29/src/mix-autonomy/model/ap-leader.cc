@@ -56,7 +56,7 @@ APLeader::SetupHeader(PacketHeader &hdr)
   hdr.SetSCHslotAllocation(m_SCHslotAllocation);
 }
 
-bool
+void
 APLeader::SlotAllocation ()
 {
   if (m_CCHslotAllocation.size() == 0)
@@ -110,7 +110,6 @@ APLeader::SlotAllocation ()
   }
   std::cout<<std::endl;
   //查找leader给自己分配的数据帧发包时隙
-  std::vector <uint64_t> mySendSlot;
   for(uint32_t i=0; i<curSlot.SCHSlotNum; i++) //查找发数据包的时隙
   {
     if(GetNode ()->GetId () == m_SCHslotAllocation[i])
@@ -118,20 +117,11 @@ APLeader::SlotAllocation ()
         mySendSlot.push_back(i); //将i插入到向量最后面
       } 
   }
-  //判断此时是否为leader发包的时隙
-  if(curSlot.frameId == curSlot.apCCHSlotNum - 1 && curSlot.curFrame == CCH_apFrame)
-     {
-       return true;
-     } 
-  if(curSlot.curFrame == SCH_apFrame)
+  if(!mySendSlot.size())
     {
-      for (uint64_t i = 0; i < mySendSlot.size(); i++)
-      {
-        if(curSlot.frameId == mySendSlot[i]) return true;
-      }
+     curSlot.duration = mySendSlot.size()* slotSize - minTxInterval;
+     slotStartEvt = Simulator::Schedule (mySendSlot[0] * slotSize + minTxInterval, &APLeader::SlotStarted, this);
     }
-  return false;
-
 }
 
 }

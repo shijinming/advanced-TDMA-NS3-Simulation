@@ -108,7 +108,11 @@ TDMAApplication::SlotEnded (void)
   }
   txEvent.Cancel ();
   curSlot = GetNextSlotInterval ();
-  slotStartEvt = Simulator::Schedule (curSlot.start, &TDMAApplication::SlotStarted, this);
+  if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == CCH_hdvFrame)
+     {
+       slotStartEvt = Simulator::Schedule (curSlot.start, &TDMAApplication::SlotStarted, this);
+      
+     }
   isAtOwnSlot = false;
   SlotDidEnd ();
 }
@@ -123,6 +127,7 @@ TDMAApplication::SlotStarted (void)
     exit (1);
   }
   slotEndEvt = Simulator::Schedule (curSlot.duration, &TDMAApplication::SlotEnded, this);
+  if(curSlot.curFrame == SCH_apFrame)  curSlot.duration = slotSize - minTxInterval;
   slotCnt += 1;
   isAtOwnSlot = true;
   SlotWillStart ();
@@ -200,7 +205,7 @@ TDMAApplication::WakeUpTxQueue ()
 {
   if (!isAtOwnSlot) return; 
   Ptr<Packet> pktToSend = NULL;
-  if (!SlotAllocation ()) return;
+  SlotAllocation();
   if (!txq.empty ())
     {
       std::cout<<"Send normal packet."<<std::endl;
@@ -248,79 +253,70 @@ TDMAApplication::WakeUpTxQueue ()
 void
 TDMAApplication::PeriodicSwitch (struct TDMASlot curSlot)
 {
-  if (curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
+  if (curSlot.curFrame == Frame::CCH_hdvFrame && curSlot.frameId == curSlot.hdvCCHSlotNum -1)
     {
-      if (slotCnt == curSlot.CCHSlotNum)
-        {
-          SwitchToNextChannel (tdma_CCH, tdma_SCH1);
-          slotCnt=0;
-        };
+      SwitchToNextChannel (tdma_CCH, tdma_SCH1);
     }
-  if (curSlot.curFrame == Frame::SCH_apFrame || curSlot.curFrame == Frame::SCH_hdvFrame)
+  if (curSlot.curFrame == Frame::SCH_hdvFrame && curSlot.frameId == curSlot.hdvSCHSlotNum -1)
     {
-      if (slotCnt == curSlot.SCHSlotNum)
-        {
-          SwitchToNextChannel (tdma_SCH1, tdma_CCH);
-          slotCnt=0;
-        };
+      SwitchToNextChannel (tdma_SCH1, tdma_CCH);
     }
 }
 
- struct TDMASlot
- TDMAApplication:: GetInitalSlot (void)
- {
-  struct TDMASlot slot;
-  // LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
-  // slot.start = slotSize * GetNode ()->GetId () + minTxInterval;
-  slot.start = minTxInterval;
-  slot.duration =  slotSize - minTxInterval;
-  slot.CCHSlotNum = 2*(config.apNum+1);
-  slot.SCHSlotNum = 2*(config.apNum+1); 
-  slot.apCCHSlotNum = config.apNum+1;  
-  slot.apSCHSlotNum = config.apNum+1;  
-  slot.hdvCCHSlotNum = config.apNum+1; 
-  slot.hdvSCHSlotNum = config.apNum+1;
-  return slot;
- }
-
- struct TDMASlot 
- TDMAApplication:: GetNextSlotInterval (void)
- {
-  // LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
-  // curSlot.start = slotSize * (config.nNodes - 1) + minTxInterval;
-  curSlot.start = slotCnt *slotSize + minTxInterval;
-  curSlot.duration = slotSize - minTxInterval;
-  curSlot.id = slotCnt;
+void
+TDMAApplication:: SetCurSlot(void)
+{
+  slotId = Simulator::Now ().GetMilliSeconds ()/slotSize.GetMilliSeconds();
+  curSlot.id = slotId;
   curSlot.CCHSlotNum = 2*(config.apNum+1);
   curSlot.SCHSlotNum = 2*(config.apNum+1); 
   curSlot.apCCHSlotNum = config.apNum+1;  
   curSlot.apSCHSlotNum = config.apNum+1;  
   curSlot.hdvCCHSlotNum = config.apNum+1; 
   curSlot.hdvSCHSlotNum = config.apNum+1;  
-  if(slotCnt/(curSlot.CCHSlotNum + curSlot.SCHSlotNum) == 0) 
+  if(slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) == 0) 
     {
      curSlot.frameNum = curSlot.frameNum +1;
     }
-  if(slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < curSlot.apCCHSlotNum )
+  if(slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < curSlot.apCCHSlotNum )
     {
       curSlot.curFrame = CCH_apFrame;
-      curSlot.frameId = slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum);
+      curSlot.frameId = slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum);
     }
-  else if(slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < (curSlot.apCCHSlotNum+curSlot.hdvCCHSlotNum))
+  else if(slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < (curSlot.apCCHSlotNum+curSlot.hdvCCHSlotNum))
          {
             curSlot.curFrame = CCH_hdvFrame;
-            curSlot.frameId = slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum;
+            curSlot.frameId = slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum;
          }
-  else if(slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < (curSlot.apCCHSlotNum+curSlot.hdvCCHSlotNum+curSlot.SCHSlotNum))
+  else if(slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < (curSlot.apCCHSlotNum+curSlot.hdvCCHSlotNum+curSlot.SCHSlotNum))
          {
             curSlot.curFrame = SCH_apFrame;
-            curSlot.frameId = slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum-curSlot.hdvCCHSlotNum;
+            curSlot.frameId = slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum-curSlot.hdvCCHSlotNum;
          }
   else 
       {
         curSlot.curFrame = SCH_hdvFrame;
-        curSlot.frameId = slotCnt%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum-curSlot.hdvCCHSlotNum-curSlot.apSCHSlotNum;
+        curSlot.frameId = slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum-curSlot.hdvCCHSlotNum-curSlot.apSCHSlotNum;
       }
+}
+
+struct TDMASlot
+TDMAApplication:: GetInitalSlot (void)
+{
+  LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
+  SetCurSlot();
+  if(GetNode ()->GetId () == 0) 
+     {
+       curSlot.start = slotSize * config.apNum + minTxInterval;
+
+     }
+  else if(GetNode ()->GetId () < config.apNum) 
+         {
+           curSlot.start = slotSize * (GetNode ()->GetId ()-1) + minTxInterval;
+         }
+  else curSlot.start = slotSize * (config.apNum + 1) + minTxInterval;
+  curSlot.duration =  slotSize - minTxInterval;
   return curSlot;
- }
+}
+
 }

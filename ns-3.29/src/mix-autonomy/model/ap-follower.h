@@ -25,7 +25,8 @@ public:
   void SetupHeader(PacketHeader &hdr);
   bool IsAPApplicationInstalled (Ptr<Node> node);
   Ptr<Node> GetNodeFromAddress (Ipv4Address & address);
-  bool SlotAllocation ();
+  void SlotAllocation () {};
+  struct TDMASlot GetNextSlotInterval (void);
 
 private:
   uint64_t CCHSendSlot;

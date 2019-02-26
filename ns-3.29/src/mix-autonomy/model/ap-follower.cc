@@ -1,5 +1,5 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-#include<cstdlib>
+//#include<cstdlib>
 #include "ap-leader.h"
 
 namespace ns3
@@ -39,6 +39,12 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
   {
     // 收到了来自内核层的数据包
     ReceivePacketFromAP (pkt);
+    if(!SCHSendSlot.size())
+    {
+     curSlot.duration = SCHSendSlot.size()* slotSize - minTxInterval;
+     slotStartEvt = Simulator::Schedule (SCHSendSlot[0] * slotSize + minTxInterval, &APFollower::SlotStarted, this);
+    }
+    
   }
 }
 
@@ -74,7 +80,7 @@ APFollower::SetupHeader (PacketHeader &hdr)
   hdr.SetIsLeader(false);
   hdr.SetType(1);
   hdr.SetId(GetNode ()->GetId ());
-  hdr.SetQueueLen(rand()%100);
+  hdr.SetQueueLen(txq.size());
   hdr.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
   Vector pos = GetNode ()->GetObject<MobilityModel> ()->GetPosition ();
   hdr.SetLocLat(pos.x);
@@ -113,21 +119,14 @@ APFollower::GetNodeFromAddress (Ipv4Address & address)
     return NULL;
 }
 
-bool
-APFollower::SlotAllocation ()
+struct TDMASlot 
+APFollower::GetNextSlotInterval (void)
 {
-  if(curSlot.frameId == CCHSendSlot && curSlot.curFrame == CCH_apFrame)
-     {
-       return true;
-     } 
-  if(curSlot.curFrame == SCH_apFrame)
-    {
-      for (uint64_t i = 0; i < SCHSendSlot.size(); i++)
-      {
-        if(curSlot.frameId == SCHSendSlot[i]) return true;
-      }
-    }
-  return false;
+  LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
+  SetCurSlot();
+  curSlot.start = (curSlot.CCHSlotNum + curSlot.SCHSlotNum -1)*slotSize + minTxInterval;
+  curSlot.duration = slotSize - minTxInterval;
+  return curSlot;
 }
 
 }

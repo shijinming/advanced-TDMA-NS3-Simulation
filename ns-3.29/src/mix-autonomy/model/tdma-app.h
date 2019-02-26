@@ -70,7 +70,7 @@ protected:
   virtual void DoInitialize ();
 
   /** 时隙ID */
-  uint32_t slotId; 
+  int64_t slotId; 
   /** 发送socket */
   Ptr<Socket> socket;
   /** 接收socket */
@@ -146,16 +146,6 @@ private:
    * @param socket 出发回调的socket，这里总是sink
    */
   void OnReceivePacket (Ptr<Socket> socket);
-
-  /**
-   * @brief 时隙已经结束（注意这个函数不是用来结束时隙，而是告知时隙已经结束。下面的SlotStarted含义类似
-   */
-  void SlotEnded (void);
-
-  /**
-   * @brief 时隙开始
-   */
-  void SlotStarted (void);
   
   /**
    * @brief 取消所有调度事件
@@ -184,6 +174,15 @@ private:
   void SetapNum (uint32_t N);
 
 protected:
+  /**
+   * @brief 时隙已经结束（注意这个函数不是用来结束时隙，而是告知时隙已经结束。下面的SlotStarted含义类似
+   */
+  void SlotEnded (void);
+
+  /**
+   * @brief 时隙开始
+   */
+  void SlotStarted (void);
 
   /**
    * 对接收到的数据包进行处理，子类必须实现
@@ -191,12 +190,12 @@ protected:
   virtual void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr) = 0;
 
   /**
-   * @brief 获取下一个时隙的信息，TDMAApplication会按照这个函数返回的间隔来设定定时器
+   * @brief 获取下一个时隙的间隔，TDMAApplication会按照这个函数返回的间隔来设定定时器
    * 以在对应的时间唤醒发送队列
-   * @brief  配置当前时隙信息 TDMASlot curSlot
+   * 
    * @return TDMASlot 下一个时隙
    */
-  struct TDMASlot GetNextSlotInterval (void);
+  virtual struct TDMASlot GetNextSlotInterval (void);
 
   /**
    * @brief 获取起始时隙
@@ -204,6 +203,11 @@ protected:
    * @return TDMASlot   起始时隙
    */
   struct TDMASlot GetInitalSlot (void);
+
+  /**
+   * @brief 对curSlot结构体里的一些变量进行配置
+   */
+  void SetCurSlot(void);
 
   /**
    * @brief 时隙开始的钩子函数Ptr<Packet> pkt, Address & srcAddr
@@ -223,7 +227,7 @@ protected:
    */
   virtual void WillSendMockPacket (Ptr<const Packet> pkt) {};
 
-  virtual bool SlotAllocation () = 0;
+  virtual void SlotAllocation (void) {};
 };
 
 }

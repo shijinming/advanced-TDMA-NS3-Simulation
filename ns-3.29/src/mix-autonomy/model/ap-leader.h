@@ -27,13 +27,14 @@ public:
    * @param hdr 
    */
   void SetupHeader(PacketHeader &hdr); //将时隙分配信息写入报头
-  bool SlotAllocation ();
+  void SlotAllocation ();
 
 private:
   //std::vector <struct PacketHeader::FrameHeader> followerList; //收到的follower控制包报头
   std::vector <uint16_t> m_CCHslotAllocation; //时隙分配数组，每个元素对应一个控制帧时隙，值为车辆id
   std::vector <uint16_t> m_SCHslotAllocation; //时隙分配数组，每个元素对应一个数据帧时隙，值为车辆id
   std::map <uint16_t, uint32_t> m_queueLen;
+  std::vector <uint64_t> mySendSlot;
 };
 
 }

@@ -23,7 +23,7 @@ public:
   BeaconVehicleApplication () {};
   virtual void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr) {};
   void SetupHeader (PacketHeader &hdr) {};
-  bool SlotAllocation () {return true;}
+  void SlotAllocation () {};
 private:
   //Time slotSize;
 
