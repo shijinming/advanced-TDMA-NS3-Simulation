@@ -63,7 +63,7 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
      return;
    }
   leaderPacketCnt = leaderPacketCnt + 1;
-  std::cout<<GetNode()->GetId()<<"当前收到"<<leaderPacketCnt<<"个leader的包"<<std::endl;
+  // std::cout<<GetNode()->GetId()<<"当前收到"<<leaderPacketCnt<<"个leader的包"<<std::endl;
   uint16_t *CCHslotAllocation = pHeader.GetCCHslotAllocation();
   uint16_t *SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
   for(uint32_t i=0; i<curSlot.CCHSlotNum; i++) //查找下次发控制包的时隙
@@ -79,7 +79,7 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
     if(GetNode ()->GetId () == SCHslotAllocation[i])
       {
         SCHSendSlot.push_back(i); //将i插入到向量最后面
-        std::cout<<GetNode()->GetId()<<" 收到时隙分配数组，在"<<i<<"数据时隙可发包"<<std::endl;
+        // std::cout<<GetNode()->GetId()<<" 收到时隙分配数组，在"<<i<<"数据时隙可发包"<<std::endl;
       } 
   }
 }
@@ -133,7 +133,7 @@ APFollower::GetNodeFromAddress (Ipv4Address & address)
 struct TDMASlot 
 APFollower::GetNextSlotInterval (void)
 {
-  LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
+  // LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
   SetCurSlot();
   curSlot.start = (curSlot.CCHSlotNum + curSlot.SCHSlotNum -1)*slotSize + minTxInterval;
   curSlot.duration = slotSize - minTxInterval;

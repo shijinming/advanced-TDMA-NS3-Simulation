@@ -75,17 +75,17 @@ APLeader::SlotAllocation ()
 {
   if (m_CCHslotAllocation.size() == 0)
   {
-      for(uint32_t i=0; i < config.apNum; i++)
-        m_CCHslotAllocation.push_back(i+1);
-      m_CCHslotAllocation.push_back(0);
-      for(uint32_t i=config.apNum+1; i < curSlot.CCHSlotNum; i++)
-        m_CCHslotAllocation.push_back(config.apNum);   
+      for(uint32_t i=0; i < curSlot.apCCHSlotNum; i++)
+        m_CCHslotAllocation.push_back((i+1)%(config.apNum+1));
+      for(uint32_t i=curSlot.apCCHSlotNum; i < curSlot.CCHSlotNum; i++)
+        m_CCHslotAllocation.push_back(config.apNum + 1);   
   }
-  m_SCHslotAllocation.clear();
   if (m_SCHslotAllocation.size() == 0)
   {
-      for(uint32_t i=0; i < curSlot.SCHSlotNum; i++)
+      for(uint32_t i=0; i < curSlot.apSCHSlotNum; i++)
         m_SCHslotAllocation.push_back(config.apNum);
+      for(uint32_t i=curSlot.apSCHSlotNum; i < curSlot.SCHSlotNum; i++)
+        m_SCHslotAllocation.push_back(config.apNum + 1);  
   }
   std::map <uint16_t, uint32_t>::iterator iter;
   iter = m_queueLen.find(GetNode () -> GetId());
@@ -98,10 +98,13 @@ APLeader::SlotAllocation ()
     m_queueLen.insert(std::pair<uint16_t, uint16_t> (GetNode ()->GetId(), txq.size ()));
   }
   int totalLen = 0;
+  std::cout<<"QueueLen:"<<std::endl;
   for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
   {
     totalLen+=iter->second;
+    std::cout<<iter->first<<':'<<iter->second<<' ';
   }
+  std::cout<<std::endl;
   int index1 = 0;
   for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
   {
@@ -120,7 +123,7 @@ APLeader::SlotAllocation ()
   }
   std::cout<<std::endl;
   std::cout<<"SCH slot allocation:"<<std::endl;
-  for(uint32_t i=0;i<m_CCHslotAllocation.size();i++)
+  for(uint32_t i=0;i<m_SCHslotAllocation.size();i++)
   {
     std::cout<<i<<':'<<m_SCHslotAllocation[i]<<' ';
   }

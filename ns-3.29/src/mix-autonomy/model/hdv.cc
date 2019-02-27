@@ -105,13 +105,14 @@ HumanApplication::GetNextSlotInterval (void)
   //LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
   SetCurSlot();
   if(GetStatus () == Middle)
-    {
-  curSlot.start = curSlot.apCCHSlotNum *slotSize + minTxInterval;
-  curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval; 
-    }
-  else {
-        curSlot.start = curSlot.apCCHSlotNum *slotSize + minTxInterval;
-        curSlot.duration = 30000 * slotSize -minTxInterval;
+  {
+    curSlot.start = curSlot.apCCHSlotNum *slotSize + minTxInterval;
+    curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval; 
+  }
+  else 
+  {
+    curSlot.start = curSlot.apCCHSlotNum *slotSize + minTxInterval;
+    curSlot.duration = 30000 * slotSize -minTxInterval;
   }
   return curSlot;
 }

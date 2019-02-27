@@ -101,6 +101,7 @@ TDMAApplication::CancelAllEvents (void)
 void
 TDMAApplication::SlotEnded (void) 
 {
+  std::cout<<GetNode()->GetId()<<" SlotEnded"<<std::endl;
   // LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " ended at " << Simulator::Now ().GetMicroSeconds ());
   if (!isAtOwnSlot) {
     LOG_UNCOND ("Fatal Error[1]: 时隙调度错误");
@@ -110,8 +111,7 @@ TDMAApplication::SlotEnded (void)
   curSlot = GetNextSlotInterval ();
   if(GetNode()->GetId()< config.apNum)
   {
-    std::cout<<GetNode()->GetId()<<" SlotEnded"<<std::endl;
-    std::cout<<curSlot.curFrame<<" Current Frame"<<std::endl;
+    // std::cout<<curSlot.curFrame<<" Current Frame"<<std::endl;
   }
   if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == CCH_hdvFrame)
      {
@@ -310,7 +310,7 @@ TDMAApplication:: SetCurSlot(void)
 struct TDMASlot
 TDMAApplication:: GetInitalSlot (void)
 {
-  LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
+  // LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
   SetCurSlot();
   if(GetNode ()->GetId () == 0) 
      {
