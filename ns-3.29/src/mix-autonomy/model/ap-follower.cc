@@ -40,16 +40,16 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
     // 收到了来自内核层的数据包
     ReceivePacketFromAP (pkt);
     if(SCHSendSlot.size() > 0 && leaderPacketCnt == 1)
-    {
-      curSlot.duration = SCHSendSlot.size()* slotSize - minTxInterval;
-      slotStartEvt = Simulator::Schedule (SCHSendSlot[0] * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval, &APFollower::SlotStarted, this);
+    { 
+      SetCurSlot();
+      if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == CCH_hdvFrame)
+      {
+       curSlot.duration = SCHSendSlot.size()* slotSize - minTxInterval;
+       slotStartEvt = Simulator::Schedule (SCHSendSlot[0] * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval, &APFollower::SlotStarted, this);
+       std::cout<<GetNode()->GetId()<<" 预计在数据帧时隙"<<SCHSendSlot[0]<<"发包"<<std::endl;
+      }
     } 
   }
-  else
-  {
-    leaderPacketCnt = 0;
-  }
-  
 }
 
 void
@@ -58,8 +58,12 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
   PacketHeader pHeader;
   pkt->RemoveHeader(pHeader);
   if(!pHeader.GetIsLeader())
-    return;
-  leaderPacketCnt++;
+   { 
+     leaderPacketCnt = 0;
+     return;
+   }
+  leaderPacketCnt = leaderPacketCnt + 1;
+  std::cout<<GetNode()->GetId()<<"当前收到"<<leaderPacketCnt<<"个leader的包"<<std::endl;
   uint16_t *CCHslotAllocation = pHeader.GetCCHslotAllocation();
   uint16_t *SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
   for(uint32_t i=0; i<curSlot.CCHSlotNum; i++) //查找下次发控制包的时隙
