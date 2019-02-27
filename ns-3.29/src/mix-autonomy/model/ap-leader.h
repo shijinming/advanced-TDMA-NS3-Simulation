@@ -29,6 +29,7 @@ public:
    */
   void SetupHeader(PacketHeader &hdr); //将时隙分配信息写入报头
   void SlotAllocation ();
+  void SlotDidEnd (void);
 
 private:
   //std::vector <struct PacketHeader::FrameHeader> followerList; //收到的follower控制包报头

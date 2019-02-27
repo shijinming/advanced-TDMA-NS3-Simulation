@@ -75,13 +75,16 @@ APLeader::SlotAllocation ()
 {
   if (m_CCHslotAllocation.size() == 0)
   {
-      for(uint32_t i=0; i < curSlot.CCHSlotNum; i++)
-        m_CCHslotAllocation.push_back(i);
+      for(uint32_t i=0; i < config.apNum; i++)
+        m_CCHslotAllocation.push_back(i+1);
+      m_CCHslotAllocation.push_back(0);
+      for(uint32_t i=config.apNum+1; i < curSlot.CCHSlotNum; i++)
+        m_CCHslotAllocation.push_back(config.apNum);   
   }
   if (m_SCHslotAllocation.size() == 0)
   {
       for(uint32_t i=0; i < curSlot.SCHSlotNum; i++)
-        m_SCHslotAllocation.push_back(0);
+        m_SCHslotAllocation.push_back(config.apNum);
   }
   std::map <uint16_t, uint32_t>::iterator iter;
   iter = m_queueLen.find(GetNode () -> GetId());
@@ -98,18 +101,17 @@ APLeader::SlotAllocation ()
   {
     totalLen+=iter->second;
   }
-  int index1 = 0, index2 = 0;
+  int index1 = 0;
+
   for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
   {
-    m_CCHslotAllocation[index1] = iter->first;
-    index1++;
     if(totalLen > 0)
     {
-      for(uint32_t i = 0; i < iter->second * curSlot.SCHSlotNum / totalLen; i++){
-        m_SCHslotAllocation[index2] = iter->first;
-        index2++;
+      for(uint32_t i = 0; i < iter->second * curSlot.apSCHSlotNum / totalLen; i++){
+        m_SCHslotAllocation[index1] = iter->first;
+        index1++;
       }
-    } 
+    }
   }
   std::cout<<"CCH slot allocation:"<<std::endl;
   for(uint32_t i=0;i<m_CCHslotAllocation.size();i++)
@@ -124,18 +126,23 @@ APLeader::SlotAllocation ()
   }
   std::cout<<std::endl;
   //查找leader给自己分配的数据帧发包时隙
-  for(uint32_t i=0; i<curSlot.SCHSlotNum; i++) //查找发数据包的时隙
+  for(uint32_t i=0; i<curSlot.apSCHSlotNum; i++) //查找发数据包的时隙
   {
     if(GetNode ()->GetId () == m_SCHslotAllocation[i])
       {
         mySendSlot.push_back(i); //将i插入到向量最后面
       } 
   }
-  if(!mySendSlot.size())
+
+}
+
+void
+APLeader::SlotDidEnd (void)
+{
+  if(mySendSlot.size()>0)
     {
       curSlot.duration = mySendSlot.size()* slotSize - minTxInterval;
       slotStartEvt = Simulator::Schedule (mySendSlot[0] * slotSize + minTxInterval, &APLeader::SlotStarted, this);
-      curSlot.duration = slotSize - minTxInterval;
     }
 }
 

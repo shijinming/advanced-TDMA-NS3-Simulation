@@ -38,13 +38,11 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
   if (IsAPApplicationInstalled (node))
   {
     // 收到了来自内核层的数据包
-    leaderPacketCnt++;
     ReceivePacketFromAP (pkt);
     if(SCHSendSlot.size() > 0 && leaderPacketCnt == 1)
     {
       curSlot.duration = SCHSendSlot.size()* slotSize - minTxInterval;
       slotStartEvt = Simulator::Schedule (SCHSendSlot[0] * slotSize + minTxInterval, &APFollower::SlotStarted, this);
-      curSlot.duration = slotSize - minTxInterval;
     } 
   }
   else
@@ -61,6 +59,7 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
   pkt->RemoveHeader(pHeader);
   if(!pHeader.GetIsLeader())
     return;
+  leaderPacketCnt++;
   uint16_t *CCHslotAllocation = pHeader.GetCCHslotAllocation();
   uint16_t *SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
   for(uint32_t i=0; i<curSlot.CCHSlotNum; i++) //查找下次发控制包的时隙
