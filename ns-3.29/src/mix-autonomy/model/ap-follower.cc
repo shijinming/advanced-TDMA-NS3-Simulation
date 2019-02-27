@@ -42,7 +42,7 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
     if(SCHSendSlot.size() > 0 && leaderPacketCnt == 1)
     {
       curSlot.duration = SCHSendSlot.size()* slotSize - minTxInterval;
-      slotStartEvt = Simulator::Schedule (SCHSendSlot[0] * slotSize + minTxInterval, &APFollower::SlotStarted, this);
+      slotStartEvt = Simulator::Schedule (SCHSendSlot[0] * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval, &APFollower::SlotStarted, this);
     } 
   }
   else
@@ -75,6 +75,7 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
     if(GetNode ()->GetId () == SCHslotAllocation[i])
       {
         SCHSendSlot.push_back(i); //将i插入到向量最后面
+        std::cout<<GetNode()->GetId()<<" 收到时隙分配数组，在"<<i<<"数据时隙可发包"<<std::endl;
       } 
   }
 }

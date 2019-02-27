@@ -102,7 +102,6 @@ APLeader::SlotAllocation ()
     totalLen+=iter->second;
   }
   int index1 = 0;
-
   for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
   {
     if(totalLen > 0)
@@ -142,7 +141,7 @@ APLeader::SlotDidEnd (void)
   if(mySendSlot.size()>0)
     {
       curSlot.duration = mySendSlot.size()* slotSize - minTxInterval;
-      slotStartEvt = Simulator::Schedule (mySendSlot[0] * slotSize + minTxInterval, &APLeader::SlotStarted, this);
+      slotStartEvt = Simulator::Schedule (mySendSlot[0] * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval, &APLeader::SlotStarted, this);
     }
 }
 
