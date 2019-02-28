@@ -39,7 +39,21 @@ HumanApplication::GetStatus ()
 void
 HumanApplication::AddToMiddle ()
 {
-    m_status = Middle;
+  m_status = Middle;
+  slotEndEvt.Cancel();
+  txEvent.Cancel ();
+  Time t1,t2,t3;
+  t1 = Simulator::Now() - minTxInterval;
+  t2 = (curSlot.CCHSlotNum + curSlot.SCHSlotNum) * slotSize;
+  t3 = MilliSeconds(t1.GetMilliSeconds()%t2.GetMilliSeconds());
+  if(t3.GetMilliSeconds() <= curSlot.CCHSlotNum * slotSize.GetMilliSeconds())
+     {
+      curSlot.start = curSlot.CCHSlotNum * slotSize - t3;
+     }
+  else curSlot.start = t2 + curSlot.CCHSlotNum * slotSize - t3;
+  curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval;  
+  slotStartEvt = Simulator::Schedule (curSlot.start, &HumanApplication::SlotStarted, this);
+  isAtOwnSlot = false;
 } 
 
 void 
@@ -61,7 +75,7 @@ HumanApplication::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
         AddToMiddle ();
         receiveAPId = curSlot.id;
     }
-    else if (curSlot.id-receiveAPId > (curSlot.CCHSlotNum + curSlot.SCHSlotNum)) //一个总帧内未收到内核层的包
+    else if (curSlot.id-receiveAPId > 2 * (curSlot.CCHSlotNum + curSlot.SCHSlotNum)) //一个总帧内未收到内核层的包
             {
               QuitFromMiddle();
             }
@@ -107,13 +121,20 @@ HumanApplication::GetNextSlotInterval (void)
   SetCurSlot();
   if(GetStatus () == Middle)
   {
-    //如果CCH和SCH长度不相等，则需要加入判断当前帧
-    curSlot.start = curSlot.apCCHSlotNum *slotSize + minTxInterval;
-    curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval; 
+     if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == SCH_hdvFrame)
+     {
+      curSlot.start = curSlot.apCCHSlotNum *slotSize + minTxInterval;
+      curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval; 
+     }
+     else
+     {
+      curSlot.start = curSlot.apSCHSlotNum *slotSize + minTxInterval;
+      curSlot.duration = slotSize * curSlot.hdvSCHSlotNum - minTxInterval; 
+     }
   }
   else 
   {
-    curSlot.start = curSlot.apCCHSlotNum *slotSize + minTxInterval;
+    curSlot.start = minTxInterval;
     curSlot.duration = Seconds(config.simTime);
   }
   return curSlot;
