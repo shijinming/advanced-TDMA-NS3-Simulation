@@ -150,7 +150,8 @@ TDMAApplication::SlotStarted (void)
     std::cout<<"SCH:";
   std::cout<<GetNode()->GetId()<<" SlotStarted "<<Simulator::Now()<<std::endl;
 
-  if(curSlot.curFrame == SCH_apFrame)  curSlot.duration = slotSize - minTxInterval;
+  if(curSlot.curFrame == SCH_apFrame)  
+    curSlot.duration = slotSize - minTxInterval;
   slotCnt += 1;
   isAtOwnSlot = true;
   if(curSlot.curFrame == Frame::CCH_apFrame)
@@ -199,7 +200,8 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
     {
       InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
       Address addr = inetAddr.GetIpv4 ();
-      ReceivePacket (pkt, srcAddr);
+      if(Simulator::Now() > m_startTime)
+        ReceivePacket (pkt, srcAddr);
       // 取出帧头的操作应该放在ReceivePacket函数中，由子类进行。
       // PacketHeader pHeader;
       // pkt->RemoveHeader(pHeader);

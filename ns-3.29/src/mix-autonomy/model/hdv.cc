@@ -46,11 +46,11 @@ HumanApplication::AddToMiddle ()
   t1 = Simulator::Now() - minTxInterval;
   t2 = (curSlot.CCHSlotNum + curSlot.SCHSlotNum) * slotSize;
   t3 = MilliSeconds(t1.GetMilliSeconds()%t2.GetMilliSeconds());
-  if(t3.GetMilliSeconds() <= curSlot.CCHSlotNum * slotSize.GetMilliSeconds())
-     {
-      curSlot.start = curSlot.CCHSlotNum * slotSize - t3;
-     }
-  else curSlot.start = t2 + curSlot.CCHSlotNum * slotSize - t3;
+  if(t3.GetMilliSeconds() <= uint32_t (curSlot.apCCHSlotNum) * slotSize.GetMilliSeconds())
+  {
+    curSlot.start = curSlot.apCCHSlotNum * slotSize - t3;
+  }
+  else curSlot.start = t2 + curSlot.apCCHSlotNum * slotSize - t3;
   curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval;  
   slotStartEvt = Simulator::Schedule (curSlot.start, &HumanApplication::SlotStarted, this);
   isAtOwnSlot = false;
@@ -72,13 +72,15 @@ HumanApplication::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
     if (IsAPApplicationInstalled (node))
     {
         // 收到了来自内核层的数据包
-        AddToMiddle ();
+        if(m_status == Outter)
+          AddToMiddle ();
         receiveAPId = curSlot.id;
     }
     else if (curSlot.id-receiveAPId > 2 * (curSlot.CCHSlotNum + curSlot.SCHSlotNum)) //一个总帧内未收到内核层的包
-            {
-              QuitFromMiddle();
-            }
+    {
+      //if(m_status == Middle)
+        //QuitFromMiddle();
+    }
 }
 
 

@@ -14,7 +14,7 @@ public:
     /** 任务id */
     uint32_t taskId = 0;
     /** 节点数量 */
-    uint32_t nNodes = 16;
+    uint32_t nNodes = 143;
     /** 仿真时间 */
     uint32_t simTime = 600;
     /** 自动驾驶车辆数量 */
