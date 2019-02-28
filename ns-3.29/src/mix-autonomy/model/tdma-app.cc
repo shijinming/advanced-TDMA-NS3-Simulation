@@ -109,20 +109,24 @@ TDMAApplication::SlotEnded (void)
   txEvent.Cancel ();
   curSlot = GetNextSlotInterval ();
 
-  if(curSlot.curFrame == Frame::CCH_apFrame)
+  if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
     std::cout<<"CCH:";
   else
     std::cout<<"SCH:";
   std::cout<<GetNode()->GetId()<<" SlotEnded "<<Simulator::Now()<<std::endl;
 
-  if(GetNode()->GetId()< config.apNum)
+  if(IsAPApplicationInstalled(GetNode()))
   {
-    // std::cout<<curSlot.curFrame<<" Current Frame"<<std::endl;
+    if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == CCH_hdvFrame)
+    {
+      slotStartEvt = Simulator::Schedule (curSlot.start, &TDMAApplication::SlotStarted, this);     
+    }
   }
-  if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == CCH_hdvFrame)
-     {
-       slotStartEvt = Simulator::Schedule (curSlot.start, &TDMAApplication::SlotStarted, this);     
-     }
+  else
+  {
+    slotStartEvt = Simulator::Schedule (curSlot.start, &TDMAApplication::SlotStarted, this);
+  }
+  
   isAtOwnSlot = false;
   if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == CCH_hdvFrame) 
     SlotDidEnd ();
@@ -140,7 +144,7 @@ TDMAApplication::SlotStarted (void)
   slotEndEvt = Simulator::Schedule (curSlot.duration, &TDMAApplication::SlotEnded, this);
   SetCurSlot();
 
-  if(curSlot.curFrame == Frame::CCH_apFrame)
+  if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
     std::cout<<"CCH:";
   else
     std::cout<<"SCH:";
@@ -338,16 +342,21 @@ TDMAApplication:: GetInitalSlot (void)
   // LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
   SetCurSlot();
   if(GetNode ()->GetId () == 0) 
-     {
-       curSlot.start = slotSize * config.apNum + minTxInterval;
+  {
+    curSlot.duration =  slotSize - minTxInterval;
+    curSlot.start = slotSize * config.apNum + minTxInterval;
 
-     }
+  }
   else if(GetNode ()->GetId () < config.apNum) 
-         {
-           curSlot.start = slotSize * (GetNode ()->GetId ()-1) + minTxInterval;
-         }
-  else curSlot.start = slotSize * (config.apNum + 1) + minTxInterval;
-  curSlot.duration =  slotSize - minTxInterval;
+  {
+    curSlot.duration =  slotSize - minTxInterval;
+    curSlot.start = slotSize * (GetNode ()->GetId ()-1) + minTxInterval;
+  }
+  else 
+  {
+    curSlot.start = slotSize * (config.apNum + 1) + minTxInterval;
+    curSlot.duration = Seconds(config.simTime);
+  }
   return curSlot;
 }
 

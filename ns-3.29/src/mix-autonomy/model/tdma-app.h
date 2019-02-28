@@ -229,6 +229,8 @@ protected:
   virtual void WillSendMockPacket (Ptr<Packet> pkt) {SendPacket();};
 
   virtual void SlotAllocation (void) {};
+
+  virtual bool IsAPApplicationInstalled (Ptr<Node> node) = 0;
 };
 
 }

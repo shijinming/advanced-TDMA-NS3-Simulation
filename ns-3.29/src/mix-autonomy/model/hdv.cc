@@ -22,6 +22,7 @@ HumanApplication::GetTypeId ()
 HumanApplication::HumanApplication ()
 {
     NS_LOG_FUNCTION (this);
+    m_status = Outter;
 }
 
 HumanApplication::~HumanApplication ()
@@ -106,13 +107,14 @@ HumanApplication::GetNextSlotInterval (void)
   SetCurSlot();
   if(GetStatus () == Middle)
   {
+    //如果CCH和SCH长度不相等，则需要加入判断当前帧
     curSlot.start = curSlot.apCCHSlotNum *slotSize + minTxInterval;
     curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval; 
   }
   else 
   {
     curSlot.start = curSlot.apCCHSlotNum *slotSize + minTxInterval;
-    curSlot.duration = 30000 * slotSize -minTxInterval;
+    curSlot.duration = Seconds(config.simTime);
   }
   return curSlot;
 }

@@ -31,6 +31,7 @@ private:
   virtual void ReceivePacket (Ptr<const Packet> pkt, const Address & srcAddr) {};
   virtual struct TDMASlot GetNextSlotInterval (void) {return TDMASlot();}
   //virtual struct TDMASlot GetInitalSlot (void);
+  bool IsAPApplicationInstalled (Ptr<Node> node) {return false;}
 };
 
 TypeId
