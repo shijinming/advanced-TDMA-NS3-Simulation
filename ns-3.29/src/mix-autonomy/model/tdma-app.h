@@ -114,8 +114,9 @@ protected:
    * 
    * 注意，发送具有实际意义的控制包的时候，不要直接使用socket，将包放入这个队列，可以直接使用SendPacket这个函数
    */
-  std::queue<Ptr<Packet> > txq;
-  void SendPacket (Ptr<Packet> pkt);
+  std::queue<Ptr<Packet> > txqCCH;
+  std::queue<Ptr<Packet> > txqSCH;
+  virtual void SendPacket (void) = 0;
 
   /**
    * @brief 唤醒发送队列
@@ -225,7 +226,7 @@ protected:
    * 
    * @param pkt 
    */
-  virtual void WillSendMockPacket (Ptr<Packet> pkt) {SendPacket(pkt);};
+  virtual void WillSendMockPacket (Ptr<Packet> pkt) {SendPacket();};
 
   virtual void SlotAllocation (void) {};
 };

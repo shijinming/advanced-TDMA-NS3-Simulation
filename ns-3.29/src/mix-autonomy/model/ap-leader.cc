@@ -73,6 +73,7 @@ APLeader::SetupHeader(PacketHeader &hdr)
 void
 APLeader::SlotAllocation ()
 {
+  m_SCHslotAllocation.clear();
   if (m_CCHslotAllocation.size() == 0)
   {
       for(uint32_t i=0; i < curSlot.apCCHSlotNum; i++)
@@ -91,11 +92,11 @@ APLeader::SlotAllocation ()
   iter = m_queueLen.find(GetNode () -> GetId());
   if(iter != m_queueLen.end())
     {
-      m_queueLen[iter->first] = txq.size();
+      m_queueLen[iter->first] = txqSCH.size();
     }
   else
   {
-    m_queueLen.insert(std::pair<uint16_t, uint16_t> (GetNode ()->GetId(), txq.size ()));
+    m_queueLen.insert(std::pair<uint16_t, uint16_t> (GetNode ()->GetId(), txqSCH.size ()));
   }
   int totalLen = 0;
   std::cout<<"QueueLen:"<<std::endl;
@@ -132,9 +133,9 @@ APLeader::SlotAllocation ()
   for(uint32_t i=0; i<curSlot.apSCHSlotNum; i++) //查找发数据包的时隙
   {
     if(GetNode ()->GetId () == m_SCHslotAllocation[i])
-      {
-        mySendSlot.push_back(i); //将i插入到向量最后面
-      } 
+    {
+      mySendSlot.push_back(i); //将i插入到向量最后面
+    } 
   }
 
 }
@@ -147,6 +148,7 @@ APLeader::SlotDidEnd (void)
       curSlot.duration = mySendSlot.size()* slotSize - minTxInterval;
       slotStartEvt = Simulator::Schedule (mySendSlot[0] * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval, &APLeader::SlotStarted, this);
     }
+    mySendSlot.clear();
 }
 
 }

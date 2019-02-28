@@ -24,6 +24,7 @@ public:
   virtual void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr) {};
   void SetupHeader (PacketHeader &hdr) {};
   void SlotAllocation () {};
+  void SendPacket () {};
 private:
   //Time slotSize;
 

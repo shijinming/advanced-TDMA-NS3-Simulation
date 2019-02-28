@@ -35,6 +35,10 @@ public:
     void SlotAllocation () {};
     struct TDMASlot GetNextSlotInterval (void);
 
+    void SendPacket (void);
+    void SlotWillStart (void);
+
+
 private:
     Status              m_status;
     uint64_t            receiveAPId;

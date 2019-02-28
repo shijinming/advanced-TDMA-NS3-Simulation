@@ -15,7 +15,7 @@ TDMAApplication::GetTypeId ()
       MakeDataRateAccessor (&TDMAApplication::dataRate),
       MakeDataRateChecker ())
     .AddAttribute ("EnableMockTraffic", "Whether to enable mock traffic",
-      BooleanValue (true),
+      BooleanValue (false),
       MakeBooleanAccessor (&TDMAApplication::enableMockTraffic),
       MakeBooleanChecker ())
     .AddAttribute ("MockPacketSize", "Size of mock packets (in bytes)",
@@ -101,7 +101,6 @@ TDMAApplication::CancelAllEvents (void)
 void
 TDMAApplication::SlotEnded (void) 
 {
-  std::cout<<GetNode()->GetId()<<" SlotEnded"<<std::endl;
   // LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " ended at " << Simulator::Now ().GetMicroSeconds ());
   if (!isAtOwnSlot) {
     LOG_UNCOND ("Fatal Error[1]: 时隙调度错误");
@@ -109,6 +108,13 @@ TDMAApplication::SlotEnded (void)
   }
   txEvent.Cancel ();
   curSlot = GetNextSlotInterval ();
+
+  if(curSlot.curFrame == Frame::CCH_apFrame)
+    std::cout<<"CCH:";
+  else
+    std::cout<<"SCH:";
+  std::cout<<GetNode()->GetId()<<" SlotEnded "<<Simulator::Now()<<std::endl;
+
   if(GetNode()->GetId()< config.apNum)
   {
     // std::cout<<curSlot.curFrame<<" Current Frame"<<std::endl;
@@ -118,14 +124,13 @@ TDMAApplication::SlotEnded (void)
        slotStartEvt = Simulator::Schedule (curSlot.start, &TDMAApplication::SlotStarted, this);     
      }
   isAtOwnSlot = false;
-  SlotDidEnd ();
+  if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == CCH_hdvFrame) 
+    SlotDidEnd ();
 }
 
 void
 TDMAApplication::SlotStarted (void) 
 {
-  if(GetNode()->GetId()< config.apNum)
-  std::cout<<GetNode()->GetId()<<" SlotStarted"<<std::endl;
   //LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " started at " << Simulator::Now ().GetMicroSeconds ());
   if (isAtOwnSlot) {
     // 已经开始了的时隙重复启动
@@ -134,11 +139,19 @@ TDMAApplication::SlotStarted (void)
   }
   slotEndEvt = Simulator::Schedule (curSlot.duration, &TDMAApplication::SlotEnded, this);
   SetCurSlot();
+
+  if(curSlot.curFrame == Frame::CCH_apFrame)
+    std::cout<<"CCH:";
+  else
+    std::cout<<"SCH:";
+  std::cout<<GetNode()->GetId()<<" SlotStarted "<<Simulator::Now()<<std::endl;
+
   if(curSlot.curFrame == SCH_apFrame)  curSlot.duration = slotSize - minTxInterval;
   slotCnt += 1;
   isAtOwnSlot = true;
+  if(curSlot.curFrame == Frame::CCH_apFrame)
+    SlotAllocation();
   SlotWillStart ();
-  SlotAllocation();
   WakeUpTxQueue ();
 }
 
@@ -191,12 +204,6 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
 }
 
 void
-TDMAApplication::SendPacket (Ptr<Packet> pkt)
-{
-  txq.push (pkt);
-}
-
-void
 TDMAApplication::DoSendPacket (Ptr<Packet> pkt)
 {
   PacketHeader pktHdr;
@@ -213,17 +220,35 @@ TDMAApplication::WakeUpTxQueue ()
 {
   if (!isAtOwnSlot) return; 
   Ptr<Packet> pktToSend = NULL;
-  if (!txq.empty ())
+
+  if (curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
+  {
+    if(!txqCCH.empty ())
     {
       // std::cout<<"Send normal packet."<<std::endl;
-      pktToSend = txq.front ();
-      txq.pop ();
+      pktToSend = txqCCH.front ();
+      txqCCH.pop ();
     }
-  else if (enableMockTraffic)
+    else if (enableMockTraffic)
     {
       pktToSend = Create<Packet> (mockPktSize);
       WillSendMockPacket (pktToSend);
     }
+  }
+  else
+  {
+    if(!txqSCH.empty ())
+    {
+      // std::cout<<"Send normal packet."<<std::endl;
+      pktToSend = txqSCH.front ();
+      txqSCH.pop ();
+    }
+    else if (enableMockTraffic)
+    {
+      pktToSend = Create<Packet> (mockPktSize);
+      WillSendMockPacket (pktToSend);
+    }
+  }
   Time nextTxTime = minTxInterval;
   if (pktToSend != NULL)
     {

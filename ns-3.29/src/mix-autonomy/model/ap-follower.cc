@@ -42,11 +42,11 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
     if(SCHSendSlot.size() > 0 && leaderPacketCnt == 1)
     { 
       SetCurSlot();
-      if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == CCH_hdvFrame)
+      if(curSlot.curFrame == CCH_apFrame) 
       {
        curSlot.duration = SCHSendSlot.size()* slotSize - minTxInterval;
-       slotStartEvt = Simulator::Schedule (SCHSendSlot[0] * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval, &APFollower::SlotStarted, this);
-       std::cout<<GetNode()->GetId()<<" 预计在数据帧时隙"<<SCHSendSlot[0]<<"发包"<<std::endl;
+       slotStartEvt = Simulator::Schedule ((SCHSendSlot[0]+1) * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval, &APFollower::SlotStarted, this);
+      //  std::cout<<GetNode()->GetId()<<" 预计在数据帧时隙"<<SCHSendSlot[0]<<"发包"<<std::endl;
       }
     } 
   }
@@ -58,11 +58,11 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
   PacketHeader pHeader;
   pkt->RemoveHeader(pHeader);
   if(!pHeader.GetIsLeader())
-   { 
-     leaderPacketCnt = 0;
-     return;
-   }
-  leaderPacketCnt = leaderPacketCnt + 1;
+  {
+    leaderPacketCnt = 0;
+    return;
+  }
+  leaderPacketCnt++;
   // std::cout<<GetNode()->GetId()<<"当前收到"<<leaderPacketCnt<<"个leader的包"<<std::endl;
   uint16_t *CCHslotAllocation = pHeader.GetCCHslotAllocation();
   uint16_t *SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
@@ -90,7 +90,7 @@ APFollower::SetupHeader (PacketHeader &hdr)
   hdr.SetIsLeader(false);
   hdr.SetType(1);
   hdr.SetId(GetNode ()->GetId ());
-  hdr.SetQueueLen(txq.size());
+  hdr.SetQueueLen(txqSCH.size());
   // hdr.SetQueueLen(rand()%100);
   hdr.SetTimestamp(Simulator::Now ().GetMicroSeconds ());
   Vector pos = GetNode ()->GetObject<MobilityModel> ()->GetPosition ();
@@ -138,6 +138,33 @@ APFollower::GetNextSlotInterval (void)
   curSlot.start = (curSlot.CCHSlotNum + curSlot.SCHSlotNum -1)*slotSize + minTxInterval;
   curSlot.duration = slotSize - minTxInterval;
   return curSlot;
+}
+
+void
+APFollower::SendPacket (void)
+{
+  if (curSlot.curFrame == CCH_apFrame && isAtOwnSlot)
+  {
+    Ptr<Packet> pkt;
+    uint32_t CpktCnt = 5;
+    uint32_t SpktCnt = rand()%10;
+    for(uint32_t i = 0; i < CpktCnt; i++)
+    {
+      pkt = Create<Packet> (0);
+      txqCCH.push(pkt);
+    }
+    for(uint32_t i = 0; i < SpktCnt; i++)
+    {
+      pkt = Create<Packet> (0);
+      txqSCH.push(pkt);
+    }
+  }
+}
+
+void
+APFollower::SlotWillStart (void)
+{
+  SendPacket ();
 }
 
 }

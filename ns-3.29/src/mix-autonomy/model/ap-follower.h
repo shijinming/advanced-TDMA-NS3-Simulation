@@ -27,6 +27,8 @@ public:
   Ptr<Node> GetNodeFromAddress (Ipv4Address & address);
   void SlotAllocation () {};
   struct TDMASlot GetNextSlotInterval (void);
+  void SendPacket (void);
+  void SlotWillStart (void);
 
 private:
   uint64_t CCHSendSlot;
