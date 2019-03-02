@@ -109,11 +109,11 @@ TDMAApplication::SlotEnded (void)
   txEvent.Cancel ();
   curSlot = GetNextSlotInterval ();
 
-  if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
-    std::cout<<"CCH:";
-  else
-    std::cout<<"SCH:";
-  std::cout<<GetNode()->GetId()<<" SlotEnded "<<Simulator::Now()<<std::endl;
+  // if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
+  //   std::cout<<"CCH:";
+  // else
+  //   std::cout<<"SCH:";
+  // std::cout<<GetNode()->GetId()<<" SlotEnded "<<Simulator::Now()<<std::endl;
 
   if(IsAPApplicationInstalled(GetNode()))
   {
@@ -144,11 +144,11 @@ TDMAApplication::SlotStarted (void)
   slotEndEvt = Simulator::Schedule (curSlot.duration, &TDMAApplication::SlotEnded, this);
   SetCurSlot();
 
-  if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
-    std::cout<<"CCH:";
-  else
-    std::cout<<"SCH:";
-  std::cout<<GetNode()->GetId()<<" SlotStarted "<<Simulator::Now()<<std::endl;
+  // if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
+  //   std::cout<<"CCH:";
+  // else
+  //   std::cout<<"SCH:";
+  // std::cout<<GetNode()->GetId()<<" SlotStarted "<<Simulator::Now()<<std::endl;
 
   if(curSlot.curFrame == SCH_apFrame)  
     curSlot.duration = slotSize - minTxInterval;

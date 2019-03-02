@@ -99,11 +99,11 @@ APLeader::SlotAllocation ()
     m_queueLen.insert(std::pair<uint16_t, uint16_t> (GetNode ()->GetId(), txqSCH.size ()));
   }
   int totalLen = 0;
-  std::cout<<"QueueLen:"<<std::endl;
+  // std::cout<<"QueueLen:"<<std::endl;
   for(iter = m_queueLen.begin(); iter != m_queueLen.end(); iter++)
   {
     totalLen+=iter->second;
-    std::cout<<iter->first<<':'<<iter->second<<' ';
+    // std::cout<<iter->first<<':'<<iter->second<<' ';
   }
   std::cout<<std::endl;
   int index1 = 0;
@@ -117,18 +117,18 @@ APLeader::SlotAllocation ()
       }
     }
   }
-  std::cout<<"CCH slot allocation:"<<std::endl;
-  for(uint32_t i=0;i<m_CCHslotAllocation.size();i++)
-  {
-    std::cout<<i<<':'<<m_CCHslotAllocation[i]<<' ';
-  }
-  std::cout<<std::endl;
-  std::cout<<"SCH slot allocation:"<<std::endl;
-  for(uint32_t i=0;i<m_SCHslotAllocation.size();i++)
-  {
-    std::cout<<i<<':'<<m_SCHslotAllocation[i]<<' ';
-  }
-  std::cout<<std::endl;
+  // std::cout<<"CCH slot allocation:"<<std::endl;
+  // for(uint32_t i=0;i<m_CCHslotAllocation.size();i++)
+  // {
+  //   std::cout<<i<<':'<<m_CCHslotAllocation[i]<<' ';
+  // }
+  // std::cout<<std::endl;
+  // std::cout<<"SCH slot allocation:"<<std::endl;
+  // for(uint32_t i=0;i<m_SCHslotAllocation.size();i++)
+  // {
+  //   std::cout<<i<<':'<<m_SCHslotAllocation[i]<<' ';
+  // }
+  // std::cout<<std::endl;
   //查找leader给自己分配的数据帧发包时隙
   for(uint32_t i=0; i<curSlot.apSCHSlotNum; i++) //查找发数据包的时隙
   {

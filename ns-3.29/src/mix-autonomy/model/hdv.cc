@@ -78,8 +78,8 @@ HumanApplication::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
     }
     else if (curSlot.id-receiveAPId > 2 * (curSlot.CCHSlotNum + curSlot.SCHSlotNum)) //一个总帧内未收到内核层的包
     {
-      //if(m_status == Middle)
-        //QuitFromMiddle();
+      if(m_status == Middle)
+        QuitFromMiddle();
     }
 }
 

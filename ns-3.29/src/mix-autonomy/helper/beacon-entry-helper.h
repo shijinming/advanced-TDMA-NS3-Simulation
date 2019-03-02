@@ -86,8 +86,8 @@ BeaconSimulationEntry::ConfigureApplication ()
         app = apfollowerHelper.Install(*node);
       else
         app = hdvHelper.Install(*node);
-        //app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
-        //app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
+        app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
+        app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
       //(*node)->AddApplication (app);
     }
   LOG_UNCOND ("Done create application");
@@ -96,14 +96,16 @@ BeaconSimulationEntry::ConfigureApplication ()
 void 
 BeaconSimulationEntry::PrintSendPacket(Ptr<const Packet> packet, const Address &address)
 {
-  std::cout<<"Send a packet "<<packet<<" from "<<address<<std::endl;
+  // std::cout<<"Send a packet "<<packet<<" from "<<address<<std::endl;
+  std::cout<<address<<','<<packet<<std::endl;
 }
 
 void 
 BeaconSimulationEntry::PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3::Application const> app, const Address &address)
 {
   Ptr<Ipv4> ipv4 = app->GetNode ()->GetObject<Ipv4> ();
-  std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<" Received a packet "<<packet<<" from "<<address<<std::endl;
+  // std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<" Received a packet "<<packet<<" from "<<address<<std::endl;
+  std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<','<<packet<<','<<address<<std::endl;
 }
 
 }
