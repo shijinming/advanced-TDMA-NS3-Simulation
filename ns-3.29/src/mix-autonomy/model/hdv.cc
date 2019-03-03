@@ -40,6 +40,7 @@ void
 HumanApplication::AddToMiddle ()
 {
   m_status = Middle;
+  std::cout<<GetNode()->GetId()<<" add to middle."<<std::endl;
   slotEndEvt.Cancel();
   txEvent.Cancel ();
   Time t1,t2,t3;
@@ -60,6 +61,7 @@ void
 HumanApplication::QuitFromMiddle ()
 {
     m_status = Outter;
+    std::cout<<GetNode()->GetId()<<" quit from middle."<<std::endl;
 }
 
 void 
