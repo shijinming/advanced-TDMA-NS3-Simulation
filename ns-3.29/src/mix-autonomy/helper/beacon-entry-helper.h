@@ -107,7 +107,7 @@ BeaconSimulationEntry::PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3
   // std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<" Received a packet "<<packet<<" from "<<address<<std::endl;
   std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<','<<packet->GetUid ()<<','<<address<<','
   <<Simulator::Now().GetMilliSeconds()<<','<<app->GetObject<TDMAApplication>()->GetStatus()<<','
-  <<app->GetNode ()->GetObject<ConstantPositionMobilityModel>()->GetPosition()<<std::endl;
+  <<app->GetNode ()->GetObject<ConstantVelocityMobilityModel>()->GetPosition()<<std::endl;
 }
 
 }
