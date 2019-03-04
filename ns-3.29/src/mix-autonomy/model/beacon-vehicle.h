@@ -25,6 +25,7 @@ public:
   void SetupHeader (PacketHeader &hdr) {};
   void SlotAllocation () {};
   void SendPacket () {};
+  uint8_t GetStatus () {};
 private:
   //Time slotSize;
 

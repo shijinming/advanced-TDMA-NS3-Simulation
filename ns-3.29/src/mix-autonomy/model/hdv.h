@@ -20,7 +20,7 @@ public:
 
     enum Status {Middle, Outter};
     //static int GetHumanStatus (Ptr<Node> node);
-    Status GetStatus ();
+    uint8_t GetStatus ();
     void SetTDMAEnable (bool val);
 
     void AddToMiddle(); //如果收到内核层包，更新状态信息

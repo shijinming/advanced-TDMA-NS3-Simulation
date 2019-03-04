@@ -30,10 +30,13 @@ HumanApplication::~HumanApplication ()
     NS_LOG_FUNCTION (this);
 }
 
-HumanApplication::Status
+uint8_t
 HumanApplication::GetStatus ()
 {
-    return m_status;
+  if(m_status == Middle)
+    return 1;
+  else
+    return 2;
 }
 
 void

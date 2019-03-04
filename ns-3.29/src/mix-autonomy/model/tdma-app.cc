@@ -15,7 +15,7 @@ TDMAApplication::GetTypeId ()
       MakeDataRateAccessor (&TDMAApplication::dataRate),
       MakeDataRateChecker ())
     .AddAttribute ("EnableMockTraffic", "Whether to enable mock traffic",
-      BooleanValue (false),
+      BooleanValue (true),
       MakeBooleanAccessor (&TDMAApplication::enableMockTraffic),
       MakeBooleanChecker ())
     .AddAttribute ("MockPacketSize", "Size of mock packets (in bytes)",

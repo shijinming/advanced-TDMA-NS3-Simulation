@@ -97,7 +97,7 @@ void
 BeaconSimulationEntry::PrintSendPacket(Ptr<const Packet> packet, const Address &address)
 {
   // std::cout<<"Send a packet "<<packet<<" from "<<address<<std::endl;
-  // std::cout<<address<<','<<packet->GetUid ()<<','<<address.GetNode()->GetObject<Mobility>()->GetPosition()<<std::endl;
+  std::cout<<address<<','<<packet->GetUid ()<<','<<Simulator::Now()<<std::endl;
 }
 
 void 
@@ -105,7 +105,9 @@ BeaconSimulationEntry::PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3
 {
   Ptr<Ipv4> ipv4 = app->GetNode ()->GetObject<Ipv4> ();
   // std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<" Received a packet "<<packet<<" from "<<address<<std::endl;
-  // std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<','<<packet->GetUid ()<<','<<address<<','<<app->GetNode ()->GetObject<ConstantPositionMobilityModel>()->GetPosition()<<std::endl;
+  std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<','<<packet->GetUid ()<<','
+  <<address<<','<<Simulator::Now()<<','<<app->GetStatus()<<','
+  <<app->GetNode ()->GetObject<ConstantPositionMobilityModel>()->GetPosition()<<std::endl;
 }
 
 }

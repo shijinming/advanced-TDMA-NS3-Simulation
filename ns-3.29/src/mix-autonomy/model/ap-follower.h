@@ -29,6 +29,7 @@ public:
   struct TDMASlot GetNextSlotInterval (void);
   void SendPacket (void);
   void SlotWillStart (void);
+  uint8_t GetStatus () {return 0;}
 
 private:
   uint64_t CCHSendSlot;

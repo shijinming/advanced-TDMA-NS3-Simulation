@@ -226,11 +226,13 @@ protected:
    * 
    * @param pkt 
    */
-  virtual void WillSendMockPacket (Ptr<Packet> pkt) {SendPacket();};
+  virtual void WillSendMockPacket (Ptr<Packet> pkt) {};
 
   virtual void SlotAllocation (void) {};
 
   virtual bool IsAPApplicationInstalled (Ptr<Node> node) = 0;
+
+  virtual uint8_t GetStatus () = 0;
 };
 
 }
