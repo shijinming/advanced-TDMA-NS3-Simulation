@@ -63,6 +63,8 @@ public:
   void SetStartTime (Time start);
   void SetStopTime (Time stop);
 
+  virtual int GetStatus () = 0;
+
 protected:
   virtual void StartApplication (void);
   virtual void StopApplication (void);
@@ -232,7 +234,6 @@ protected:
 
   virtual bool IsAPApplicationInstalled (Ptr<Node> node) = 0;
 
-  virtual uint8_t GetStatus () = 0;
 };
 
 }
