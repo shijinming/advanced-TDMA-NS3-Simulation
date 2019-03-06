@@ -21,7 +21,7 @@ public:
   APFollower ();
   virtual ~APFollower ();
   void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr); //判断接收到的包是否来自内核层
-  void ReceivePacketFromAP (Ptr<Packet> pkt); //对接收到的leader的控制包进行处理解析
+  bool ReceivePacketFromAP (Ptr<Packet> pkt); //对接收到的leader的控制包进行处理解析
   void SetupHeader(PacketHeader &hdr);
   bool IsAPApplicationInstalled (Ptr<Node> node);
   Ptr<Node> GetNodeFromAddress (Ipv4Address & address);
@@ -29,7 +29,7 @@ public:
   struct TDMASlot GetNextSlotInterval (void);
   void SendPacket (void);
   void SlotWillStart (void);
-  int GetStatus () {return 0;}
+  int GetStatus () {return 2;}
 
 private:
   uint64_t CCHSendSlot;

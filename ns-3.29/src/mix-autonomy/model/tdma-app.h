@@ -212,6 +212,8 @@ protected:
    */
   void SetCurSlot(void);
 
+  void GetCurFrame (void);
+
   /**
    * @brief 时隙开始的钩子函数Ptr<Packet> pkt, Address & srcAddr
    */

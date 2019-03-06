@@ -107,7 +107,7 @@ TDMAApplication::SlotEnded (void)
     exit (1);
   }
   txEvent.Cancel ();
-  curSlot = GetNextSlotInterval ();
+  GetNextSlotInterval ();
 
   // if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
   //   std::cout<<"CCH:";
@@ -129,26 +129,29 @@ TDMAApplication::SlotEnded (void)
   
   isAtOwnSlot = false;
   if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == CCH_hdvFrame) 
+  {
     SlotDidEnd ();
+  }
 }
 
 void
 TDMAApplication::SlotStarted (void) 
 {
-  //LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " started at " << Simulator::Now ().GetMicroSeconds ());
+  // LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " started at " << Simulator::Now ().GetMicroSeconds ());
+  GetCurFrame();
+  // if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
+  //   std::cout<<"CCH:";
+  // else
+  //   std::cout<<"SCH:";
+  // std::cout<<GetNode()->GetId()<<" SlotStarted "<<Simulator::Now()<<std::endl;
+
+  std::cout<<GetNode ()->GetId ()<<" CCH queue:"<<txqCCH.size()<<" SSH queue:"<<txqSCH.size()<<std::endl;
   if (isAtOwnSlot) {
     // 已经开始了的时隙重复启动
     LOG_UNCOND ("Fatal Error[0]: 时隙调度错误");
     exit (1);
   }
   slotEndEvt = Simulator::Schedule (curSlot.duration, &TDMAApplication::SlotEnded, this);
-  SetCurSlot();
-
-  // if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
-  //   std::cout<<"CCH:";
-  // else
-  //   std::cout<<"SCH:";
-  // std::cout<<GetNode()->GetId()<<" SlotStarted "<<Simulator::Now()<<std::endl;
 
   if(curSlot.curFrame == SCH_apFrame)  
     curSlot.duration = slotSize - minTxInterval;
@@ -304,38 +307,44 @@ TDMAApplication::PeriodicSwitch (struct TDMASlot curSlot)
 void
 TDMAApplication:: SetCurSlot(void)
 {
-  slotId = Simulator::Now ().GetMilliSeconds ()/slotSize.GetMilliSeconds();
-  curSlot.id = slotId;
   curSlot.CCHSlotNum = 2*(config.apNum+1);
   curSlot.SCHSlotNum = 2*(config.apNum+1); 
   curSlot.apCCHSlotNum = config.apNum+1;  
   curSlot.apSCHSlotNum = config.apNum+1;  
   curSlot.hdvCCHSlotNum = config.apNum+1; 
   curSlot.hdvSCHSlotNum = config.apNum+1;  
-  if(slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) == 0) 
-    {
-     curSlot.frameNum = curSlot.frameNum +1;
-    }
-  if(slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < curSlot.apCCHSlotNum )
-    {
-      curSlot.curFrame = CCH_apFrame;
-      curSlot.frameId = slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum);
-    }
-  else if(slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < (curSlot.apCCHSlotNum+curSlot.hdvCCHSlotNum))
-         {
-            curSlot.curFrame = CCH_hdvFrame;
-            curSlot.frameId = slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum;
-         }
-  else if(slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum) < (curSlot.apCCHSlotNum+curSlot.hdvCCHSlotNum+curSlot.SCHSlotNum))
-         {
-            curSlot.curFrame = SCH_apFrame;
-            curSlot.frameId = slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum-curSlot.hdvCCHSlotNum;
-         }
+}
+
+void
+TDMAApplication::GetCurFrame (void)
+{
+  slotId = Simulator::Now ().GetMilliSeconds ()/slotSize.GetMilliSeconds();
+  curSlot.id = slotId;
+  uint64_t slot = slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum);
+  if(slot == 0) 
+  {
+    curSlot.frameNum = curSlot.frameNum +1;
+  }
+  if(slot < curSlot.apCCHSlotNum )
+  {
+    curSlot.curFrame = CCH_apFrame;
+    curSlot.frameId = slot;
+  }
+  else if(slot < (curSlot.apCCHSlotNum + curSlot.hdvCCHSlotNum))
+  {
+    curSlot.curFrame = CCH_hdvFrame;
+    curSlot.frameId = slot-curSlot.apCCHSlotNum;
+  }
+  else if(slot < (curSlot.apCCHSlotNum+curSlot.hdvCCHSlotNum + curSlot.SCHSlotNum))
+  {
+    curSlot.curFrame = SCH_apFrame;
+    curSlot.frameId = slot - curSlot.apCCHSlotNum - curSlot.hdvCCHSlotNum;
+  }
   else 
-      {
-        curSlot.curFrame = SCH_hdvFrame;
-        curSlot.frameId = slotId%(curSlot.CCHSlotNum + curSlot.SCHSlotNum)-curSlot.apCCHSlotNum-curSlot.hdvCCHSlotNum-curSlot.apSCHSlotNum;
-      }
+  {
+    curSlot.curFrame = SCH_hdvFrame;
+    curSlot.frameId = slot-curSlot.apCCHSlotNum-curSlot.hdvCCHSlotNum-curSlot.apSCHSlotNum;
+  }
 }
 
 struct TDMASlot

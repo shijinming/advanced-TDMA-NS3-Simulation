@@ -20,7 +20,7 @@ APFollower::GetTypeId ()
 
 APFollower::APFollower ()
 {
-
+  leaderPacketCnt = 0;
 }
 
 APFollower::~APFollower ()
@@ -38,13 +38,17 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
   if (IsAPApplicationInstalled (node))
   {
     // 收到了来自内核层的数据包
-    ReceivePacketFromAP (pkt);
-    if(SCHSendSlot.size() > 0 && leaderPacketCnt == 1)
+    // std::cout<<GetNode()->GetId()<<':'<<leaderPacketCnt<<' ';
+    bool isLeader = ReceivePacketFromAP (pkt);
+    // std::cout<<leaderPacketCnt<<std::endl;
+    if(SCHSendSlot.size() > 0 && leaderPacketCnt == 1 && isLeader)
     { 
-      SetCurSlot();
       if(curSlot.curFrame == CCH_apFrame) 
       {
        curSlot.duration = SCHSendSlot.size()* slotSize - minTxInterval;
+      //  std::cout<<GetNode()->GetId()<<':'<<"Simulator::Schedule ("
+      //  <<(SCHSendSlot[0]+1) * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval
+      //  <<", &APFollower::SlotStarted, this)"<<std::endl;
        slotStartEvt = Simulator::Schedule ((SCHSendSlot[0]+1) * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval, &APFollower::SlotStarted, this);
       //  std::cout<<GetNode()->GetId()<<" 预计在数据帧时隙"<<SCHSendSlot[0]<<"发包"<<std::endl;
       }
@@ -52,17 +56,21 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
   }
 }
 
-void
+bool
 APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
 { 
   PacketHeader pHeader;
   pkt->RemoveHeader(pHeader);
   if(!pHeader.GetIsLeader())
   {
-    leaderPacketCnt = 0;
-    return;
+    return false;
   }
-  leaderPacketCnt++;
+  GetCurFrame ();
+  if(curSlot.curFrame == CCH_apFrame && curSlot.frameId == curSlot.apCCHSlotNum - 1)
+    leaderPacketCnt++;
+  else
+    leaderPacketCnt = 0;
+  
   // std::cout<<GetNode()->GetId()<<"当前收到"<<leaderPacketCnt<<"个leader的包"<<std::endl;
   uint16_t *CCHslotAllocation = pHeader.GetCCHslotAllocation();
   uint16_t *SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
@@ -82,6 +90,7 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
         // std::cout<<GetNode()->GetId()<<" 收到时隙分配数组，在"<<i<<"数据时隙可发包"<<std::endl;
       } 
   }
+  return true;
 }
 
 void
@@ -134,7 +143,7 @@ struct TDMASlot
 APFollower::GetNextSlotInterval (void)
 {
   // LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
-  SetCurSlot();
+  GetCurFrame();
   curSlot.start = (curSlot.CCHSlotNum + curSlot.SCHSlotNum -1)*slotSize + minTxInterval;
   curSlot.duration = slotSize - minTxInterval;
   return curSlot;
@@ -146,8 +155,8 @@ APFollower::SendPacket (void)
   if (curSlot.curFrame == CCH_apFrame && isAtOwnSlot)
   {
     Ptr<Packet> pkt;
-    uint32_t CpktCnt = 10;
-    uint32_t SpktCnt = rand()%20;
+    uint32_t CpktCnt = 2;
+    uint32_t SpktCnt = 1;
     for(uint32_t i = 0; i < CpktCnt; i++)
     {
       pkt = Create<Packet> (0);
@@ -159,6 +168,9 @@ APFollower::SendPacket (void)
       txqSCH.push(pkt);
     }
   }
+  Time sendInterval = MilliSeconds(360);
+  EventId sendEvent;
+  sendEvent = Simulator::Schedule(sendInterval, &APFollower::SendPacket, this);
 }
 
 void

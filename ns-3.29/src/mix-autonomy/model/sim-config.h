@@ -24,7 +24,7 @@ public:
     /** 物理层设置 */
     std::string phyMode = "OfdmRate6MbpsBW10MHz";
     /** 运动文件输入 */
-    std::string mobilityInput = "/home/vehicle/mobility/fcd-trace-1.ns2.output.xml";
+    std::string mobilityInput = "../../mobility/fcd-trace-1.ns2.output.xml";
     /** 日志文件 */
     std::string packetTraceFile = "";
     std::string eventTraceFile = "";

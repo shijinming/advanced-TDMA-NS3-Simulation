@@ -33,10 +33,7 @@ HumanApplication::~HumanApplication ()
 int
 HumanApplication::GetStatus ()
 {
-  if(m_status == Middle)
-    return 1;
-  else
-    return 2;
+  return m_status;
 }
 
 void
@@ -72,8 +69,11 @@ HumanApplication::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
 {
   InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
   Ipv4Address addr = inetAddr.GetIpv4 ();
-    // 获取发送该数据包的节点
-    Ptr<Node> node = GetNodeFromAddress (addr);
+  // 获取发送该数据包的节点
+  Ptr<Node> node = GetNodeFromAddress (addr);
+
+  curSlot.id = Simulator::Now ().GetMilliSeconds ()/slotSize.GetMilliSeconds();
+
     if (IsAPApplicationInstalled (node))
     {
         // 收到了来自内核层的数据包
@@ -125,7 +125,7 @@ struct TDMASlot
 HumanApplication::GetNextSlotInterval (void)
 {
   //LOG_UNCOND ("Get Next Slot " << GetNode ()->GetId ());
-  SetCurSlot();
+  GetCurFrame();
   if(GetStatus () == Middle)
   {
      if(curSlot.curFrame == CCH_apFrame || curSlot.curFrame == SCH_hdvFrame)
@@ -153,8 +153,8 @@ HumanApplication::SendPacket (void)
   if (curSlot.curFrame == CCH_hdvFrame && isAtOwnSlot)
   {
     Ptr<Packet> pkt;
-    uint32_t CpktCnt = 10;
-    uint32_t SpktCnt = rand()%20;
+    uint32_t CpktCnt = 1;
+    uint32_t SpktCnt = 1;
     for(uint32_t i = 0; i < CpktCnt; i++)
     {
       pkt = Create<Packet> (0);
@@ -166,6 +166,9 @@ HumanApplication::SendPacket (void)
       txqSCH.push(pkt);
     }
   }
+  Time sendInterval = MilliSeconds(100);
+  EventId sendEvent;
+  sendEvent = Simulator::Schedule(sendInterval, &HumanApplication::SendPacket, this);
 }
 
 void 
