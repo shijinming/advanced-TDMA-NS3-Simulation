@@ -88,7 +88,7 @@ APLeader::SlotAllocation ()
       for(uint32_t i=curSlot.apSCHSlotNum; i < curSlot.SCHSlotNum; i++)
         m_SCHslotAllocation.push_back(config.apNum + 1);  
   }
-  return;
+/*
   std::map <uint16_t, uint32_t>::iterator iter;
   iter = m_queueLen.find(GetNode () -> GetId());
   if(iter != m_queueLen.end())
@@ -118,6 +118,8 @@ APLeader::SlotAllocation ()
       }
     }
   }
+*/
+
   // std::cout<<"CCH slot allocation:"<<std::endl;
   // for(uint32_t i=0;i<m_CCHslotAllocation.size();i++)
   // {
@@ -138,7 +140,6 @@ APLeader::SlotAllocation ()
       mySendSlot.push_back(i); //将i插入到向量最后面
     } 
   }
-  std::cout<<"leader SCH size:"<<mySendSlot.size()<<std::endl;
 }
 
 void
