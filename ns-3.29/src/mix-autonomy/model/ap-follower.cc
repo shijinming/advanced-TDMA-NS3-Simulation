@@ -61,16 +61,17 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
 { 
   PacketHeader pHeader;
   pkt->RemoveHeader(pHeader);
-  if(!pHeader.GetIsLeader())
-  {
-    return false;
-  }
+
   GetCurFrame ();
   if(curSlot.curFrame == CCH_apFrame && curSlot.frameId == curSlot.apCCHSlotNum - 1)
     leaderPacketCnt++;
   else
     leaderPacketCnt = 0;
-  
+
+  if(!pHeader.GetIsLeader())
+  {
+    return false;
+  }
   // std::cout<<GetNode()->GetId()<<"当前收到"<<leaderPacketCnt<<"个leader的包"<<std::endl;
   uint16_t *CCHslotAllocation = pHeader.GetCCHslotAllocation();
   uint16_t *SCHslotAllocation = pHeader.GetSCHslotAllocation(); 

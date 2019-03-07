@@ -138,7 +138,7 @@ APLeader::SlotAllocation ()
       mySendSlot.push_back(i); //将i插入到向量最后面
     } 
   }
-
+  std::cout<<"leader SCH size:"<<mySendSlot.size()<<std::endl;
 }
 
 void
