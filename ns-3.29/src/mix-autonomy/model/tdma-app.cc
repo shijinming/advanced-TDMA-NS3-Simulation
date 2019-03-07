@@ -229,7 +229,7 @@ TDMAApplication::WakeUpTxQueue ()
 {
   if (!isAtOwnSlot) return; 
   Ptr<Packet> pktToSend = NULL;
-
+  GetCurFrame();
   if (curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
   {
     if(!txqCCH.empty ())

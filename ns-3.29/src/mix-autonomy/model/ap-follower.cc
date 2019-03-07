@@ -156,7 +156,7 @@ APFollower::SendPacket (void)
   {
     Ptr<Packet> pkt;
     uint32_t CpktCnt = 2;
-    uint32_t SpktCnt = 1;
+    uint32_t SpktCnt = 3;
     for(uint32_t i = 0; i < CpktCnt; i++)
     {
       pkt = Create<Packet> (0);
