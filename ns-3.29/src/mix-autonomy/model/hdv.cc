@@ -41,8 +41,15 @@ HumanApplication::AddToMiddle ()
 {
   m_status = Middle;
   std::cout<<GetNode()->GetId()<<" add to middle."<<std::endl;
-  slotEndEvt.Cancel();
-  txEvent.Cancel ();
+  if (isAtOwnSlot)
+  {
+    slotEndEvt.Cancel();
+    txEvent.Cancel ();
+  }
+  else
+  {
+    slotStartEvt.Cancel();
+  }
   Time t1,t2,t3;
   t1 = Simulator::Now() - minTxInterval;
   t2 = (curSlot.CCHSlotNum + curSlot.SCHSlotNum) * slotSize;
