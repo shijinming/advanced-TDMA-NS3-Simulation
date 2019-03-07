@@ -84,10 +84,11 @@ APLeader::SlotAllocation ()
   if (m_SCHslotAllocation.size() == 0)
   {
       for(uint32_t i=0; i < curSlot.apSCHSlotNum; i++)
-        m_SCHslotAllocation.push_back(config.apNum);
+        m_SCHslotAllocation.push_back((i+1)%(config.apNum+1));
       for(uint32_t i=curSlot.apSCHSlotNum; i < curSlot.SCHSlotNum; i++)
         m_SCHslotAllocation.push_back(config.apNum + 1);  
   }
+  return;
   std::map <uint16_t, uint32_t>::iterator iter;
   iter = m_queueLen.find(GetNode () -> GetId());
   if(iter != m_queueLen.end())
