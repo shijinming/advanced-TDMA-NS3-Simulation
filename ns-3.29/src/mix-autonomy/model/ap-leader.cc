@@ -144,9 +144,14 @@ APLeader::SlotAllocation ()
 void
 APLeader::SlotDidEnd (void)
 {
+  std::cout<<"leader SCH size:"<<mySendSlot.size()<<std::endl;
   if(mySendSlot.size()>0)
     {
+      std::cout<<"leader SSH slot:"<<mySendSlot[0]<<std::endl;
       curSlot.duration = mySendSlot.size()* slotSize - minTxInterval;
+      std::cout<<GetNode()->GetId()<<':'<<"Simulator::Schedule ("
+       <<mySendSlot[0] * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval
+       <<", &APLeader::SlotStarted, this)"<<std::endl;
       slotStartEvt = Simulator::Schedule (mySendSlot[0] * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval, &APLeader::SlotStarted, this);
     }
     mySendSlot.clear();
