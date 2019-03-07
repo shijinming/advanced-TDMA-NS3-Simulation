@@ -124,6 +124,7 @@ TDMAApplication::SlotEnded (void)
   }
   else
   {
+    std::cout<<GetNode()->GetId()<<':slot will start at '<<curSlot.start<<std::endl;
     slotStartEvt = Simulator::Schedule (curSlot.start, &TDMAApplication::SlotStarted, this);
   }
   

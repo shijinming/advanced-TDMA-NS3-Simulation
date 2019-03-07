@@ -53,6 +53,7 @@ HumanApplication::AddToMiddle ()
   }
   else curSlot.start = t2 + curSlot.apCCHSlotNum * slotSize - t3;
   curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval;  
+  std::cout<<GetNode()->GetId()<<':slot will start at '<<curSlot.start<<std::endl;
   slotStartEvt = Simulator::Schedule (curSlot.start, &HumanApplication::SlotStarted, this);
   isAtOwnSlot = false;
 } 
