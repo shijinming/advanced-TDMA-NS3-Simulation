@@ -170,7 +170,7 @@ APFollower::SendPacket (void)
       txqSCH.push(pkt);
     }
   }
-  Time sendInterval = MilliSeconds(360);
+  Time sendInterval = MilliSeconds(720);
   EventId sendEvent;
   sendEvent = Simulator::Schedule(sendInterval, &APFollower::SendPacket, this);
 }

@@ -173,7 +173,8 @@ HumanApplication::SendPacket (void)
       txqSCH.push(pkt);
     }
   }
-  Time sendInterval = MilliSeconds(360);
+  std::cout<<GetNode()->GetId()<<" CCH queue:"<<txqCCH.size()<<" SCH queue:"<<txqSCH.size()<<std::endl;
+  Time sendInterval = MilliSeconds(720);
   EventId sendEvent;
   sendEvent = Simulator::Schedule(sendInterval, &HumanApplication::SendPacket, this);
 }
