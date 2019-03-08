@@ -146,7 +146,6 @@ TDMAApplication::SlotStarted (void)
     std::cout<<"SCH:";
   std::cout<<GetNode()->GetId()<<" SlotStarted "<<Simulator::Now().GetMilliSeconds()<<std::endl;
 
-  // std::cout<<GetNode ()->GetId ()<<" CCH queue:"<<txqCCH.size()<<" SSH queue:"<<txqSCH.size()<<std::endl;
   if (isAtOwnSlot) {
     // 已经开始了的时隙重复启动
     LOG_UNCOND ("Fatal Error[0]: 时隙调度错误");
@@ -161,6 +160,7 @@ TDMAApplication::SlotStarted (void)
   if(curSlot.curFrame == Frame::CCH_apFrame)
     SlotAllocation();
   SlotWillStart ();
+  std::cout<<GetNode ()->GetId ()<<" CCH queue:"<<txqCCH.size()<<" SSH queue:"<<txqSCH.size()<<std::endl;
   WakeUpTxQueue ();
 }
 
