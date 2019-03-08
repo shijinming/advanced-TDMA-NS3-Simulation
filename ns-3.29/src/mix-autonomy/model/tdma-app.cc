@@ -15,7 +15,7 @@ TDMAApplication::GetTypeId ()
       MakeDataRateAccessor (&TDMAApplication::dataRate),
       MakeDataRateChecker ())
     .AddAttribute ("EnableMockTraffic", "Whether to enable mock traffic",
-      BooleanValue (true),
+      BooleanValue (false),
       MakeBooleanAccessor (&TDMAApplication::enableMockTraffic),
       MakeBooleanChecker ())
     .AddAttribute ("MockPacketSize", "Size of mock packets (in bytes)",
@@ -124,7 +124,6 @@ TDMAApplication::SlotEnded (void)
   }
   else
   {
-    std::cout<<GetNode()->GetId()<<":slot will start at "<<curSlot.start<<std::endl;
     slotStartEvt = Simulator::Schedule (curSlot.start, &TDMAApplication::SlotStarted, this);
   }
   
@@ -235,10 +234,8 @@ TDMAApplication::WakeUpTxQueue ()
   {
     if(!txqCCH.empty ())
     {
-      // std::cout<<"Send normal packet."<<std::endl;
       pktToSend = txqCCH.front ();
       txqCCH.pop ();
-      std::cout<<GetNode ()->GetId ()<<" CCH queue:"<<txqCCH.size()<<" SSH queue:"<<txqSCH.size()<<std::endl;
     }
     else if (enableMockTraffic)
     {
@@ -250,10 +247,8 @@ TDMAApplication::WakeUpTxQueue ()
   {
     if(!txqSCH.empty ())
     {
-      // std::cout<<"Send normal packet."<<std::endl;
       pktToSend = txqSCH.front ();
       txqSCH.pop ();
-      std::cout<<GetNode ()->GetId ()<<" CCH queue:"<<txqCCH.size()<<" SSH queue:"<<txqSCH.size()<<std::endl;
     }
     else if (enableMockTraffic)
     {
@@ -266,7 +261,7 @@ TDMAApplication::WakeUpTxQueue ()
     {
       DoSendPacket (pktToSend);
       nextTxTime = Max(nextTxTime, Seconds (
-        (pktToSend->GetSize () * 8) / static_cast<double>(dataRate.GetBitRate ())*2
+        (pktToSend->GetSize () * 8) / static_cast<double>(dataRate.GetBitRate ())
       ));
     }
   

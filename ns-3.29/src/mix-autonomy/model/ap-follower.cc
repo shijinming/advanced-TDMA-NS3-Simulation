@@ -38,17 +38,12 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
   if (IsAPApplicationInstalled (node))
   {
     // 收到了来自内核层的数据包
-    // std::cout<<GetNode()->GetId()<<':'<<leaderPacketCnt<<' ';
     bool isLeader = ReceivePacketFromAP (pkt);
-    std::cout<<GetNode()->GetId()<<" leaderPacketCnt:"<<leaderPacketCnt<<" SCH size:"<<SCHSendSlot.size()<<std::endl;
     if(SCHSendSlot.size() > 0 && leaderPacketCnt == 1 && isLeader)
     { 
       if(curSlot.curFrame == CCH_apFrame) 
       {
         curSlot.duration = SCHSendSlot.size()* slotSize - minTxInterval;
-       std::cout<<GetNode()->GetId()<<':'<<"Simulator::Schedule ("
-       <<(SCHSendSlot[0]+1) * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval
-       <<", &APFollower::SlotStarted, this)"<<std::endl;
         slotStartEvt = Simulator::Schedule ((SCHSendSlot[0]+1) * slotSize + curSlot.hdvCCHSlotNum * slotSize + minTxInterval, &APFollower::SlotStarted, this);
       //  std::cout<<GetNode()->GetId()<<" 预计在数据帧时隙"<<SCHSendSlot[0]<<"发包"<<std::endl;
       }
@@ -72,7 +67,6 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
   {
     return false;
   }
-  // std::cout<<GetNode()->GetId()<<"当前收到"<<leaderPacketCnt<<"个leader的包"<<std::endl;
   uint16_t *CCHslotAllocation = pHeader.GetCCHslotAllocation();
   uint16_t *SCHslotAllocation = pHeader.GetSCHslotAllocation(); 
   for(uint32_t i=0; i<curSlot.CCHSlotNum; i++) //查找下次发控制包的时隙
@@ -157,8 +151,8 @@ APFollower::SendPacket (void)
   if (curSlot.curFrame == CCH_apFrame && isAtOwnSlot)
   {
     Ptr<Packet> pkt;
-    uint32_t CpktCnt = 2;
-    uint32_t SpktCnt = 3;
+    uint32_t CpktCnt = 10;
+    uint32_t SpktCnt = 20;
     for(uint32_t i = 0; i < CpktCnt; i++)
     {
       pkt = Create<Packet> (0);
@@ -170,16 +164,12 @@ APFollower::SendPacket (void)
       txqSCH.push(pkt);
     }
   }
-  // std::cout<<GetNode()->GetId()<<" CCH queue:"<<txqCCH.size()<<" SCH queue:"<<txqSCH.size()<<std::endl;
-  // Time sendInterval = MilliSeconds(720);
-  // EventId sendEvent;
-  // sendEvent = Simulator::Schedule(sendInterval, &APFollower::SendPacket, this);
 }
 
 void
 APFollower::SlotWillStart (void)
 {
-  // SendPacket ();
+  SendPacket ();
 }
 
 }
