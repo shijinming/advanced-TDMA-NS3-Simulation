@@ -15,7 +15,7 @@ TDMAApplication::GetTypeId ()
       MakeDataRateAccessor (&TDMAApplication::dataRate),
       MakeDataRateChecker ())
     .AddAttribute ("EnableMockTraffic", "Whether to enable mock traffic",
-      BooleanValue (false),
+      BooleanValue (true),
       MakeBooleanAccessor (&TDMAApplication::enableMockTraffic),
       MakeBooleanChecker ())
     .AddAttribute ("MockPacketSize", "Size of mock packets (in bytes)",
@@ -266,7 +266,7 @@ TDMAApplication::WakeUpTxQueue ()
     {
       DoSendPacket (pktToSend);
       nextTxTime = Max(nextTxTime, Seconds (
-        (pktToSend->GetSize () * 8) / static_cast<double>(dataRate.GetBitRate ())
+        (pktToSend->GetSize () * 8) / static_cast<double>(dataRate.GetBitRate ())*2
       ));
     }
   
@@ -347,8 +347,7 @@ TDMAApplication::GetCurFrame (void)
   {
     curSlot.curFrame = SCH_hdvFrame;
     curSlot.frameId = slot-curSlot.apCCHSlotNum-curSlot.hdvCCHSlotNum-curSlot.apSCHSlotNum;
-  }
-}
+  }}
 
 struct TDMASlot
 TDMAApplication:: GetInitalSlot (void)
