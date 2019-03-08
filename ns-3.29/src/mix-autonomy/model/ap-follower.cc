@@ -83,12 +83,16 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
         break;
       }
   }
-  SCHSendSlot.clear();
+  int count=0;
   for(uint32_t i=0; i<curSlot.SCHSlotNum; i++) //查找发数据包的时隙
   {
     if(GetNode ()->GetId () == SCHslotAllocation[i])
       {
-        SCHSendSlot.push_back(i); //将i插入到向量最后面
+        if (SCHSendSlot.size()<= count)
+          SCHSendSlot.push_back(i); //将i插入到向量最后面
+        else
+          SCHSendSlot[count] = i;
+        count++;
         // std::cout<<GetNode()->GetId()<<" 收到时隙分配数组，在"<<i<<"数据时隙可发包"<<std::endl;
       } 
   }
