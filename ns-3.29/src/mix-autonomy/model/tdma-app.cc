@@ -374,7 +374,7 @@ TDMAApplication:: GetInitalSlot (void)
 void
 TDMAApplication::OutputPosition (void)
 {
-  std::cout<<GetNode ()->GetId ()<<' position:'<<GetNode ()->GetObject<ConstantVelocityMobilityModel>()->GetPosition()<<std::endl;
+  std::cout<<GetNode ()->GetId ()<<" position: "<<GetNode ()->GetObject<ConstantVelocityMobilityModel>()->GetPosition()<<std::endl;
   position = Simulator::Schedule (MilliSeconds(20), &TDMAApplication::OutputPosition, this);
 }
 
