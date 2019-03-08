@@ -181,7 +181,7 @@ HumanApplication::SendPacket (void)
 void 
 HumanApplication::SlotWillStart (void)
 {
-  // SendPacket ();
+  SendPacket ();
 }
 
 }

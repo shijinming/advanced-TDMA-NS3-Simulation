@@ -178,7 +178,7 @@ APFollower::SendPacket (void)
 void
 APFollower::SlotWillStart (void)
 {
-  // SendPacket ();
+  SendPacket ();
 }
 
 }
