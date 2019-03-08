@@ -1,3 +1,4 @@
+#include "ns3/mobility-module.h"
 #include "ns3/internet-module.h"
 #include"ns3/wave-module.h"
 #include "tdma-app.h"
@@ -82,6 +83,7 @@ TDMAApplication::StartApplication (void)
 {
   // 第一个时隙开始
   SlotStarted ();
+  OutputPosition ();
 }
 
 void 
@@ -96,6 +98,7 @@ TDMAApplication::CancelAllEvents (void)
   txEvent.Cancel ();
   slotEndEvt.Cancel ();
   slotStartEvt.Cancel ();
+  position.Cancel ();
 }
 
 void
@@ -366,6 +369,13 @@ TDMAApplication:: GetInitalSlot (void)
     curSlot.duration = Seconds(config.simTime);
   }
   return curSlot;
+}
+
+void
+TDMAApplication::OutputPosition (void)
+{
+  std::cout<<GetNode ()->GetId ()<<' position:'<<GetNode ()->GetObject<ConstantVelocityMobilityModel>()->GetPosition()<<std::endl;
+  position = Simulator::Schedule (MilliSeconds(20), &TDMAApplication::OutputPosition, this);
 }
 
 }

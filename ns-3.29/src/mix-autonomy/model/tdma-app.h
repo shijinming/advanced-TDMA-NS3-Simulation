@@ -132,6 +132,10 @@ protected:
    */
   virtual void SetupHeader(PacketHeader &hdr) = 0;
 
+  EventId position;
+
+  void OutputPosition (void);
+
 private:
 
   //====================================
