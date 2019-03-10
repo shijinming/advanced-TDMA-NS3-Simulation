@@ -62,6 +62,8 @@ HumanApplication::AddToMiddle ()
   curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval;  
   slotStartEvt = Simulator::Schedule (curSlot.start, &HumanApplication::SlotStarted, this);
   isAtOwnSlot = false;
+  ChangeWindowSize (config.cwMin, config.cwMax, tdma_CCH);
+  ChangeWindowSize (config.cwMin, config.cwMax, tdma_SCH1);
 } 
 
 void 
@@ -69,6 +71,8 @@ HumanApplication::QuitFromMiddle ()
 {
     m_status = Outter;
     std::cout<<GetNode()->GetId()<<" quit from middle."<<std::endl;
+    ChangeWindowSize (15, 1023, tdma_CCH);
+    ChangeWindowSize (15, 1023, tdma_SCH1);
 }
 
 void 
@@ -179,6 +183,21 @@ void
 HumanApplication::SlotWillStart (void)
 {
   SendPacket ();
+}
+
+void
+HumanApplication::ChangeWindowSize (uint32_t cwMin, uint32_t cwMax, uint32_t channelNumber)
+{
+  Ptr<WaveNetDevice> device = GetNode ()->GetObject<WaveNetDevice> ();
+  Ptr<OcbWifiMac> mac = device->GetMac (channelNumber);
+
+  // if not modified, cwmin = 15, cwmax = 1023
+
+  mac->ConfigureEdca (cwMin, cwMax, 2, AC_BE_NQOS);
+  mac->ConfigureEdca (cwMin, cwMax, 2, AC_VO);
+  mac->ConfigureEdca (cwMin, cwMax, 3, AC_VI);
+  mac->ConfigureEdca (cwMin, cwMax, 6, AC_BE);
+  mac->ConfigureEdca (cwMin, cwMax, 9, AC_BK);
 }
 
 }

@@ -32,6 +32,8 @@ SimulationConfig::ConfigureCommandLineParams (CommandLine &cmd) {
     cmd.AddValue ("event-trace", "Path to event trace file", eventTraceFile);
     cmd.AddValue ("throughput-trace", "Path to throughput file", throughputTraceFile);
     cmd.AddValue ("mobility-trace", "Path to mobility file", mobilityTraceFile);
+    cmd.AddValue ("cw-min", "Middle minimum contention window", cwMin);
+    cmd.AddValue ("cw-max", "Middle maximum contention window", cwMax);
 }
 
 void 
@@ -50,6 +52,8 @@ SimulationConfig::PrintConfiguration () {
     SHOW_CONF (eventTraceFile);
     SHOW_CONF (throughputTraceFile);
     SHOW_CONF (mobilityTraceFile);
+    SHOW_CONF (cwMin);
+    SHOW_CONF (cwMax);
     LOG_UNCOND ("====================");
 #undef SHOW_CONF
 }
