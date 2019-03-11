@@ -38,7 +38,9 @@ APFollower::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
   if (IsAPApplicationInstalled (node))
   {
     // 收到了来自内核层的数据包
+    std::cout<<GetNode()->GetId()<<" leader packet number:"<<leaderPacketCnt<<std::endl;
     bool isLeader = ReceivePacketFromAP (pkt);
+    std::cout<<GetNode()->GetId()<<" leader packet number:"<<leaderPacketCnt<<" leader:"<<isLeader<<std::endl;
     if(SCHSendSlot.size() > 0 && leaderPacketCnt == 1 && isLeader)
     { 
       if(curSlot.curFrame == CCH_apFrame) 
