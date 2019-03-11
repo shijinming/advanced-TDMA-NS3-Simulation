@@ -172,17 +172,17 @@ TDMAApplication::CreateSocket (void)
   auto broadcastAddr = InetSocketAddress (Ipv4Address ("255.255.255.255"), config.socketPort);
   socketTid = UdpSocketFactory::GetTypeId ();
   if (!socket) 
+  {
+    socket = Socket::CreateSocket (GetNode (), socketTid);
+    if (socket->Bind ())
     {
-      socket = Socket::CreateSocket (GetNode (), socketTid);
-      if (socket->Bind ())
-        {
-          LOG_UNCOND ("Fatal Error: Fail to bind socket");
-          exit (1);
-        }
-      socket->Connect (broadcastAddr);
-      socket->SetAllowBroadcast (true);
-      socket->ShutdownRecv ();
+      LOG_UNCOND ("Fatal Error: Fail to bind socket");
+      exit (1);
     }
+    socket->Connect (broadcastAddr);
+    socket->SetAllowBroadcast (true);
+    socket->ShutdownRecv ();
+  }
   if (!sink)
     {
       sink = Socket::CreateSocket (GetNode (), socketTid);
