@@ -7,6 +7,7 @@
 #include "ns3/network-module.h"
 #include "my-header.h"
 #include "tdma-app.h"
+#include "ns3/sim-config.h"
 
 namespace ns3
 {
@@ -38,7 +39,7 @@ public:
     void SendPacket (void);
     void SlotWillStart (void);
 
-    void ChangeWindowSize (uint32_t cwMin, uint32_t cwMax);
+    void ChangeWindowSize (uint32_t cwMin, uint32_t cwMax, uint32_t channelNumber);
 
 private:
     Status              m_status;
