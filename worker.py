@@ -18,6 +18,6 @@ def run_bash_task(cmd, std_out=None, working_dir=".", **kwargs):
     print("finish task %s\n\n" % cmd)
 
 @huey.task()
-def run_analysis(file):
-    cmd = ['python',file]
+def run_analysis(index):
+    cmd = ['python','analysis.py',str(index)]
     subprocess.check_call(cmd)

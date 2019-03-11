@@ -1,3 +1,4 @@
+import sys
 from worker import run_analysis
 
 def computeDistance(a,b):
@@ -85,12 +86,10 @@ def analysis(file,nnode):
     return [coreDelay,middleDelay,outterDelay,coreRec,middleRec,outterRec]
 
 if __name__ == "__main__":
-    files=os.listdir('../output')
-    n=17
-    for i in range(1,n+1):
-        f=open("../mobility/fcd-trace-"+str(i)+".ns2.output.xml.node_start_time.txt")
-        nnode=len([i for i in f.read().split('\n') if i!=''])
-        f.close()
-        result = analysis("output/stdout_"+str(i)+".log",nnode)
-        with open("result.txt",'a') as f:
-            f.write(','.join(result)+'\n')
+    index=sys.argv[1]
+    f=open("../mobility/fcd-trace-"+str(index)+".ns2.output.xml.node_start_time.txt")
+    nnode=len([i for i in f.read().split('\n') if i!=''])
+    f.close()
+    result = analysis("../output/stdout_"+str(index)+".log",nnode)
+    with open("result.txt",'a') as f:
+        f.write(','.join(result)+'\n')
