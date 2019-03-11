@@ -203,6 +203,7 @@ void
 HumanApplication::ChangeWindowSize (uint32_t cwMin, uint32_t cwMax, uint32_t channelNumber)
 {
   Ptr<WaveNetDevice> device = GetNode ()->GetObject<WaveNetDevice> ();
+  std::cout<<device->GetPhys().size()<<std::endl;
   Ptr<WifiPhy> phy = device->GetPhy (0);
   uint32_t curChannel = phy->GetChannelNumber ();
   Ptr<OcbWifiMac> mac = device->GetMac (curChannel);
