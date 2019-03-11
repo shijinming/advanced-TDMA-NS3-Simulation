@@ -181,12 +181,12 @@ HumanApplication::SendPacket (void)
   {
     if (curSlot.curFrame == CCH_hdvFrame && isAtOwnSlot)
     {
-      CreatePackets (10, 20);
+      CreatePackets (5, 5);
     }
   }
   else
   {
-    CreatePackets (10, 20);
+    CreatePackets (5, 5);
     EventId sendPacket;
     Time t = (curSlot.CCHSlotNum + curSlot.SCHSlotNum) * slotSize;
     sendPacket = Simulator::Schedule(t, &HumanApplication::SendPacket, this);
