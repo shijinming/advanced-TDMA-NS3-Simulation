@@ -159,24 +159,39 @@ HumanApplication::GetNextSlotInterval (void)
 }
 
 void
+HumanApplication::CreatePackets (uint32_t CpktCnt, uint32_t SpktCnt)
+{
+  Ptr<Packet> pkt;
+  for(uint32_t i = 0; i < CpktCnt; i++)
+  {
+    pkt = Create<Packet> (0);
+    txqCCH.push(pkt);
+  }
+  for(uint32_t i = 0; i < SpktCnt; i++)
+  {
+    pkt = Create<Packet> (0);
+    txqSCH.push(pkt);
+  }
+}
+
+void
 HumanApplication::SendPacket (void)
 {
-  if (curSlot.curFrame == CCH_hdvFrame && isAtOwnSlot)
+  if (GetStatus() == Middle)
   {
-    Ptr<Packet> pkt;
-    uint32_t CpktCnt = 10;
-    uint32_t SpktCnt = 20;
-    for(uint32_t i = 0; i < CpktCnt; i++)
+    if (curSlot.curFrame == CCH_hdvFrame && isAtOwnSlot)
     {
-      pkt = Create<Packet> (0);
-      txqCCH.push(pkt);
-    }
-    for(uint32_t i = 0; i < SpktCnt; i++)
-    {
-      pkt = Create<Packet> (0);
-      txqSCH.push(pkt);
+      CreatePackets (10, 20);
     }
   }
+  else
+  {
+    CreatePackets (10, 20);
+    EventId sendPacket;
+    Time t = (curSlot.CCHSlotNum + curSlot.SCHSlotNum) * slotSize;
+    sendPacket = Simulator::Schedule(t, &HumanApplication::SendPacket, this);
+  }
+
 }
 
 void 

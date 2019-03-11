@@ -36,6 +36,7 @@ public:
     void SlotAllocation () {};
     struct TDMASlot GetNextSlotInterval (void);
 
+    void CreatePackets (uint32_t CpktCnt, uint32_t SpktCnt);
     void SendPacket (void);
     void SlotWillStart (void);
 
