@@ -62,8 +62,8 @@ HumanApplication::AddToMiddle ()
   curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval;  
   slotStartEvt = Simulator::Schedule (curSlot.start, &HumanApplication::SlotStarted, this);
   isAtOwnSlot = false;
-  ChangeWindowSize (config.cwMin, config.cwMax, tdma_CCH);
-  ChangeWindowSize (config.cwMin, config.cwMax, tdma_SCH1);
+  // ChangeWindowSize (config.cwMin, config.cwMax, tdma_CCH);
+  // ChangeWindowSize (config.cwMin, config.cwMax, tdma_SCH1);
 } 
 
 void 
@@ -71,8 +71,8 @@ HumanApplication::QuitFromMiddle ()
 {
     m_status = Outter;
     std::cout<<GetNode()->GetId()<<" quit from middle."<<std::endl;
-    ChangeWindowSize (15, 1023, tdma_CCH);
-    ChangeWindowSize (15, 1023, tdma_SCH1);
+    // ChangeWindowSize (15, 1023, tdma_CCH);
+    // ChangeWindowSize (15, 1023, tdma_SCH1);
 }
 
 void 

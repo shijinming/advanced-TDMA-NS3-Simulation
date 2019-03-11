@@ -61,7 +61,8 @@ APFollower::ReceivePacketFromAP (Ptr<Packet> pkt)
 
   GetCurFrame ();
   if(curSlot.curFrame == CCH_apFrame && curSlot.frameId == curSlot.apCCHSlotNum - 1)
-    leaderPacketCnt++;
+    if (pHeader.GetIsLeader())
+      leaderPacketCnt++;
   else
     leaderPacketCnt = 0;
 
