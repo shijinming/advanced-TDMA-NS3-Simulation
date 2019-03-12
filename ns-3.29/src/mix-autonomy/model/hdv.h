@@ -40,7 +40,7 @@ public:
     void SendPacket (void);
     void SlotWillStart (void);
 
-    void ChangeWindowSize (uint32_t cwMin, uint32_t cwMax, uint32_t channelNumber);
+    void ChangeWindowSize (uint32_t cwMin, uint32_t cwMax);
 
 private:
     Status              m_status;

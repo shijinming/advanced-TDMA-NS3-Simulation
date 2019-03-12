@@ -2,6 +2,7 @@
 
 #include "hdv.h"
 #include "ap-leader.h"
+#include "ns3/wifi-net-device.h"
 
 namespace ns3
 {
@@ -62,8 +63,8 @@ HumanApplication::AddToMiddle ()
   curSlot.duration = slotSize * curSlot.hdvCCHSlotNum - minTxInterval;  
   slotStartEvt = Simulator::Schedule (curSlot.start, &HumanApplication::SlotStarted, this);
   isAtOwnSlot = false;
-  ChangeWindowSize (config.cwMin, config.cwMax, tdma_CCH);
-  ChangeWindowSize (config.cwMin, config.cwMax, tdma_SCH1);
+  ChangeWindowSize (config.cwMin, config.cwMax);
+  ChangeWindowSize (config.cwMin, config.cwMax);
 } 
 
 void 
@@ -71,8 +72,8 @@ HumanApplication::QuitFromMiddle ()
 {
     m_status = Outter;
     std::cout<<GetNode()->GetId()<<" quit from middle."<<std::endl;
-    ChangeWindowSize (15, 1023, tdma_CCH);
-    ChangeWindowSize (15, 1023, tdma_SCH1);
+    ChangeWindowSize (15, 1023);
+    ChangeWindowSize (15, 1023);
 }
 
 void 
@@ -200,16 +201,11 @@ HumanApplication::SlotWillStart (void)
 }
 
 void
-HumanApplication::ChangeWindowSize (uint32_t cwMin, uint32_t cwMax, uint32_t channelNumber)
+HumanApplication::ChangeWindowSize (uint32_t cwMin, uint32_t cwMax)
 {
-  Ptr<WaveNetDevice> device = GetNode ()->GetObject<WaveNetDevice> ();
-  std::cout<<device->GetPhys().size()<<std::endl;
-  Ptr<WifiPhy> phy = device->GetPhy (0);
-  uint32_t curChannel = phy->GetChannelNumber ();
-  Ptr<OcbWifiMac> mac = device->GetMac (curChannel);
-
+  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
+  Ptr<OcbWifiMac> mac = DynamicCast<OcbWifiMac> (device->GetMac ());
   // if not modified, cwmin = 15, cwmax = 1023
-
   mac->ConfigureEdca (cwMin, cwMax, 2, AC_BE_NQOS);
   mac->ConfigureEdca (cwMin, cwMax, 2, AC_VO);
   mac->ConfigureEdca (cwMin, cwMax, 3, AC_VI);
