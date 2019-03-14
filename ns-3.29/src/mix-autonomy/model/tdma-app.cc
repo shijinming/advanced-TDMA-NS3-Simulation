@@ -90,7 +90,7 @@ TDMAApplication::StartApplication (void)
 {
   // 第一个时隙开始
   SlotStarted ();
-  // OutputPosition ();
+  OutputPosition ();
 }
 
 void 
@@ -230,6 +230,7 @@ TDMAApplication::DoSendPacket (Ptr<Packet> pkt)
   
   pkt->AddHeader(pktHdr);
   socket->Send (pkt);
+  std::cout<<GetNode()->GetId()<<" socket send "<<pkt->GetUid()<<std::endl;
   Ptr<Ipv4> ipv4 = GetNode ()->GetObject<Ipv4> ();
   txTrace (pkt, ipv4->GetAddress (1, 0).GetLocal ());
 }
@@ -381,7 +382,7 @@ TDMAApplication:: GetInitalSlot (void)
 void
 TDMAApplication::OutputPosition (void)
 {
-  std::cout<<GetNode ()->GetId ()<<" position: "<<GetNode ()->GetObject<ConstantVelocityMobilityModel>()->GetPosition()<<std::endl;
+  std::cout<<GetNode ()->GetId ()<<" position: "<<GetNode ()->GetObject<ConstantVelocityMobilityModel>()->GetPosition().x<<std::endl;
   position = Simulator::Schedule (MilliSeconds(20), &TDMAApplication::OutputPosition, this);
 }
 
@@ -391,7 +392,7 @@ TDMAApplication::WifiPhyTxBeginTrace (Ptr<const Packet> p)
   WakeUpTxQueue ();
   WifiMacHeader hdr;
   p->PeekHeader(hdr);
-  // std::cout<<hdr.GetAddr2()<<','<<p->GetUid ()<<','<<Simulator::Now().GetMilliSeconds()<<std::endl;
+  std::cout<<hdr.GetAddr2()<<','<<p->GetUid ()<<','<<Simulator::Now().GetMilliSeconds()<<std::endl;
 }
 
 void 
