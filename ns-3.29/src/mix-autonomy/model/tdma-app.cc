@@ -1,6 +1,7 @@
 #include "ns3/mobility-module.h"
 #include "ns3/internet-module.h"
 #include"ns3/wave-module.h"
+#include "ns3/wifi-net-device.h"
 #include "tdma-app.h"
 
 
@@ -16,7 +17,7 @@ TDMAApplication::GetTypeId ()
       MakeDataRateAccessor (&TDMAApplication::dataRate),
       MakeDataRateChecker ())
     .AddAttribute ("EnableMockTraffic", "Whether to enable mock traffic",
-      BooleanValue (false),
+      BooleanValue (true),
       MakeBooleanAccessor (&TDMAApplication::enableMockTraffic),
       MakeBooleanChecker ())
     .AddAttribute ("MockPacketSize", "Size of mock packets (in bytes)",
@@ -67,6 +68,12 @@ TDMAApplication::DoInitialize (void)
   curSlot = GetInitalSlot ();
   m_startTime = curSlot.start;
   m_stopTime = Seconds (config.simTime);
+
+  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
+  Ptr<WifiPhy> phy = device->GetPhy ();
+  phy->TraceConnectWithoutContext("PhyTxBegin", MakeCallback(&TDMAApplication::WifiPhyTxBeginTrace, this));
+  // phy->TraceConnectWithoutContext("PhyRxBegin", MakeCallback(&TDMAApplication::WifiPhyRxBeginTrace, this));
+
   // 在基类函数中，会根据m_startTime设置一个定时器来调用StartApplication
   Application::DoInitialize ();
 }
@@ -83,7 +90,7 @@ TDMAApplication::StartApplication (void)
 {
   // 第一个时隙开始
   SlotStarted ();
-  OutputPosition ();
+  // OutputPosition ();
 }
 
 void 
@@ -109,7 +116,7 @@ TDMAApplication::SlotEnded (void)
     LOG_UNCOND ("Fatal Error[1]: 时隙调度错误");
     exit (1);
   }
-  txEvent.Cancel ();
+  // txEvent.Cancel ();
   GetNextSlotInterval ();
 
   if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
@@ -263,13 +270,13 @@ TDMAApplication::WakeUpTxQueue ()
   if (pktToSend != NULL)
     {
       DoSendPacket (pktToSend);
-      nextTxTime = Max(nextTxTime, Seconds (
-        (pktToSend->GetSize () * 8) / static_cast<double>(dataRate.GetBitRate ())
-      ));
+      // nextTxTime = Max(nextTxTime, Seconds (
+      //   (pktToSend->GetSize () * 8) / static_cast<double>(dataRate.GetBitRate ())
+      // ));
     }
   
   // Schedule Next Tx
-  txEvent = Simulator::Schedule (nextTxTime, &TDMAApplication::WakeUpTxQueue, this);
+  // txEvent = Simulator::Schedule (nextTxTime, &TDMAApplication::WakeUpTxQueue, this);
 }
 
  void
@@ -376,6 +383,23 @@ TDMAApplication::OutputPosition (void)
 {
   std::cout<<GetNode ()->GetId ()<<" position: "<<GetNode ()->GetObject<ConstantVelocityMobilityModel>()->GetPosition()<<std::endl;
   position = Simulator::Schedule (MilliSeconds(20), &TDMAApplication::OutputPosition, this);
+}
+
+void 
+TDMAApplication::WifiPhyTxBeginTrace (Ptr<const Packet> p)
+{
+  WakeUpTxQueue ();
+  WifiMacHeader hdr;
+  p->PeekHeader(hdr);
+  // std::cout<<hdr.GetAddr2()<<','<<p->GetUid ()<<','<<Simulator::Now().GetMilliSeconds()<<std::endl;
+}
+
+void 
+TDMAApplication::WifiPhyRxBeginTrace (Ptr<const Packet> p)
+{
+  WifiMacHeader hdr;
+  p->PeekHeader(hdr);
+    std::cout<<"1,"<<','<<hdr.GetAddr2()<<','<<p->GetUid ()<<','<<Simulator::Now().GetMilliSeconds()<<std::endl;
 }
 
 }

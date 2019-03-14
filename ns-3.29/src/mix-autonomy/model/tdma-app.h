@@ -65,6 +65,9 @@ public:
 
   virtual int GetStatus () = 0;
 
+  void WifiPhyTxBeginTrace (Ptr<const Packet> p);
+  void WifiPhyRxBeginTrace (Ptr<const Packet> p);
+
 protected:
   virtual void StartApplication (void);
   virtual void StopApplication (void);

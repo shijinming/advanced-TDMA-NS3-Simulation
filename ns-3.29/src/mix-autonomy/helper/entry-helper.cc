@@ -8,6 +8,7 @@
 #include "ns3/mobility-module.h"
 
 #include "entry-helper.h"
+#include "ns3/tdma-app.h"
 
 namespace ns3
 {
