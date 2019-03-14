@@ -28,7 +28,7 @@ def convert_settings_to_cmd_flags(settings):
 def run_project(settings, print_cmd_only=False, stdout=None):
     flags = convert_settings_to_cmd_flags(settings)
     flags = " ".join(flags)
-    cmd_to_run = ["./waf", "--cwd={}".format(os.path.join(BASE_DIR, ".."), 
+    cmd_to_run = ["./waf", "--cwd={}".format(BASE_DIR), 
         '--run', 'mix-autonomy-example {}'.format(flags)]
     if not print_cmd_only:
         os.chdir(os.path.join(BASE_DIR, "ns-3.29"))
@@ -46,7 +46,7 @@ def get_configure_params():
         help="build profile, should be debug or optimized")
     parser.add_argument("--worker", type=int, default=8,
         help="number of workers")
-    parser.add_argument("--output", type=str, default="../output",
+    parser.add_argument("--output", type=str, default="output3",
         help="Output directory")
     parser.add_argument("--sim-idx", type=int,
         help="REQUIRED, Simulation id, must be unique")
@@ -122,7 +122,8 @@ class SequentialSimulator:
         return self.cmd_opts.run
     
     def genrate_tasks(self, tasks):
-        task_num = mobility_data_num
+        task_num = 5
+        window=[16,32,64,128,256]
         if self.cmd_opts.reversed:
             iterator = range(1, 1 + task_num)
         else:
@@ -132,8 +133,10 @@ class SequentialSimulator:
                 "sim-time": self.cmd_opts.sim_time,
                 "ap-num": 8,
             }
+            task["cw-min"]=15
+            task["cw-max"]=window[idx-1]
             task["mobility"] = os.path.join(BASE_DIR,
-                "../mobility", "fcd-trace-{}.ns2.output.xml".format(idx))
+                "../mobility", "fcd-trace-1.ns2.output.xml")
             trace_file_name = task["mobility"].split("/")[-1]
             node_start_time = os.path.join(BASE_DIR, "../mobility",
                 "{}.node_start_time.txt".format(trace_file_name))
