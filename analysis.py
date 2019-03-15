@@ -13,7 +13,7 @@ def analysis(file,nnode):
     with open(file) as a:
         for i in a:
             if 'position' in i:
-                position[int(i.split(' ')[0])]=int(i.split(' ')[2])
+                position[int(i.split(' ')[0])]=float(i.split(' ')[2])
             if 'middle' in i:
                 if 'add' in i:
                     outter.remove(int(i.split(' ')[0]))
@@ -23,7 +23,7 @@ def analysis(file,nnode):
             if len(tmp)<3:
                 continue
             if tmp[1] not in packets:
-                    packets[tmp[1]]=[0,0,0,'',0,0]
+                packets[tmp[1]]=[0,0,0,0,0,0]
             if len(tmp)==3:
                 sid=int(tmp[0].split(':')[-1],16)-1
                 packets[tmp[1]][0]=sid
@@ -79,8 +79,8 @@ if __name__ == "__main__":
     f=open("../mobility/fcd-trace-"+str(index)+".ns2.output.xml.node_start_time.txt")
     nnode=len([i for i in f.read().split('\n') if i!=''])
     f.close()
-    result = analysis("output3/stdout_"+str(index)+".log",143)
-    with open("result3.txt",'a') as f:
+    result = analysis("output17/stdout_"+str(index)+".log",nnode)
+    with open("result17.txt",'a') as f:
         f.write(str(index)+'\n')
         for r in result:
             f.write(str(r)+',')

@@ -6,4 +6,4 @@ else
     CPU_NUM="8"
 fi
 
-python2 run_analysis.py "$@" --worker=${CPU_NUM}
+python2 runner.py "$@" --worker=${CPU_NUM}

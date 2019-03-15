@@ -230,7 +230,7 @@ TDMAApplication::DoSendPacket (Ptr<Packet> pkt)
   
   pkt->AddHeader(pktHdr);
   socket->Send (pkt);
-  std::cout<<GetNode()->GetId()<<" socket send "<<pkt->GetUid()<<std::endl;
+//   std::cout<<GetNode()->GetId()<<" socket send "<<pkt->GetUid()<<std::endl;
   Ptr<Ipv4> ipv4 = GetNode ()->GetObject<Ipv4> ();
   txTrace (pkt, ipv4->GetAddress (1, 0).GetLocal ());
 }
