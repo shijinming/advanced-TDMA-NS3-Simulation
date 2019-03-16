@@ -122,7 +122,7 @@ class SequentialSimulator:
         return self.cmd_opts.run
     
     def genrate_tasks(self, tasks):
-        task_num = 17
+        task_num = 12
         if self.cmd_opts.reversed:
             iterator = range(1, 1 + task_num)
         else:

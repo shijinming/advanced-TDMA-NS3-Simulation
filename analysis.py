@@ -3,8 +3,9 @@ import numpy as np
 
 disMax=472
 
-def analysis(file,nnode):
-    position=np.array([0]*nnode)
+def analysis(file,start):
+    nnode=len(start)
+    position=np.array([-1]*nnode)
     outter=list(range(8,nnode))
     packets={}
     delay=[[],[],[],[]]
@@ -13,7 +14,9 @@ def analysis(file,nnode):
     with open(file) as a:
         for i in a:
             if 'position' in i:
-                position[int(i.split(' ')[0])]=float(i.split(' ')[2])
+                tmp=i.split(' ')
+                if start[int(tmp[0])]<=int(tmp[3])/1000:
+                    position[int(tmp[0])]=float(tmp[2])
             if 'middle' in i:
                 if 'add' in i:
                     outter.remove(int(i.split(' ')[0]))
@@ -23,20 +26,22 @@ def analysis(file,nnode):
             if len(tmp)<3:
                 continue
             if tmp[1] not in packets:
-                packets[tmp[1]]=[0,0,0,0,0,0]
+                packets[tmp[1]]=[0,0,0,-1,0,0]
             if len(tmp)==3:
-                sid=int(tmp[0].split(':')[-1],16)-1
+                sid=256*int(tmp[0].split(':')[-2],16)+int(tmp[0].split(':')[-1],16)-1
                 packets[tmp[1]][0]=sid
                 packets[tmp[1]][1]=int(tmp[2])
                 if sid in outter:
                     packets[tmp[1]][2]=1
-                packets[tmp[1]][3]=position[sid]
-                relativeDis = abs(position-position[sid])
-                packets[tmp[1]][4]=len([d for d in relativeDis if d<disMax])-1
+                if position[sid]>=0:
+                    packets[tmp[1]][3]=position[sid]
+                    relativeDis = abs([j for j in position if j>=0]-position[sid])
+                    packets[tmp[1]][4]=len([d for d in relativeDis if d<disMax])-1
             elif len(tmp)==4:
-                rid=int(tmp[0].split('.')[-1])-1
-                sid=int(tmp[2].split(':')[-1],16)-1
-                packets[tmp[1]][5]+=1
+                rid=256*int(tmp[0].split('.')[-2])+int(tmp[0].split('.')[-1])-1
+                sid=256*int(tmp[0].split(':')[-2],16)+int(tmp[0].split(':')[-1],16)-1
+                if position[rid]>=0:
+                    packets[tmp[1]][5]+=1
                 if packets[tmp[1]][2]==1:
                     ind=3
                 else:
@@ -47,9 +52,9 @@ def analysis(file,nnode):
                     else:
                         ind=2
                 delay[ind].append(int(tmp[3])-packets[tmp[1]][1])
-                if abs(position[sid]-position[rid])>dismax:
+                if abs(position[sid]-position[rid])>dismax and position[sid]>=0 and position[rid]>=0:
                     dismax=abs(position[sid]-position[rid])
-                
+
     for i in packets:
         if packets[i][2]==1:
             ind=3
@@ -77,9 +82,9 @@ def analysis(file,nnode):
 if __name__ == "__main__":
     index=sys.argv[1]
     f=open("../mobility/fcd-trace-"+str(index)+".ns2.output.xml.node_start_time.txt")
-    nnode=len([i for i in f.read().split('\n') if i!=''])
+    start=[float(i) for i in f.read().split('\n') if i!='']
     f.close()
-    result = analysis("output17/stdout_"+str(index)+".log",nnode)
+    result = analysis("output17/stdout_"+str(index)+".log",start)
     with open("result17.txt",'a') as f:
         f.write(str(index)+'\n')
         for r in result:
