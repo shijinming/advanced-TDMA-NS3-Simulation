@@ -393,7 +393,7 @@ TDMAApplication::WifiPhyTxBeginTrace (Ptr<const Packet> p)
   WakeUpTxQueue ();
   WifiMacHeader hdr;
   p->PeekHeader(hdr);
-  std::cout<<hdr.GetAddr2()<<','<<p->GetUid ()<<','<<Simulator::Now().GetMilliSeconds()<<std::endl;
+  std::cout<<hdr.GetAddr2()<<','<<p->GetUid ()<<','<<Simulator::Now().GetMicroSeconds()<<std::endl;
 }
 
 void 
@@ -401,7 +401,7 @@ TDMAApplication::WifiPhyRxBeginTrace (Ptr<const Packet> p)
 {
   WifiMacHeader hdr;
   p->PeekHeader(hdr);
-    std::cout<<"1,"<<','<<hdr.GetAddr2()<<','<<p->GetUid ()<<','<<Simulator::Now().GetMilliSeconds()<<std::endl;
+    std::cout<<"1,"<<','<<hdr.GetAddr2()<<','<<p->GetUid ()<<','<<Simulator::Now().GetMicroSeconds()<<std::endl;
 }
 
 }

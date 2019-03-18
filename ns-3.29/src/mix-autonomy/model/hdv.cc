@@ -165,12 +165,12 @@ HumanApplication::CreatePackets (uint32_t CpktCnt, uint32_t SpktCnt)
   Ptr<Packet> pkt;
   for(uint32_t i = 0; i < CpktCnt; i++)
   {
-    pkt = Create<Packet> (0);
+    pkt = Create<Packet> (200);
     txqCCH.push(pkt);
   }
   for(uint32_t i = 0; i < SpktCnt; i++)
   {
-    pkt = Create<Packet> (0);
+    pkt = Create<Packet> (200);
     txqSCH.push(pkt);
   }
 }
