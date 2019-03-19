@@ -97,7 +97,7 @@ void
 BeaconSimulationEntry::PrintSendPacket(Ptr<const Packet> packet, const Address &address)
 {
   // std::cout<<"Send a packet "<<packet<<" from "<<address<<std::endl;
-  // std::cout<<address<<','<<packet->GetUid ()<<','<<Simulator::Now().GetMilliSeconds()<<std::endl;
+  std::cout<<address<<','<<packet->GetUid ()<<','<<Simulator::Now().GetMicroSeconds()<<std::endl;
 }
 
 void 
