@@ -34,6 +34,7 @@ SimulationConfig::ConfigureCommandLineParams (CommandLine &cmd) {
     cmd.AddValue ("mobility-trace", "Path to mobility file", mobilityTraceFile);
     cmd.AddValue ("cw-min", "Middle minimum contention window", cwMin);
     cmd.AddValue ("cw-max", "Middle maximum contention window", cwMax);
+    cmd.AddValue ("send-num", "number of packets to send in a period", sendNum);
 }
 
 void 
@@ -54,6 +55,7 @@ SimulationConfig::PrintConfiguration () {
     SHOW_CONF (mobilityTraceFile);
     SHOW_CONF (cwMin);
     SHOW_CONF (cwMax);
+    SHOW_CONF (sendNum);
     LOG_UNCOND ("====================");
 #undef SHOW_CONF
 }

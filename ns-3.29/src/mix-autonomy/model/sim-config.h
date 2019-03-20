@@ -36,6 +36,7 @@ public:
 
     uint32_t cwMin = 15;
     uint32_t cwMax = 1023;
+    uint32_t sendNum = 5;
 
     void ParceCommandLineArguments (int argc, char **argv, bool doValidate);
     void ParceCommandLineArguments (int argc, char **argv) {
