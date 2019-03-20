@@ -154,8 +154,8 @@ APFollower::SendPacket (void)
   if (curSlot.curFrame == CCH_apFrame && isAtOwnSlot)
   {
     Ptr<Packet> pkt;
-    uint32_t CpktCnt = 5;
-    uint32_t SpktCnt = 5;
+    uint32_t CpktCnt = 20;
+    uint32_t SpktCnt = 20;
     for(uint32_t i = 0; i < CpktCnt; i++)
     {
       pkt = Create<Packet> (200);

@@ -182,12 +182,12 @@ HumanApplication::SendPacket (void)
   {
     if (curSlot.curFrame == CCH_hdvFrame && isAtOwnSlot)
     {
-      CreatePackets (5, 5);
+      CreatePackets (20, 20);
     }
   }
   else
   {
-    CreatePackets (5, 5);
+    CreatePackets (20, 20);
     WakeUpTxQueue ();
     EventId sendPacket;
     Time t = (curSlot.CCHSlotNum + curSlot.SCHSlotNum) * slotSize;
