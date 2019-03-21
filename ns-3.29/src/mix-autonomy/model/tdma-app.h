@@ -139,8 +139,6 @@ protected:
 
   void OutputPosition (void);
 
-  Ptr<UniformRandomVariable> m_rand;
-
 private:
 
   //====================================

@@ -190,7 +190,7 @@ HumanApplication::SendPacket (void)
     CreatePackets (config.sendNum, config.sendNum);
     WakeUpTxQueue ();
     EventId sendPacket;
-    Time t = (curSlot.CCHSlotNum + curSlot.SCHSlotNum) * slotSize + MicroSeconds (m_rand->GetInteger(0,3000));
+    Time t = (curSlot.CCHSlotNum + curSlot.SCHSlotNum) * slotSize;
     sendPacket = Simulator::Schedule(t, &HumanApplication::SendPacket, this);
   }
 }
