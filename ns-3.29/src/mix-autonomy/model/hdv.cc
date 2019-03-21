@@ -24,7 +24,6 @@ HumanApplication::HumanApplication ()
 {
     NS_LOG_FUNCTION (this);
     m_status = Outter;
-    m_rand = CreateObject<UniformRandomVariable> ();
 }
 
 HumanApplication::~HumanApplication ()

@@ -68,6 +68,7 @@ TDMAApplication::DoInitialize (void)
   curSlot = GetInitalSlot ();
   m_startTime = curSlot.start;
   m_stopTime = Seconds (config.simTime);
+  m_rand = CreateObject<UniformRandomVariable> ();
 
   Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
   Ptr<WifiPhy> phy = device->GetPhy ();
