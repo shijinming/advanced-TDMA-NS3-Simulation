@@ -10,6 +10,7 @@ def analysis(file,start):
     packets={}
     delay=[[],[],[],[]]
     receive=[[],[],[],[]]
+    throughput=[0]*nnode
     dismax=0
     with open(file) as a:
         for i in a:
@@ -39,9 +40,13 @@ def analysis(file,start):
                     packets[tmp[1]][4]=len([d for d in relativeDis if d<disMax])-1
             elif len(tmp)==4:
                 rid=256*int(tmp[0].split('.')[-2])+int(tmp[0].split('.')[-1])-1
-                sid=256*int(tmp[0].split(':')[-2],16)+int(tmp[0].split(':')[-1],16)-1
+                sid=256*int(tmp[2].split(':')[-2],16)+int(tmp[2].split(':')[-1],16)-1
                 if position[rid]>=0:
-                    packets[tmp[1]][5]+=1
+                    if sid<8:
+                        if rid<8:
+                            packets[tmp[1]][5]+=1
+                    else:
+                        packets[tmp[1]][5]+=1
                 if packets[tmp[1]][2]==1:
                     ind=3
                 else:
@@ -52,6 +57,11 @@ def analysis(file,start):
                     else:
                         ind=2
                 delay[ind].append(int(tmp[3])-packets[tmp[1]][1])
+                if rid<8:
+                    if sid<8:
+                        throughput[rid]+=1
+                else:
+                    throughput[rid]+=1
                 if abs(position[sid]-position[rid])>dismax and position[sid]>=0 and position[rid]>=0:
                     dismax=abs(position[sid]-position[rid])
 
@@ -66,7 +76,10 @@ def analysis(file,start):
             else:
                 ind=2
         if packets[i][4]>0:
-            receive[ind].append(packets[i][5]/packets[i][4])
+            if packets[i][0]<8:
+                receive[ind].append(packets[i][5]/7)
+            else:
+                receive[ind].append(packets[i][5]/packets[i][4])
     leaderDelay=sum(delay[0])/len(delay[0])
     followerDelay=sum(delay[1])/len(delay[1])
     coreDelay=sum(delay[0]+delay[1])/len(delay[0]+delay[1])
@@ -77,7 +90,9 @@ def analysis(file,start):
     coreRec=sum(receive[0]+receive[1])/len(receive[0]+receive[1])
     middleRec=sum(receive[2])/len(receive[2])
     outterRec=sum(receive[3])/len(receive[3])
-    return [coreDelay,middleDelay,outterDelay,coreRec,middleRec,outterRec,dismax]
+    coreThroughput=sum(throughput[:8])/len(throughput[:8])
+    hdvThroughput=sum(throughput[8:])/len(throughput[8:])
+    return [coreDelay,middleDelay,outterDelay,coreRec,middleRec,outterRec,coreThroughput,hdvThroughput,dismax]
 
 if __name__ == "__main__":
     index=sys.argv[1]
