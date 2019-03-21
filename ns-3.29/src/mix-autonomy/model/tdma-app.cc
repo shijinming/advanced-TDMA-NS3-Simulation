@@ -170,7 +170,7 @@ TDMAApplication::SlotStarted (void)
     SlotAllocation();
   SlotWillStart ();
   std::cout<<GetNode ()->GetId ()<<" CCH queue:"<<txqCCH.size()<<" SSH queue:"<<txqSCH.size()<<std::endl;
-  WakeUpTxQueue ();
+  wakeUp = Simulator::Schedule (MicroSeconds(m_rand->GetInteger(0,2000)), &TDMAApplication::WakeUpTxQueue, this);
 }
 
 void 
