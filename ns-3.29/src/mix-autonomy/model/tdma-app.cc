@@ -218,17 +218,14 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
 {
   Ptr<Packet> pkt;
   Address srcAddr;
-  if(Simulator::Now() < startTime)
-    return;
   while ((pkt = sink->RecvFrom (srcAddr)))
     {
       InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
       Address addr = inetAddr.GetIpv4 ();
-      ReceivePacket (pkt, srcAddr);
-      // 取出帧头的操作应该放在ReceivePacket函数中，由子类进行。
-      // PacketHeader pHeader;
-      // pkt->RemoveHeader(pHeader);
-      rxTrace (pkt, this, addr);
+      if(Simulator::Now() >= startTime){
+        ReceivePacket (pkt, srcAddr);
+        rxTrace (pkt, this, addr);
+      }
     }
 }
 
