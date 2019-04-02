@@ -73,7 +73,7 @@ TDMAApplication::DoInitialize (void)
   if (!f.is_open())
     std::cout<<"start time file is not open!"<<std::endl;
   float t=0;
-  for (int i=0;i<GetNode()->GetId();i++)
+  for (uint32_t i=0;i<GetNode()->GetId();i++)
     f>>t;
   startTime = Seconds(t);
   std::cout<<GetNode()->GetId()<<" starts at "<<startTime<<std::endl;
