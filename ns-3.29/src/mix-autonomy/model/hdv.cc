@@ -90,7 +90,7 @@ HumanApplication::ReceivePacket (Ptr<Packet> pkt, Address & srcAddr)
     {
         // 收到了来自内核层的数据包
         if(m_status == Outter)
-          AddToMiddle ();
+          // AddToMiddle ();
         receiveAPId = curSlot.id;
     }
     else if (curSlot.id-receiveAPId > 2 * (curSlot.CCHSlotNum + curSlot.SCHSlotNum)) //一个总帧内未收到内核层的包

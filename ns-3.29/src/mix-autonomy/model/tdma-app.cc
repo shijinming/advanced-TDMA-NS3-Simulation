@@ -3,6 +3,7 @@
 #include"ns3/wave-module.h"
 #include "ns3/wifi-net-device.h"
 #include "tdma-app.h"
+#include <fstream>
 
 
 namespace ns3 {
@@ -68,6 +69,14 @@ TDMAApplication::DoInitialize (void)
   curSlot = GetInitalSlot ();
   m_startTime = curSlot.start;
   m_stopTime = Seconds (config.simTime);
+  std::ifstream f(config.startTimeFile);
+  if (!f.is_open())
+    std::cout<<"start time file is not open!"<<std::endl;
+  float t=0;
+  for (int i=0;i<GetNode()->GetId();i++)
+    f>>t;
+  startTime = Seconds(t);
+  std::cout<<GetNode()->GetId()<<" starts at "<<startTime<<std::endl;
 
   Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
   Ptr<WifiPhy> phy = device->GetPhy ();
@@ -168,6 +177,8 @@ TDMAApplication::SlotStarted (void)
   isAtOwnSlot = true;
   if(curSlot.curFrame == Frame::CCH_apFrame)
     SlotAllocation();
+  if(Simulator::Now() < startTime)
+    return;
   SlotWillStart ();
   // std::cout<<GetNode ()->GetId ()<<" CCH queue:"<<txqCCH.size()<<" SSH queue:"<<txqSCH.size()<<std::endl;
   WakeUpTxQueue ();
@@ -209,12 +220,13 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
 {
   Ptr<Packet> pkt;
   Address srcAddr;
+  if(Simulator::Now() < startTime)
+    return;
   while ((pkt = sink->RecvFrom (srcAddr)))
     {
       InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
       Address addr = inetAddr.GetIpv4 ();
-      if(Simulator::Now() > m_startTime)
-        ReceivePacket (pkt, srcAddr);
+      ReceivePacket (pkt, srcAddr);
       // 取出帧头的操作应该放在ReceivePacket函数中，由子类进行。
       // PacketHeader pHeader;
       // pkt->RemoveHeader(pHeader);
@@ -316,12 +328,19 @@ TDMAApplication::PeriodicSwitch (struct TDMASlot curSlot)
 void
 TDMAApplication:: SetCurSlot(void)
 {
-  curSlot.CCHSlotNum = 2*(config.apNum+1);
-  curSlot.SCHSlotNum = 2*(config.apNum+1); 
+  // curSlot.CCHSlotNum = 2*(config.apNum+1);
+  // curSlot.SCHSlotNum = 2*(config.apNum+1); 
+  // curSlot.apCCHSlotNum = config.apNum+1;  
+  // curSlot.apSCHSlotNum = config.apNum+1;  
+  // curSlot.hdvCCHSlotNum = config.apNum+1; 
+  // curSlot.hdvSCHSlotNum = config.apNum+1; 
+  
+  curSlot.CCHSlotNum = 1*(config.apNum+1);
+  curSlot.SCHSlotNum = 1*(config.apNum+1); 
   curSlot.apCCHSlotNum = config.apNum+1;  
   curSlot.apSCHSlotNum = config.apNum+1;  
-  curSlot.hdvCCHSlotNum = config.apNum+1; 
-  curSlot.hdvSCHSlotNum = config.apNum+1;  
+  curSlot.hdvCCHSlotNum = 0; 
+  curSlot.hdvSCHSlotNum = 0;   
 }
 
 void

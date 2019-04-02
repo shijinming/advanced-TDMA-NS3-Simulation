@@ -103,6 +103,8 @@ protected:
   /** 自动驾驶车辆数量 */
   uint64_t apNum;
 
+  Time startTime;
+
   Time minTxInterval = MicroSeconds (100);
   Time slotSize = MilliSeconds (20);
 

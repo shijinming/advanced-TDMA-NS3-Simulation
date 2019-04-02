@@ -30,6 +30,7 @@ public:
     std::string eventTraceFile = "";
     std::string throughputTraceFile = "";
     std::string mobilityTraceFile = "";
+    std::string startTimeFile = "";
 
     /** 全局队列属性 */
     uint32_t txqCapacity = 100; // 发送队列大小

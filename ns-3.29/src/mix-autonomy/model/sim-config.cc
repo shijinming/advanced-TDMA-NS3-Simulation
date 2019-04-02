@@ -32,6 +32,7 @@ SimulationConfig::ConfigureCommandLineParams (CommandLine &cmd) {
     cmd.AddValue ("event-trace", "Path to event trace file", eventTraceFile);
     cmd.AddValue ("throughput-trace", "Path to throughput file", throughputTraceFile);
     cmd.AddValue ("mobility-trace", "Path to mobility file", mobilityTraceFile);
+    cmd.AddValue ("start-time", "Path to start time file", startTimeFile);
     cmd.AddValue ("cw-min", "Middle minimum contention window", cwMin);
     cmd.AddValue ("cw-max", "Middle maximum contention window", cwMax);
     cmd.AddValue ("send-num", "number of packets to send in a period", sendNum);
@@ -53,6 +54,7 @@ SimulationConfig::PrintConfiguration () {
     SHOW_CONF (eventTraceFile);
     SHOW_CONF (throughputTraceFile);
     SHOW_CONF (mobilityTraceFile);
+    SHOW_CONF (startTimeFile);
     SHOW_CONF (cwMin);
     SHOW_CONF (cwMax);
     SHOW_CONF (sendNum);
