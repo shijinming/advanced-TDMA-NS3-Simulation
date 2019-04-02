@@ -139,9 +139,9 @@ class SequentialSimulator:
             task["mobility"] = os.path.join(BASE_DIR,
                 "../mobility", "fcd-trace-{}.ns2.output.xml".format(idx))
             trace_file_name = task["mobility"].split("/")[-1]
-            node_start_time = os.path.join(BASE_DIR, "../mobility",
+            task["start-time"] = os.path.join(BASE_DIR, "../mobility",
                 "{}.node_start_time.txt".format(trace_file_name))
-            task["nnodes"] = get_node_num(node_start_time)
+            task["nnodes"] = get_node_num(task["start-time"])
             task["task-id"] = idx
             tasks.append(task)
 
