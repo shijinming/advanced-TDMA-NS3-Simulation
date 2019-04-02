@@ -84,7 +84,9 @@ APLeader::SlotAllocation ()
   if (m_SCHslotAllocation.size() == 0)
   {
       for(uint32_t i=0; i < curSlot.apSCHSlotNum; i++)
-        m_SCHslotAllocation.push_back((i+1)%(config.apNum+1));
+        m_SCHslotAllocation.push_back(config.apNum-1-i);
+      m_SCHslotAllocation[curSlot.apSCHSlotNum-2]=config.apNum + 1;
+      m_SCHslotAllocation[curSlot.apSCHSlotNum-1]=0;
       for(uint32_t i=curSlot.apSCHSlotNum; i < curSlot.SCHSlotNum; i++)
         m_SCHslotAllocation.push_back(config.apNum + 1);  
   }

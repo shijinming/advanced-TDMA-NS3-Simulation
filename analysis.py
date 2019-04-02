@@ -1,19 +1,24 @@
 import sys
 import numpy as np
 
-disMax=472
+disMax=465
 
-def analysis(file,start):
+def analysis(root_dir,index):
+    f=open("../mobility/fcd-trace-"+str(index)+".ns2.output.xml.node_start_time.txt")
+    start=np.array([float(i) for i in f.read().split('\n') if i!=''])
+    f.close()
     nnode=len(start)
     position=np.array([-1]*nnode)
     outter=list(range(8,nnode))
     packets={}
     delay=[[],[],[],[]]
     receive=[[],[],[],[]]
-    throughput=[0]*nnode
+    throughput=np.array([0]*nnode)
     dismax=0
-    with open(file) as a:
+    with open(root_dir+"/stdout_"+str(index)+".log") as a:
         for i in a:
+            if "Tick" in i:
+                print(i,end='')
             if 'position' in i:
                 tmp=i.split(' ')
                 if start[int(tmp[0])]<=int(tmp[3])/1000:
@@ -47,6 +52,11 @@ def analysis(file,start):
                             packets[tmp[1]][5]+=1
                     else:
                         packets[tmp[1]][5]+=1
+                    if rid<8:
+                        if sid<8:
+                            throughput[rid]+=1
+                    else:
+                        throughput[rid]+=1 
                 if packets[tmp[1]][2]==1:
                     ind=3
                 else:
@@ -57,11 +67,6 @@ def analysis(file,start):
                     else:
                         ind=2
                 delay[ind].append(int(tmp[3])-packets[tmp[1]][1])
-                if rid<8:
-                    if sid<8:
-                        throughput[rid]+=1
-                else:
-                    throughput[rid]+=1
                 if abs(position[sid]-position[rid])>dismax and position[sid]>=0 and position[rid]>=0:
                     dismax=abs(position[sid]-position[rid])
 
@@ -80,6 +85,7 @@ def analysis(file,start):
                 receive[ind].append(packets[i][5]/7)
             else:
                 receive[ind].append(packets[i][5]/packets[i][4])
+    throughput=throughput/(600-start)
     leaderDelay=sum(delay[0])/len(delay[0])
     followerDelay=sum(delay[1])/len(delay[1])
     coreDelay=sum(delay[0]+delay[1])/len(delay[0]+delay[1])
@@ -96,11 +102,8 @@ def analysis(file,start):
 
 if __name__ == "__main__":
     index=sys.argv[1]
-    f=open("../mobility/fcd-trace-"+str(index)+".ns2.output.xml.node_start_time.txt")
-    start=[float(i) for i in f.read().split('\n') if i!='']
-    f.close()
-    result = analysis("output17/stdout_"+str(index)+".log",start)
-    with open("result17.txt",'a') as f:
+    result = analysis("output1",index)
+    with open("result1.txt",'a') as f:
         f.write(str(index)+'\n')
         for r in result:
             f.write(str(r)+',')

@@ -119,11 +119,11 @@ TDMAApplication::SlotEnded (void)
   // txEvent.Cancel ();
   GetNextSlotInterval ();
 
-  // if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
-  //   std::cout<<"CCH:";
-  // else
-  //   std::cout<<"SCH:";
-  // std::cout<<GetNode()->GetId()<<" SlotEnded "<<Simulator::Now().GetMilliSeconds()<<std::endl;
+//   if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
+//     std::cout<<"CCH:";
+//   else
+//     std::cout<<"SCH:";
+//   std::cout<<GetNode()->GetId()<<" SlotEnded "<<Simulator::Now().GetMilliSeconds()<<std::endl;
 
   if(IsAPApplicationInstalled(GetNode()))
   {
@@ -149,11 +149,11 @@ TDMAApplication::SlotStarted (void)
 {
   // LOG_UNCOND ("Slot of " << GetNode ()->GetId () << " started at " << Simulator::Now ().GetMicroSeconds ());
   GetCurFrame();
-  // if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
-  //   std::cout<<"CCH:";
-  // else
-  //   std::cout<<"SCH:";
-  // std::cout<<GetNode()->GetId()<<" SlotStarted "<<Simulator::Now().GetMilliSeconds()<<std::endl;
+//   if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
+//     std::cout<<"CCH:";
+//   else
+//     std::cout<<"SCH:";
+//   std::cout<<GetNode()->GetId()<<" SlotStarted "<<Simulator::Now().GetMilliSeconds()<<std::endl;
 
   if (isAtOwnSlot) {
     // 已经开始了的时隙重复启动
@@ -370,7 +370,7 @@ TDMAApplication:: GetInitalSlot (void)
   else if(GetNode ()->GetId () < config.apNum) 
   {
     curSlot.duration =  slotSize - minTxInterval;
-    curSlot.start = slotSize * (GetNode ()->GetId ()-1) + minTxInterval;
+    curSlot.start = slotSize * (config.apNum-1-GetNode ()->GetId ()) + minTxInterval;
   }
   else 
   {
