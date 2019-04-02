@@ -81,9 +81,9 @@ BeaconSimulationEntry::ConfigureApplication ()
   for (auto node = NodeList::Begin (); node != NodeList::End (); node ++) 
     { Ptr<Application> app;
       if ((*node)->GetId() == 0) 
-        app = apleaderHelper.Install(*node);
+        app = hdvHelper.Install(*node);
       else if ((*node)->GetId() <= 7) 
-        app = apfollowerHelper.Install(*node);
+        app = hdvHelper.Install(*node);
       else
         app = hdvHelper.Install(*node);
         app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
