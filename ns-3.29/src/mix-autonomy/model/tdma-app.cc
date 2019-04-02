@@ -177,8 +177,6 @@ TDMAApplication::SlotStarted (void)
   isAtOwnSlot = true;
   if(curSlot.curFrame == Frame::CCH_apFrame)
     SlotAllocation();
-  if(Simulator::Now() < startTime)
-    return;
   SlotWillStart ();
   // std::cout<<GetNode ()->GetId ()<<" CCH queue:"<<txqCCH.size()<<" SSH queue:"<<txqSCH.size()<<std::endl;
   WakeUpTxQueue ();
@@ -280,7 +278,7 @@ TDMAApplication::WakeUpTxQueue ()
     }
   }
   Time nextTxTime = minTxInterval;
-  if (pktToSend != NULL)
+  if (pktToSend != NULL && Simulator::Now() >= startTime)
     {
       DoSendPacket (pktToSend);
       // nextTxTime = Max(nextTxTime, Seconds (
