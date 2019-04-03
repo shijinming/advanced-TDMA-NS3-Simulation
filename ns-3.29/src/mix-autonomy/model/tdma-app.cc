@@ -65,16 +65,14 @@ TDMAApplication::SetStopTime (Time stop) {
 void 
 TDMAApplication::DoInitialize (void) 
 {
-  CreateSocket ();
-  curSlot = GetInitalSlot ();
-
   std::ifstream f(config.startTimeFile);
   if (!f.is_open())
     std::cout<<"start time file is not open!"<<std::endl;
   float t=0;
   for (uint32_t i=0;i<=GetNode()->GetId();i++)
     f>>t;
-  m_startTime = Seconds(t);
+  curSlot = GetInitalSlot(Seconds(t));
+  m_startTime = curSlot.start;
   m_stopTime = Seconds (config.simTime);
 
   Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
@@ -96,6 +94,7 @@ TDMAApplication::DoDispose (void)
 void 
 TDMAApplication::StartApplication (void) 
 {
+  CreateSocket ();
   // 第一个时隙开始
   SlotStarted ();
   OutputPosition ();
@@ -369,24 +368,25 @@ TDMAApplication::GetCurFrame (void)
 }
 
 struct TDMASlot
-TDMAApplication:: GetInitalSlot (void)
+TDMAApplication:: GetInitalSlot (Time start)
 {
   // LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
   SetCurSlot();
   if(GetNode ()->GetId () == 0) 
   {
     curSlot.duration =  slotSize - minTxInterval;
-    curSlot.start = slotSize * config.apNum + minTxInterval;
+    curSlot.start = start + slotSize * config.apNum + minTxInterval;
 
   }
   else if(GetNode ()->GetId () < config.apNum) 
   {
     curSlot.duration =  slotSize - minTxInterval;
-    curSlot.start = slotSize * (config.apNum-1-GetNode ()->GetId ()) + minTxInterval;
+    curSlot.start = start + slotSize * (config.apNum-1-GetNode ()->GetId ()) + minTxInterval;
   }
   else 
   {
-    curSlot.start = slotSize * (config.apNum + 1) + minTxInterval;
+    // curSlot.start = slotSize * (config.apNum + 1) + minTxInterval;
+    curSlot.start = start;
     curSlot.duration = Seconds(config.simTime);
   }
   return curSlot;

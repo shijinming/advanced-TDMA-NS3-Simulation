@@ -214,7 +214,7 @@ protected:
    * 
    * @return TDMASlot   起始时隙
    */
-  struct TDMASlot GetInitalSlot (void);
+  struct TDMASlot GetInitalSlot (Time start);
 
   /**
    * @brief 对curSlot结构体里的一些变量进行配置
