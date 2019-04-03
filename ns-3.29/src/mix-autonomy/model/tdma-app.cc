@@ -67,15 +67,15 @@ TDMAApplication::DoInitialize (void)
 {
   CreateSocket ();
   curSlot = GetInitalSlot ();
-  m_startTime = curSlot.start;
-  m_stopTime = Seconds (config.simTime);
+
   std::ifstream f(config.startTimeFile);
   if (!f.is_open())
     std::cout<<"start time file is not open!"<<std::endl;
   float t=0;
   for (uint32_t i=0;i<=GetNode()->GetId();i++)
     f>>t;
-  startTime = Seconds(t);
+  m_startTime = Seconds(t);
+  m_stopTime = Seconds (config.simTime);
   std::cout<<GetNode()->GetId()<<" starts at "<<startTime<<std::endl;
 
   Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
@@ -222,10 +222,8 @@ TDMAApplication::OnReceivePacket (Ptr<Socket> socket)
     {
       InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom (srcAddr);
       Address addr = inetAddr.GetIpv4 ();
-      if(Simulator::Now() >= startTime){
-        ReceivePacket (pkt, srcAddr);
-        rxTrace (pkt, this, addr);
-      }
+      ReceivePacket (pkt, srcAddr);
+      rxTrace (pkt, this, addr);
     }
 }
 
@@ -275,7 +273,7 @@ TDMAApplication::WakeUpTxQueue ()
     }
   }
   Time nextTxTime = minTxInterval;
-  if (pktToSend != NULL && Simulator::Now() >= startTime)
+  if (pktToSend != NULL)
     {
       DoSendPacket (pktToSend);
       // nextTxTime = Max(nextTxTime, Seconds (
