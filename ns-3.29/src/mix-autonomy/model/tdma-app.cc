@@ -76,7 +76,6 @@ TDMAApplication::DoInitialize (void)
     f>>t;
   m_startTime = Seconds(t);
   m_stopTime = Seconds (config.simTime);
-  std::cout<<GetNode()->GetId()<<" starts at "<<startTime<<std::endl;
 
   Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
   Ptr<WifiPhy> phy = device->GetPhy ();
@@ -100,6 +99,7 @@ TDMAApplication::StartApplication (void)
   // 第一个时隙开始
   SlotStarted ();
   OutputPosition ();
+  std::cout<<GetNode()->GetId()<<" starts at "<<Simulator::Now()<<std::endl;
 }
 
 void 
