@@ -81,9 +81,9 @@ BeaconSimulationEntry::ConfigureApplication ()
   for (auto node = NodeList::Begin (); node != NodeList::End (); node ++) 
     { Ptr<Application> app;
       if ((*node)->GetId() == 0) 
-        app = hdvHelper.Install(*node);
+        app = apleaderHelper.Install(*node);
       else if ((*node)->GetId() <= 7) 
-        app = hdvHelper.Install(*node);
+        app = apfollowerHelper.Install(*node);
       else
         app = hdvHelper.Install(*node);
         app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
@@ -97,7 +97,7 @@ void
 BeaconSimulationEntry::PrintSendPacket(Ptr<const Packet> packet, const Address &address)
 {
   // std::cout<<"Send a packet "<<packet<<" from "<<address<<std::endl;
-  std::cout<<address<<','<<packet->GetUid ()<<','<<Simulator::Now().GetMicroSeconds()<<std::endl;
+  // std::cout<<address<<','<<packet->GetUid ()<<','<<Simulator::Now().GetMicroSeconds()<<std::endl;
 }
 
 void 
@@ -105,8 +105,8 @@ BeaconSimulationEntry::PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3
 {
   Ptr<Ipv4> ipv4 = app->GetNode ()->GetObject<Ipv4> ();
   // std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<" Received a packet "<<packet<<" from "<<address<<std::endl;
-  std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<','<<packet->GetUid ()<<','<<address<<','
-  <<Simulator::Now().GetMicroSeconds()<<std::endl;
+  // std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<','<<packet->GetUid ()<<','<<address<<','
+  // <<Simulator::Now().GetMicroSeconds()<<std::endl;
 }
 
 }
