@@ -372,7 +372,8 @@ TDMAApplication:: GetInitalSlot (Time start)
 {
   // LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
   SetCurSlot();
-  Time willStart = MilliSeconds (720 - Simulator::Now().GetMilliSeconds()%720);
+  int64_t period = ((curSlot.CCHSlotNum + curSlot.SCHSlotNum) * slotSize).GetMilliSeconds();
+  Time willStart = MilliSeconds (start + period - start.GetMilliSeconds()%period);
   if(GetNode ()->GetId () == 0) 
   {
     curSlot.duration =  slotSize - minTxInterval;
