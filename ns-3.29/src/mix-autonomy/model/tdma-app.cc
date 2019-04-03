@@ -320,19 +320,19 @@ TDMAApplication::PeriodicSwitch (struct TDMASlot curSlot)
 void
 TDMAApplication:: SetCurSlot(void)
 {
-  // curSlot.CCHSlotNum = 2*(config.apNum+1);
-  // curSlot.SCHSlotNum = 2*(config.apNum+1); 
-  // curSlot.apCCHSlotNum = config.apNum+1;  
-  // curSlot.apSCHSlotNum = config.apNum+1;  
-  // curSlot.hdvCCHSlotNum = config.apNum+1; 
-  // curSlot.hdvSCHSlotNum = config.apNum+1; 
-  
-  curSlot.CCHSlotNum = 1*(config.apNum+1);
-  curSlot.SCHSlotNum = 1*(config.apNum+1); 
+  curSlot.CCHSlotNum = 2*(config.apNum+1);
+  curSlot.SCHSlotNum = 2*(config.apNum+1); 
   curSlot.apCCHSlotNum = config.apNum+1;  
   curSlot.apSCHSlotNum = config.apNum+1;  
-  curSlot.hdvCCHSlotNum = 0; 
-  curSlot.hdvSCHSlotNum = 0;   
+  curSlot.hdvCCHSlotNum = config.apNum+1; 
+  curSlot.hdvSCHSlotNum = config.apNum+1; 
+  
+  // curSlot.CCHSlotNum = 1*(config.apNum+1);
+  // curSlot.SCHSlotNum = 1*(config.apNum+1); 
+  // curSlot.apCCHSlotNum = config.apNum+1;  
+  // curSlot.apSCHSlotNum = config.apNum+1;  
+  // curSlot.hdvCCHSlotNum = 0; 
+  // curSlot.hdvSCHSlotNum = 0;   
 }
 
 void
@@ -373,7 +373,7 @@ TDMAApplication:: GetInitalSlot (Time start)
   // LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
   SetCurSlot();
   int64_t period = ((curSlot.CCHSlotNum + curSlot.SCHSlotNum) * slotSize).GetMilliSeconds();
-  Time willStart = MilliSeconds (start + period - start.GetMilliSeconds()%period);
+  Time willStart = MilliSeconds (start.GetMilliSeconds() + period - start.GetMilliSeconds()%period);
   if(GetNode ()->GetId () == 0) 
   {
     curSlot.duration =  slotSize - minTxInterval;
