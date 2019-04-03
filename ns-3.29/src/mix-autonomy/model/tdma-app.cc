@@ -372,16 +372,17 @@ TDMAApplication:: GetInitalSlot (Time start)
 {
   // LOG_UNCOND ("Get Initial Slot " << GetNode ()->GetId ());
   SetCurSlot();
+  Time willStart = MilliSeconds (720 - Simulator::Now().GetMilliSeconds()%720);
   if(GetNode ()->GetId () == 0) 
   {
     curSlot.duration =  slotSize - minTxInterval;
-    curSlot.start = start + slotSize * config.apNum + minTxInterval;
+    curSlot.start = willStart + slotSize * config.apNum + minTxInterval;
 
   }
   else if(GetNode ()->GetId () < config.apNum) 
   {
     curSlot.duration =  slotSize - minTxInterval;
-    curSlot.start = start + slotSize * (config.apNum-1-GetNode ()->GetId ()) + minTxInterval;
+    curSlot.start = willStart + slotSize * (config.apNum-1-GetNode ()->GetId ()) + minTxInterval;
   }
   else 
   {
