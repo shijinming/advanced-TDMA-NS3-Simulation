@@ -46,7 +46,7 @@ def get_configure_params():
         help="build profile, should be debug or optimized")
     parser.add_argument("--worker", type=int, default=8,
         help="number of workers")
-    parser.add_argument("--output", type=str, default="layer1",
+    parser.add_argument("--output", type=str, default="output20",
         help="Output directory")
     parser.add_argument("--sim-idx", type=int,
         help="REQUIRED, Simulation id, must be unique")
@@ -135,7 +135,7 @@ class SequentialSimulator:
             }
             task["cw-min"]=15
             task["cw-max"]=1023
-            task["send-num"]=8
+            task["send-num"]=20
             task["mobility"] = os.path.join(BASE_DIR,
                 "../mobility", "fcd-trace-{}.ns2.output.xml".format(idx))
             trace_file_name = task["mobility"].split("/")[-1]
