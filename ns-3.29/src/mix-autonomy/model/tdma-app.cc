@@ -79,8 +79,8 @@ TDMAApplication::DoInitialize (void)
   Ptr<WifiPhy> phy = device->GetPhy ();
   if(IsAPApplicationInstalled(GetNode()))
   {
-    phy->SetTxPowerStart (config.txPower + 5);
-    phy->SetTxPowerEnd (config.txPower + 5);
+    phy->SetTxPowerStart (config.txPower + 3);
+    phy->SetTxPowerEnd (config.txPower + 3);
   }
   phy->TraceConnectWithoutContext("PhyTxBegin", MakeCallback(&TDMAApplication::WifiPhyTxBeginTrace, this));
   // phy->TraceConnectWithoutContext("PhyRxBegin", MakeCallback(&TDMAApplication::WifiPhyRxBeginTrace, this));
