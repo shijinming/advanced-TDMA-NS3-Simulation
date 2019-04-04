@@ -39,6 +39,8 @@ public:
     uint32_t cwMax = 1023;
     uint32_t sendNum = 5;
 
+    double txPower = 35;
+
     void ParceCommandLineArguments (int argc, char **argv, bool doValidate);
     void ParceCommandLineArguments (int argc, char **argv) {
         ParceCommandLineArguments (argc, argv, true);

@@ -17,7 +17,6 @@ public:
 protected:
     SimulationConfig &config;
 
-    double txPower = 35;
     bool doValidate = true;
 
     std::ofstream m_mobilityTraceFile;

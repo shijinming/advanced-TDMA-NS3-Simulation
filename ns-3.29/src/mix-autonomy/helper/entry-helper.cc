@@ -36,8 +36,8 @@ void SimulationEntry::Simulate (int argc, char **argv)
   Ptr<YansWifiChannel> channel = wifiChannel.Create ();
   wifiPhy.SetChannel (channel);
   wifiPhy.SetPcapDataLinkType (WifiPhyHelper::DLT_IEEE802_11);
-  wifiPhy.Set ("TxPowerStart", DoubleValue (txPower));
-  wifiPhy.Set ("TxPowerEnd", DoubleValue (txPower));  // txPower: default valude is 35
+  wifiPhy.Set ("TxPowerStart", DoubleValue (config.txPower));
+  wifiPhy.Set ("TxPowerEnd", DoubleValue (config.txPower));  // txPower: default valude is 35
   // Mac layer
   auto wifi80211pMac = NqosWaveMacHelper::Default ();
   // 802.11p protocol
