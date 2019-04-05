@@ -174,7 +174,7 @@ void HumanApplication::SendPacket(void)
   {
     if (curSlot.curFrame == CCH_hdvFrame && isAtOwnSlot)
     {
-      CreatePackets(int(config.sendNum / 1.3), int(config.sendNum / 1.3));
+      CreatePackets(8,8);
       WakeUpTxQueue();
     }
   }
