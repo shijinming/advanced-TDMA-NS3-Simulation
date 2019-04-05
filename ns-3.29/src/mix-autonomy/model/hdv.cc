@@ -183,14 +183,19 @@ HumanApplication::SendPacket (void)
     if (curSlot.curFrame == CCH_hdvFrame && isAtOwnSlot)
     {
       CreatePackets (int(config.sendNum/1.3), int(config.sendNum/1.3));
+      WakeUpTxQueue ();
     }
   }
   else
   {
-    CreatePackets (int(config.sendNum/1.3), int(config.sendNum/1.3));
+    GetCurFrame();
+    if(curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
+      CreatePackets (1,0);
+    else
+      CreatePackets (0,1);  
     WakeUpTxQueue ();
     EventId sendPacket;
-    Time t = (curSlot.CCHSlotNum + curSlot.SCHSlotNum) * slotSize;
+    Time t = MilliSeconds(50);
     sendPacket = Simulator::Schedule(t, &HumanApplication::SendPacket, this);
   }
 }

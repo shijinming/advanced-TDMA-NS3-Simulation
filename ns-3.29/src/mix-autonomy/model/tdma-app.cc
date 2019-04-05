@@ -183,7 +183,6 @@ TDMAApplication::SlotStarted (void)
     SlotAllocation();
   SlotWillStart ();
   // std::cout<<GetNode ()->GetId ()<<" CCH queue:"<<txqCCH.size()<<" SSH queue:"<<txqSCH.size()<<std::endl;
-  WakeUpTxQueue ();
 }
 
 void 

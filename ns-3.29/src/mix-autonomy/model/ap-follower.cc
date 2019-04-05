@@ -173,6 +173,7 @@ void
 APFollower::SlotWillStart (void)
 {
   SendPacket ();
+  WakeUpTxQueue ();
 }
 
 }
