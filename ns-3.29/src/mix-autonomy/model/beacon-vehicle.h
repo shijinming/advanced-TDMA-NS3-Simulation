@@ -17,34 +17,36 @@
 namespace ns3
 {
 
-class BeaconVehicleApplication : public TDMAApplication {
+class BeaconVehicleApplication : public TDMAApplication
+{
 public:
-  static TypeId GetTypeId (void);
-  BeaconVehicleApplication () {};
-  virtual void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr) {};
-  void SetupHeader (PacketHeader &hdr) {};
-  void SlotAllocation () {};
-  void SendPacket () {};
-  int GetStatus () {return 3;};
+  static TypeId GetTypeId(void);
+  BeaconVehicleApplication(){};
+  virtual void ReceivePacket(Ptr<Packet> pkt, Address &srcAddr){};
+  void SetupHeader(PacketHeader &hdr){};
+  void SlotAllocation(){};
+  void SendPacket(){};
+  int GetStatus() { return 3; };
+
 private:
   //Time slotSize;
 
-  virtual void ReceivePacket (Ptr<const Packet> pkt, const Address & srcAddr) {};
-  virtual struct TDMASlot GetNextSlotInterval (void) {return TDMASlot();}
+  virtual void ReceivePacket(Ptr<const Packet> pkt, const Address &srcAddr){};
+  virtual struct TDMASlot GetNextSlotInterval(void) { return TDMASlot(); }
   //virtual struct TDMASlot GetInitalSlot (void);
-  bool IsAPApplicationInstalled (Ptr<Node> node) {return false;}
+  bool IsAPApplicationInstalled(Ptr<Node> node) { return false; }
 };
 
 TypeId
-BeaconVehicleApplication::GetTypeId ()
+BeaconVehicleApplication::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::BeaconVehicleApplication")
-    .SetParent <TDMAApplication> ()
-    .AddConstructor <BeaconVehicleApplication> ()
-    .AddAttribute ("SlotSize", "Size of time slot",
-      TimeValue (MilliSeconds (20)),
-      MakeTimeAccessor (&BeaconVehicleApplication::slotSize),
-      MakeTimeChecker ());
+  static TypeId tid = TypeId("ns3::BeaconVehicleApplication")
+                          .SetParent<TDMAApplication>()
+                          .AddConstructor<BeaconVehicleApplication>()
+                          .AddAttribute("SlotSize", "Size of time slot",
+                                        TimeValue(MilliSeconds(20)),
+                                        MakeTimeAccessor(&BeaconVehicleApplication::slotSize),
+                                        MakeTimeChecker());
   return tid;
 }
 /*
@@ -68,8 +70,8 @@ BeaconVehicleApplication::GetInitalSlot (void)
   return slot;
 }
 */
-NS_OBJECT_ENSURE_REGISTERED (BeaconVehicleApplication);
+NS_OBJECT_ENSURE_REGISTERED(BeaconVehicleApplication);
 
-}
+} // namespace ns3
 
 #endif

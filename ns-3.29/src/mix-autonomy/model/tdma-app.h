@@ -19,25 +19,32 @@
 
 #include "my-header.h"
 
-namespace ns3 
+namespace ns3
 {
 /** 当前帧状态 */
-enum Frame {CCH_apFrame, SCH_apFrame,CCH_hdvFrame,SCH_hdvFrame};
+enum Frame
+{
+  CCH_apFrame,
+  SCH_apFrame,
+  CCH_hdvFrame,
+  SCH_hdvFrame
+};
 
 /**
  * @brief 时隙单元定义  时隙数后续调试可改
  */
-struct TDMASlot {
-  Time start; /**< 时隙开始时间，注意是相对时间 */
+struct TDMASlot
+{
+  Time start;    /**< 时隙开始时间，注意是相对时间 */
   Time duration; /**< 时隙长度 */
-  uint64_t id; /**< 时隙ID，这个成员可以是Optional的，在本类中不会使用，可以供子类使用*/
+  uint64_t id;   /**< 时隙ID，这个成员可以是Optional的，在本类中不会使用，可以供子类使用*/
   Frame curFrame;
-  uint64_t frameId; /**< 处于当前帧内的第几个时隙 */
-  uint64_t frameNum;  /**< 当前为仿真开始后的第几个帧（此帧为4帧的总和） */
-  uint64_t CCHSlotNum; /**  控制帧时隙数 2*（apNum+1）*/
-  uint64_t SCHSlotNum; /**  数据帧时隙数 2*（apNum+1）*/ 
-  uint64_t apCCHSlotNum; //内核层控制帧时隙数，等于apNum+1
-  uint64_t apSCHSlotNum; //内核层数据帧时隙数，等于apNum+1
+  uint64_t frameId;       /**< 处于当前帧内的第几个时隙 */
+  uint64_t frameNum;      /**< 当前为仿真开始后的第几个帧（此帧为4帧的总和） */
+  uint64_t CCHSlotNum;    /**  控制帧时隙数 2*（apNum+1）*/
+  uint64_t SCHSlotNum;    /**  数据帧时隙数 2*（apNum+1）*/
+  uint64_t apCCHSlotNum;  //内核层控制帧时隙数，等于apNum+1
+  uint64_t apSCHSlotNum;  //内核层数据帧时隙数，等于apNum+1
   uint64_t hdvCCHSlotNum; //中间层控制帧时隙数，该层的控制帧位于内核层控制帧之后，等于apNum+1
   uint64_t hdvSCHSlotNum; //中间层数据帧时隙数，该层的数据帧位于内核层数据帧之后，apNum+1
 };
@@ -48,34 +55,34 @@ struct TDMASlot {
 #define tdma_SCH1 172
 #define tdma_SCH2 174
 #define tdma_SCH3 176
-#define tdma_CCH  178
+#define tdma_CCH 178
 #define tdma_SCH4 180
 #define tdma_SCH5 182
 #define tdma_SCH6 184
 
-class TDMAApplication: public Application
+class TDMAApplication : public Application
 {
 public:
-  static TypeId GetTypeId  (void);
-  TDMAApplication ();
-  virtual ~TDMAApplication ();
+  static TypeId GetTypeId(void);
+  TDMAApplication();
+  virtual ~TDMAApplication();
 
-  void SetStartTime (Time start);
-  void SetStopTime (Time stop);
+  void SetStartTime(Time start);
+  void SetStopTime(Time stop);
 
-  virtual int GetStatus () = 0;
+  virtual int GetStatus() = 0;
 
-  void WifiPhyTxBeginTrace (Ptr<const Packet> p);
-  void WifiPhyRxBeginTrace (Ptr<const Packet> p);
+  void WifiPhyTxBeginTrace(Ptr<const Packet> p);
+  void WifiPhyRxBeginTrace(Ptr<const Packet> p);
 
 protected:
-  virtual void StartApplication (void);
-  virtual void StopApplication (void);
-  virtual void DoDispose ();
-  virtual void DoInitialize ();
+  virtual void StartApplication(void);
+  virtual void StopApplication(void);
+  virtual void DoDispose();
+  virtual void DoInitialize();
 
   /** 时隙ID */
-  int64_t slotId; 
+  int64_t slotId;
   /** 发送socket */
   Ptr<Socket> socket;
   /** 接收socket */
@@ -105,13 +112,13 @@ protected:
 
   Time startTime;
 
-  Time minTxInterval = MicroSeconds (100);
-  Time slotSize = MilliSeconds (20);
+  Time minTxInterval = MicroSeconds(100);
+  Time slotSize = MilliSeconds(20);
 
   /** 发送的trace */
-  TracedCallback<Ptr<const Packet>, const Address & > txTrace;
+  TracedCallback<Ptr<const Packet>, const Address &> txTrace;
   /** 接收的trace */
-  TracedCallback<Ptr<const Packet>, Ptr<const Application>, const Address & > rxTrace;
+  TracedCallback<Ptr<const Packet>, Ptr<const Application>, const Address &> rxTrace;
 
   /** 全局仿真配置 */
   SimulationConfig &config;
@@ -121,16 +128,16 @@ protected:
    * 
    * 注意，发送具有实际意义的控制包的时候，不要直接使用socket，将包放入这个队列，可以直接使用SendPacket这个函数
    */
-  std::queue<Ptr<Packet> > txqCCH;
-  std::queue<Ptr<Packet> > txqSCH;
-  virtual void SendPacket (void) = 0;
+  std::queue<Ptr<Packet>> txqCCH;
+  std::queue<Ptr<Packet>> txqSCH;
+  virtual void SendPacket(void) = 0;
 
   /**
    * @brief 唤醒发送队列
    */
-  void WakeUpTxQueue (void);
+  void WakeUpTxQueue(void);
 
-    /**
+  /**
    * @brief 根据当前状态初始化发送包的帧头
    * 
    * @param hdr 
@@ -139,10 +146,9 @@ protected:
 
   EventId position;
 
-  void OutputPosition (void);
+  void OutputPosition(void);
 
 private:
-
   //====================================
   // 函数定义
   //====================================
@@ -150,56 +156,56 @@ private:
   /**
    * 创建Socket，包括socket和sink
    */
-  void CreateSocket (void);
+  void CreateSocket(void);
 
   /**
    * @brief m_sink接收到数据包后的回调
    * 
    * @param socket 出发回调的socket，这里总是sink
    */
-  void OnReceivePacket (Ptr<Socket> socket);
-  
+  void OnReceivePacket(Ptr<Socket> socket);
+
   /**
    * @brief 取消所有调度事件
    * 
    */
-  void CancelAllEvents (void);
+  void CancelAllEvents(void);
 
-  void DoSendPacket (Ptr<Packet> pkt);
+  void DoSendPacket(Ptr<Packet> pkt);
 
   /**
    * @brief 信道切换
    * 
    */
-  void SwitchToNextChannel (uint32_t curChannelNumber, uint32_t nextChannelNumber); 
+  void SwitchToNextChannel(uint32_t curChannelNumber, uint32_t nextChannelNumber);
 
   /**
    * @brief 周期性的在控制信道和服务信道中切换，从而发送控制帧和数据帧
    * 
    */
-  void PeriodicSwitch (TDMASlot curSlot);
+  void PeriodicSwitch(TDMASlot curSlot);
 
   /**
    * @brief 设置自动驾驶编队中车辆数
    * 
    */
-  void SetapNum (uint32_t N);
+  void SetapNum(uint32_t N);
 
 protected:
   /**
    * @brief 时隙已经结束（注意这个函数不是用来结束时隙，而是告知时隙已经结束。下面的SlotStarted含义类似
    */
-  void SlotEnded (void);
+  void SlotEnded(void);
 
   /**
    * @brief 时隙开始
    */
-  void SlotStarted (void);
+  void SlotStarted(void);
 
   /**
    * 对接收到的数据包进行处理，子类必须实现
    */
-  virtual void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr) = 0;
+  virtual void ReceivePacket(Ptr<Packet> pkt, Address &srcAddr) = 0;
 
   /**
    * @brief 获取下一个时隙的间隔，TDMAApplication会按照这个函数返回的间隔来设定定时器
@@ -207,46 +213,45 @@ protected:
    * 
    * @return TDMASlot 下一个时隙
    */
-  virtual struct TDMASlot GetNextSlotInterval (void) = 0;
+  virtual struct TDMASlot GetNextSlotInterval(void) = 0;
 
   /**
    * @brief 获取起始时隙
    * 
    * @return TDMASlot   起始时隙
    */
-  struct TDMASlot GetInitalSlot (Time start);
+  struct TDMASlot GetInitalSlot(Time start);
 
   /**
    * @brief 对curSlot结构体里的一些变量进行配置
    */
   void SetCurSlot(void);
 
-  void GetCurFrame (void);
+  void GetCurFrame(void);
 
   /**
    * @brief 时隙开始的钩子函数Ptr<Packet> pkt, Address & srcAddr
    */
-  virtual void SlotWillStart (void) {};
+  virtual void SlotWillStart(void){};
 
   /**
    * @brief 时隙结束的钩子函数
    * 
    */
-  virtual void SlotDidEnd (void) {};
+  virtual void SlotDidEnd(void){};
 
   /**
    * @brief  将要发送Mock包，这个回调函数允许你再Mock包被发送前对改包进行修改.
    * 
    * @param pkt 
    */
-  virtual void WillSendMockPacket (Ptr<Packet> pkt) {};
+  virtual void WillSendMockPacket(Ptr<Packet> pkt){};
 
-  virtual void SlotAllocation (void) {};
+  virtual void SlotAllocation(void){};
 
-  virtual bool IsAPApplicationInstalled (Ptr<Node> node) = 0;
-
+  virtual bool IsAPApplicationInstalled(Ptr<Node> node) = 0;
 };
 
-}
+} // namespace ns3
 
 #endif

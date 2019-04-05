@@ -1,42 +1,41 @@
 #include "hdv-helper.h"
 
-namespace ns3 
+namespace ns3
 {
 
-HumanApplicationHelper::HumanApplicationHelper ()
+HumanApplicationHelper::HumanApplicationHelper()
 {
-    m_factory.SetTypeId ("ns3::HumanApplication");
+    m_factory.SetTypeId("ns3::HumanApplication");
 }
 
-void
-HumanApplicationHelper::SetAttribute (std::string name, const AttributeValue & value)
+void HumanApplicationHelper::SetAttribute(std::string name, const AttributeValue &value)
 {
-    m_factory.Set (name, value);
+    m_factory.Set(name, value);
 }
 
 Ptr<Application>
-HumanApplicationHelper::Install (Ptr<Node> node) const
+HumanApplicationHelper::Install(Ptr<Node> node) const
 {
-    return InstallPriv (node);
+    return InstallPriv(node);
 }
 
 ApplicationContainer
-HumanApplicationHelper::Install (NodeContainer c) const
+HumanApplicationHelper::Install(NodeContainer c) const
 {
     ApplicationContainer apps;
-    for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i ++)
+    for (NodeContainer::Iterator i = c.Begin(); i != c.End(); i++)
     {
-        apps.Add (InstallPriv (*i));
+        apps.Add(InstallPriv(*i));
     }
     return apps;
 }
 
 Ptr<Application>
-HumanApplicationHelper::InstallPriv (Ptr<Node> node) const 
+HumanApplicationHelper::InstallPriv(Ptr<Node> node) const
 {
-    Ptr<Application> app = m_factory.Create<Application> ();
-    node->AddApplication (app);
+    Ptr<Application> app = m_factory.Create<Application>();
+    node->AddApplication(app);
     return app;
 }
 
-}
+} // namespace ns3

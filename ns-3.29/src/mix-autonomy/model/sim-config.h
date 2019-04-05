@@ -4,13 +4,14 @@
 #include "ns3/core-module.h"
 #include "ns3/mix-autonomy-common.h"
 
-namespace ns3 {
+namespace ns3
+{
 
 // #define LOG_UNCOND(x) std::cout << x << std::endl
 
-class SimulationConfig 
+class SimulationConfig
 {
-public:
+  public:
     /** 任务id */
     uint32_t taskId = 0;
     /** 节点数量 */
@@ -41,18 +42,19 @@ public:
 
     double txPower = 35;
 
-    void ParceCommandLineArguments (int argc, char **argv, bool doValidate);
-    void ParceCommandLineArguments (int argc, char **argv) {
-        ParceCommandLineArguments (argc, argv, true);
+    void ParceCommandLineArguments(int argc, char **argv, bool doValidate);
+    void ParceCommandLineArguments(int argc, char **argv)
+    {
+        ParceCommandLineArguments(argc, argv, true);
     };
-    static SimulationConfig& Default ();
-    void PrintConfiguration ();
+    static SimulationConfig &Default();
+    void PrintConfiguration();
 
-private:
-    void ConfigureCommandLineParams (CommandLine &cmd);
-    void Validate ();
+  private:
+    void ConfigureCommandLineParams(CommandLine &cmd);
+    void Validate();
 };
 
-}
+} // namespace ns3
 
 #endif

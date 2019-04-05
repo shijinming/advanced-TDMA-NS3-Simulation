@@ -18,24 +18,24 @@
 namespace ns3
 {
 
-class BeaconSimulationEntry: public SimulationEntry
+class BeaconSimulationEntry : public SimulationEntry
 {
 public:
-  void Simulate (int argc, char **argv) override;
+  void Simulate(int argc, char **argv) override;
+
 protected:
   //void OverrideDefaultConfig () override;
   // void LoadMobilityData () override;
-  void ConfigureApplication () override;
+  void ConfigureApplication() override;
 
   void PrintSendPacket(Ptr<const Packet> packet, const Address &address);
   void PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3::Application const> app, const Address &address);
 };
 
-void
-BeaconSimulationEntry::Simulate (int argc, char **argv)
+void BeaconSimulationEntry::Simulate(int argc, char **argv)
 {
   doValidate = false;
-  SimulationEntry::Simulate (argc, argv);
+  SimulationEntry::Simulate(argc, argv);
 }
 
 /*
@@ -48,7 +48,7 @@ BeaconSimulationEntry::OverrideDefaultConfig ()
 
 /**
  * @brief 创建简单的拓扑
-*/ 
+*/
 /*
 void
 BeaconSimulationEntry::LoadMobilityData ()
@@ -71,42 +71,40 @@ BeaconSimulationEntry::LoadMobilityData ()
   LOG_UNCOND ("Done set mobility");
 }
 */
-void
-BeaconSimulationEntry::ConfigureApplication ()
+void BeaconSimulationEntry::ConfigureApplication()
 {
   APLeaderHelper apleaderHelper;
   APFollowerHelper apfollowerHelper;
   HumanApplicationHelper hdvHelper;
   //8辆自动驾驶车辆，其中一个为leader
-  for (auto node = NodeList::Begin (); node != NodeList::End (); node ++) 
-    { Ptr<Application> app;
-      if ((*node)->GetId() == 0) 
-        app = apleaderHelper.Install(*node);
-      else if ((*node)->GetId() <= 7) 
-        app = apfollowerHelper.Install(*node);
-      else 
-        app = hdvHelper.Install(*node);
-      app->TraceConnectWithoutContext ("Tx", MakeCallback (&BeaconSimulationEntry::PrintSendPacket, this));
-      app->TraceConnectWithoutContext ("Rx", MakeCallback (&BeaconSimulationEntry::PrintReceivePacket, this));
-      //(*node)->AddApplication (app);
-    }
-  LOG_UNCOND ("Done create application");
+  for (auto node = NodeList::Begin(); node != NodeList::End(); node++)
+  {
+    Ptr<Application> app;
+    if ((*node)->GetId() == 0)
+      app = apleaderHelper.Install(*node);
+    else if ((*node)->GetId() <= 7)
+      app = apfollowerHelper.Install(*node);
+    else
+      app = hdvHelper.Install(*node);
+    app->TraceConnectWithoutContext("Tx", MakeCallback(&BeaconSimulationEntry::PrintSendPacket, this));
+    app->TraceConnectWithoutContext("Rx", MakeCallback(&BeaconSimulationEntry::PrintReceivePacket, this));
+    //(*node)->AddApplication (app);
+  }
+  LOG_UNCOND("Done create application");
 }
 
-void 
-BeaconSimulationEntry::PrintSendPacket(Ptr<const Packet> packet, const Address &address)
+void BeaconSimulationEntry::PrintSendPacket(Ptr<const Packet> packet, const Address &address)
 {
   // std::cout<<"Send a packet "<<packet<<" from "<<address<<std::endl;
-  std::cout<<address<<','<<packet->GetUid ()<<','<<Simulator::Now().GetMicroSeconds()<<std::endl;
+  std::cout << address << ',' << packet->GetUid() << ',' << Simulator::Now().GetMicroSeconds() << std::endl;
 }
 
-void 
-BeaconSimulationEntry::PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3::Application const> app, const Address &address)
+void BeaconSimulationEntry::PrintReceivePacket(Ptr<const Packet> packet, ns3::Ptr<ns3::Application const> app, const Address &address)
 {
-  Ptr<Ipv4> ipv4 = app->GetNode ()->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4 = app->GetNode()->GetObject<Ipv4>();
   // std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<" Received a packet "<<packet<<" from "<<address<<std::endl;
-  std::cout<<ipv4->GetAddress (1, 0).GetLocal ()<<','<<packet->GetUid ()<<','<<address<<','
-  <<Simulator::Now().GetMicroSeconds()<<std::endl;
+  std::cout << ipv4->GetAddress(1, 0).GetLocal() << ',' << packet->GetUid() << ',' << address << ','
+            << Simulator::Now().GetMicroSeconds() << std::endl;
 }
 
-}
+} // namespace ns3

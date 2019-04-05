@@ -17,26 +17,26 @@ namespace ns3
 class APFollower : public TDMAApplication
 {
 public:
-  static TypeId GetTypeId (void);
-  APFollower ();
-  virtual ~APFollower ();
-  void ReceivePacket (Ptr<Packet> pkt, Address & srcAddr); //判断接收到的包是否来自内核层
-  bool ReceivePacketFromAP (Ptr<Packet> pkt); //对接收到的leader的控制包进行处理解析
+  static TypeId GetTypeId(void);
+  APFollower();
+  virtual ~APFollower();
+  void ReceivePacket(Ptr<Packet> pkt, Address &srcAddr); //判断接收到的包是否来自内核层
+  bool ReceivePacketFromAP(Ptr<Packet> pkt);             //对接收到的leader的控制包进行处理解析
   void SetupHeader(PacketHeader &hdr);
-  bool IsAPApplicationInstalled (Ptr<Node> node);
-  Ptr<Node> GetNodeFromAddress (Ipv4Address & address);
-  void SlotAllocation () {};
-  struct TDMASlot GetNextSlotInterval (void);
-  void SendPacket (void);
-  void SlotWillStart (void);
-  int GetStatus () {return 2;}
+  bool IsAPApplicationInstalled(Ptr<Node> node);
+  Ptr<Node> GetNodeFromAddress(Ipv4Address &address);
+  void SlotAllocation(){};
+  struct TDMASlot GetNextSlotInterval(void);
+  void SendPacket(void);
+  void SlotWillStart(void);
+  int GetStatus() { return 2; }
 
 private:
   uint64_t CCHSendSlot;
-  std::vector <uint64_t> SCHSendSlot;
+  std::vector<uint64_t> SCHSendSlot;
   uint32_t leaderPacketCnt;
 };
 
-}
+} // namespace ns3
 
 #endif

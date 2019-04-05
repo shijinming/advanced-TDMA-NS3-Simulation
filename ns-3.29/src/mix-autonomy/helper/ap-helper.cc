@@ -3,76 +3,74 @@
 namespace ns3
 {
 
-APFollowerHelper::APFollowerHelper ()
+APFollowerHelper::APFollowerHelper()
 {
   m_factory.SetTypeId("ns3::APFollower");
 }
 
-void
-APFollowerHelper::SetAttribute (std::string name, const AttributeValue & value)
+void APFollowerHelper::SetAttribute(std::string name, const AttributeValue &value)
 {
-  m_factory.Set (name, value);
+  m_factory.Set(name, value);
 }
 
 Ptr<Application>
-APFollowerHelper::Install (Ptr<Node> node)  const
+APFollowerHelper::Install(Ptr<Node> node) const
 {
-  return InstallPriv (node);
+  return InstallPriv(node);
 }
 
 ApplicationContainer
-APFollowerHelper::Install (NodeContainer c) const
+APFollowerHelper::Install(NodeContainer c) const
 {
   ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i ++)
+  for (NodeContainer::Iterator i = c.Begin(); i != c.End(); i++)
   {
-    apps.Add (InstallPriv (*i));
+    apps.Add(InstallPriv(*i));
   }
   return apps;
 }
 
 Ptr<Application>
-APFollowerHelper::InstallPriv (Ptr<Node> node) const
+APFollowerHelper::InstallPriv(Ptr<Node> node) const
 {
-  Ptr<Application> app = m_factory.Create<Application> ();
-  node->AddApplication (app);
+  Ptr<Application> app = m_factory.Create<Application>();
+  node->AddApplication(app);
   return app;
 }
 
-APLeaderHelper::APLeaderHelper ()
+APLeaderHelper::APLeaderHelper()
 {
   m_factory.SetTypeId("ns3::APLeader");
 }
 
-void
-APLeaderHelper::SetAttribute (std::string name, const AttributeValue & value)
+void APLeaderHelper::SetAttribute(std::string name, const AttributeValue &value)
 {
-  m_factory.Set (name, value);
+  m_factory.Set(name, value);
 }
 
 Ptr<Application>
-APLeaderHelper::Install (Ptr<Node> node)  const
+APLeaderHelper::Install(Ptr<Node> node) const
 {
-  return InstallPriv (node);
+  return InstallPriv(node);
 }
 
 ApplicationContainer
-APLeaderHelper::Install (NodeContainer c) const
+APLeaderHelper::Install(NodeContainer c) const
 {
   ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i ++)
+  for (NodeContainer::Iterator i = c.Begin(); i != c.End(); i++)
   {
-    apps.Add (InstallPriv (*i));
+    apps.Add(InstallPriv(*i));
   }
   return apps;
 }
 
 Ptr<Application>
-APLeaderHelper::InstallPriv (Ptr<Node> node) const
+APLeaderHelper::InstallPriv(Ptr<Node> node) const
 {
-  Ptr<Application> app = m_factory.Create<Application> ();
-  node->AddApplication (app);
+  Ptr<Application> app = m_factory.Create<Application>();
+  node->AddApplication(app);
   return app;
 }
 
-}
+} // namespace ns3
