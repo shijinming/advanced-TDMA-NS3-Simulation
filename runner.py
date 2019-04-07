@@ -46,7 +46,7 @@ def get_configure_params():
         help="build profile, should be debug or optimized")
     parser.add_argument("--worker", type=int, default=8,
         help="number of workers")
-    parser.add_argument("--output", type=str, default="output20",
+    parser.add_argument("--output", type=str, default="output_ref",
         help="Output directory")
     parser.add_argument("--sim-idx", type=int,
         help="REQUIRED, Simulation id, must be unique")
@@ -122,12 +122,11 @@ class SequentialSimulator:
         return self.cmd_opts.run
     
     def genrate_tasks(self, tasks):
-        task_num = 16
+        task_num = 14
         if self.cmd_opts.reversed:
             iterator = range(1, 1 + task_num)
         else:
             iterator = reversed(range(1, 1 + task_num))
-        iterator=range(1,17)
         for idx in iterator:
             task = {
                 "sim-time": self.cmd_opts.sim_time,
@@ -135,7 +134,7 @@ class SequentialSimulator:
             }
             task["cw-min"]=15
             task["cw-max"]=1023
-            task["send-num"]=20
+            task["send-num"]=10
             task["mobility"] = os.path.join(BASE_DIR,
                 "../mobility", "fcd-trace-{}.ns2.output.xml".format(idx))
             trace_file_name = task["mobility"].split("/")[-1]
