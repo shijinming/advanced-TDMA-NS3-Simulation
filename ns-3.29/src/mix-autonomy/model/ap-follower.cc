@@ -32,6 +32,7 @@ void APFollower::ReceivePacket(Ptr<Packet> pkt, Address &srcAddr)
   Ipv4Address addr = inetAddr.GetIpv4();
   // 获取发送该数据包的节点
   Ptr<Node> node = GetNodeFromAddress(addr);
+  return;
   if (IsAPApplicationInstalled(node))
   {
     // 收到了来自内核层的数据包
@@ -147,8 +148,8 @@ void APFollower::SendPacket(void)
   if (curSlot.curFrame == CCH_apFrame && isAtOwnSlot)
   {
     Ptr<Packet> pkt;
-    uint32_t CpktCnt = config.sendNum;
-    uint32_t SpktCnt = config.sendNum;
+    uint32_t CpktCnt = 10;
+    uint32_t SpktCnt = 10;
     for (uint32_t i = 0; i < CpktCnt; i++)
     {
       pkt = Create<Packet>(1000);

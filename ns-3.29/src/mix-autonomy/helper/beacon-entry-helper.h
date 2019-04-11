@@ -87,8 +87,12 @@ void BeaconSimulationEntry::ConfigureApplication()
     else if ((*node)->GetId() <= 7)
       app = apfollowerHelper.Install(*node);
     else
-      app = csmaHelper.Install(*node);
-//     app = csmaHelper.Install(*node);
+    {
+      if(config.reference)
+        app = csmaHelper.Install(*node);
+      else
+        app = hdvHelper.Install(*node);
+    }
     app->TraceConnectWithoutContext("Tx", MakeCallback(&BeaconSimulationEntry::PrintSendPacket, this));
     app->TraceConnectWithoutContext("Rx", MakeCallback(&BeaconSimulationEntry::PrintReceivePacket, this));
     //(*node)->AddApplication (app);

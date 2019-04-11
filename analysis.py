@@ -102,8 +102,8 @@ def analysis(root_dir,index):
 
 if __name__ == "__main__":
     index=sys.argv[1]
-    result = analysis("output80211",index)
-    with open("result80211.txt",'a') as f:
+    result = analysis("output_tmp",index)
+    with open("result_tmp.txt",'a') as f:
         f.write(str(index)+'\n')
         for r in result:
             f.write(str(r)+',')

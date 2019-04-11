@@ -4,6 +4,7 @@
 #include "ns3/wifi-net-device.h"
 #include "tdma-app.h"
 #include <fstream>
+#include<stdlib.h>
 
 namespace ns3
 {
@@ -72,16 +73,10 @@ void TDMAApplication::DoInitialize(void)
   curSlot = GetInitalSlot(Seconds(t));
   m_startTime = curSlot.start;
   m_stopTime = Seconds(config.simTime);
-
-  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice>(GetNode()->GetDevice(0));
-  Ptr<WifiPhy> phy = device->GetPhy();
-  if (IsAPApplicationInstalled(GetNode()))
-  {
-    phy->SetTxPowerStart(config.txPower + 3);
-    phy->SetTxPowerEnd(config.txPower + 3);
-  }
+  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
+  Ptr<WifiPhy> phy = device->GetPhy ();
   phy->TraceConnectWithoutContext("PhyTxBegin", MakeCallback(&TDMAApplication::WifiPhyTxBeginTrace, this));
-  // phy->TraceConnectWithoutContext("PhyRxBegin", MakeCallback(&TDMAApplication::WifiPhyRxBeginTrace, this));
+//   phy->TraceConnectWithoutContext("PhyRxBegin", MakeCallback(&TDMAApplication::WifiPhyRxBeginTrace, this));
 
   // 在基类函数中，会根据m_startTime设置一个定时器来调用StartApplication
   Application::DoInitialize();
@@ -91,7 +86,7 @@ void TDMAApplication::DoDispose(void)
 {
   socket = NULL;
   sink = NULL;
-}
+} 
 
 void TDMAApplication::StartApplication(void)
 {
@@ -149,6 +144,10 @@ void TDMAApplication::SlotEnded(void)
   {
     SlotDidEnd();
   }
+  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
+  Ptr<WifiPhy> phy = device->GetPhy ();
+  phy->SetTxPowerStart(-1000);
+  phy->SetTxPowerEnd(-1000);
 }
 
 void TDMAApplication::SlotStarted(void)
@@ -175,6 +174,20 @@ void TDMAApplication::SlotStarted(void)
   isAtOwnSlot = true;
   if (curSlot.curFrame == Frame::CCH_apFrame)
     SlotAllocation();
+    
+  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
+  Ptr<WifiPhy> phy = device->GetPhy ();
+  if (IsAPApplicationInstalled(GetNode()))
+  {
+    phy->SetTxPowerStart(config.txPower + 3);
+    phy->SetTxPowerEnd(config.txPower + 3);
+  }
+  else
+  {
+    phy->SetTxPowerStart(config.txPower);
+    phy->SetTxPowerEnd(config.txPower);
+  }
+    
   SlotWillStart();
   // std::cout<<GetNode ()->GetId ()<<" CCH queue:"<<txqCCH.size()<<" SSH queue:"<<txqSCH.size()<<std::endl;
 }
@@ -312,19 +325,25 @@ void TDMAApplication::PeriodicSwitch(struct TDMASlot curSlot)
 
 void TDMAApplication::SetCurSlot(void)
 {
-  curSlot.CCHSlotNum = 2 * (config.apNum + 1);
-  curSlot.SCHSlotNum = 2 * (config.apNum + 1);
-  curSlot.apCCHSlotNum = config.apNum + 1;
-  curSlot.apSCHSlotNum = config.apNum + 1;
-  curSlot.hdvCCHSlotNum = config.apNum + 1;
-  curSlot.hdvSCHSlotNum = config.apNum + 1;
+  if(config.reference)
+  {
+    curSlot.CCHSlotNum = 1*(config.apNum+1);
+    curSlot.SCHSlotNum = 1*(config.apNum+1);
+    curSlot.apCCHSlotNum = config.apNum+1;
+    curSlot.apSCHSlotNum = config.apNum+1;
+    curSlot.hdvCCHSlotNum = 0;
+    curSlot.hdvSCHSlotNum = 0;
+  }
+  else
+  {
+    curSlot.CCHSlotNum = 1 * (config.apNum + 1);
+    curSlot.SCHSlotNum = 1 * (config.apNum + 1);
+    curSlot.apCCHSlotNum = config.apNum + 1;
+    curSlot.apSCHSlotNum = 0;
+    curSlot.hdvCCHSlotNum = config.apNum + 1;
+    curSlot.hdvSCHSlotNum = 0;
 
-  // curSlot.CCHSlotNum = 1*(config.apNum+1);
-  // curSlot.SCHSlotNum = 1*(config.apNum+1);
-  // curSlot.apCCHSlotNum = config.apNum+1;
-  // curSlot.apSCHSlotNum = config.apNum+1;
-  // curSlot.hdvCCHSlotNum = 0;
-  // curSlot.hdvSCHSlotNum = 0;
+  }
 }
 
 void TDMAApplication::GetCurFrame(void)
@@ -373,12 +392,12 @@ TDMAApplication::GetInitalSlot(Time start)
   else if (GetNode()->GetId() < config.apNum)
   {
     curSlot.duration = slotSize - minTxInterval;
-    curSlot.start = willStart + slotSize * (config.apNum - 1 - GetNode()->GetId()) + minTxInterval;
+    curSlot.start = willStart + slotSize * (config.apNum - GetNode()->GetId()) + minTxInterval;
   }
   else
   {
     // curSlot.start = slotSize * (config.apNum + 1) + minTxInterval;
-    curSlot.start = start;
+    curSlot.start = start + MicroSeconds(rand()%50000);
     curSlot.duration = Seconds(config.simTime);
   }
   return curSlot;
@@ -394,16 +413,18 @@ void TDMAApplication::OutputPosition(void)
 void TDMAApplication::WifiPhyTxBeginTrace(Ptr<const Packet> p)
 {
   WakeUpTxQueue();
-  // WifiMacHeader hdr;
-  // p->PeekHeader(hdr);
-  // std::cout<<hdr.GetAddr2()<<','<<p->GetUid ()<<','<<Simulator::Now().GetMicroSeconds()<<std::endl;
+//   WifiMacHeader hdr;
+//   p->PeekHeader(hdr);
+//   std::cout<<"p,"<<p->GetUid ()<<','<<Simulator::Now().GetMicroSeconds()<<std::endl;
 }
 
 void TDMAApplication::WifiPhyRxBeginTrace(Ptr<const Packet> p)
 {
-  // WifiMacHeader hdr;
-  // p->PeekHeader(hdr);
-  //   std::cout<<"1,"<<','<<hdr.GetAddr2()<<','<<p->GetUid ()<<','<<Simulator::Now().GetMicroSeconds()<<std::endl;
+//   if (Simulator::Now()<m_startTime)
+//     return;
+//   WifiMacHeader hdr;
+//   p->PeekHeader(hdr);
+//   std::cout<<"p,"<<GetNode()->GetId()<<','<<p->GetUid ()<<','<<Simulator::Now().GetMicroSeconds()<<std::endl;
 }
 
 } // namespace ns3
