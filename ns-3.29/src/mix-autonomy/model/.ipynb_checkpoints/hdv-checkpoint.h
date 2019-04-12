@@ -40,7 +40,7 @@ class HumanApplication : public TDMAApplication
     void SlotAllocation(){};
     struct TDMASlot GetNextSlotInterval(void);
 
-    void CreatePackets(uint32_t CpktCnt, uint32_t SpktCnt);
+    void CreatePackets(uint32_t CpktCnt, uint32_t SpktCnt, uint32_t size);
     void SendPacket(void);
     void SlotWillStart(void);
     void SendOut(void);

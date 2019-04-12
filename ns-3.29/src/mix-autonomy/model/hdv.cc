@@ -145,6 +145,10 @@ HumanApplication::GetNextSlotInterval(void)
       curSlot.start = curSlot.apSCHSlotNum * slotSize + minTxInterval;
       curSlot.duration = slotSize * curSlot.hdvSCHSlotNum - minTxInterval;
     }
+    Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
+    Ptr<WifiPhy> phy = device->GetPhy ();
+    phy->SetTxPowerStart(-1000);
+    phy->SetTxPowerEnd(-1000);
   }
   else
   {
@@ -154,17 +158,17 @@ HumanApplication::GetNextSlotInterval(void)
   return curSlot;
 }
 
-void HumanApplication::CreatePackets(uint32_t CpktCnt, uint32_t SpktCnt)
+void HumanApplication::CreatePackets(uint32_t CpktCnt, uint32_t SpktCnt, uint32_t size)
 {
   Ptr<Packet> pkt;
   for (uint32_t i = 0; i < CpktCnt; i++)
   {
-    pkt = Create<Packet>(1000);
+    pkt = Create<Packet>(size);
     txqCCH.push(pkt);
   }
   for (uint32_t i = 0; i < SpktCnt; i++)
   {
-    pkt = Create<Packet>(1000);
+    pkt = Create<Packet>(size);
     txqSCH.push(pkt);
   }
 }
@@ -174,9 +178,9 @@ void HumanApplication::SendPacket(void)
   if (GetStatus() == Middle)
   {
     if (curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
-      CreatePackets(config.sendNum,0);
+      CreatePackets(config.sendNum, 0, 500);
     else
-      CreatePackets(0,config.sendNum);
+      CreatePackets(0, config.sendNum, 500);
     EventId sendPacket;
     Time t = MicroSeconds(rand()%slotSize.GetMicroSeconds());
     sendPacket = Simulator::Schedule(t, &HumanApplication::SendOut, this);
@@ -185,9 +189,9 @@ void HumanApplication::SendPacket(void)
   {
     GetCurFrame();
     if (curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
-      CreatePackets(1, 0);
+      CreatePackets(1, 0, 1000);
     else
-      CreatePackets(0, 1);
+      CreatePackets(0, 1, 1000);
     WakeUpTxQueue();
     EventId sendPacket;
     Time t = MilliSeconds(50);
@@ -197,6 +201,10 @@ void HumanApplication::SendPacket(void)
 
 void HumanApplication::SlotWillStart(void)
 {
+  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
+  Ptr<WifiPhy> phy = device->GetPhy ();
+  phy->SetTxPowerStart(config.txPower);
+  phy->SetTxPowerEnd(config.txPower);
   SendPacket();
 }
     

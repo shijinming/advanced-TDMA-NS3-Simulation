@@ -7,7 +7,7 @@ from worker import run_bash_task
 
 mobility_data_num = 17
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-reference = False
+reference = True
 
 def reset_dir():
     os.chdir(BASE_DIR)
@@ -127,7 +127,7 @@ class SequentialSimulator:
         return self.cmd_opts.run
     
     def genrate_tasks(self, tasks):
-        task_num = 12
+        task_num = 14
         if self.cmd_opts.reversed:
             iterator = range(1, 1 + task_num)
         else:
@@ -139,7 +139,7 @@ class SequentialSimulator:
             }
             task["cw-min"]=15
             task["cw-max"]=1023
-            task["send-num"]=7
+            task["send-num"]=14
             task["mobility"] = os.path.join(BASE_DIR,
                 "../mobility", "fcd-trace-{}.ns2.output.xml".format(idx))
             trace_file_name = task["mobility"].split("/")[-1]

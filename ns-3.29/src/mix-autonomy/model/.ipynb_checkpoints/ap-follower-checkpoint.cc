@@ -148,11 +148,11 @@ void APFollower::SendPacket(void)
   if (curSlot.curFrame == CCH_apFrame && isAtOwnSlot)
   {
     Ptr<Packet> pkt;
-    uint32_t CpktCnt = 10;
-    uint32_t SpktCnt = 10;
+    uint32_t CpktCnt = config.sendNum;
+    uint32_t SpktCnt = 0;
     for (uint32_t i = 0; i < CpktCnt; i++)
     {
-      pkt = Create<Packet>(1000);
+      pkt = Create<Packet>(500);
       txqCCH.push(pkt);
     }
     for (uint32_t i = 0; i < SpktCnt; i++)
