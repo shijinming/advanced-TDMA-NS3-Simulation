@@ -152,7 +152,7 @@ void APFollower::SendPacket(void)
     uint32_t SpktCnt = 0;
     for (uint32_t i = 0; i < CpktCnt; i++)
     {
-      pkt = Create<Packet>(500);
+      pkt = Create<Packet>(1000);
       txqCCH.push(pkt);
     }
     for (uint32_t i = 0; i < SpktCnt; i++)

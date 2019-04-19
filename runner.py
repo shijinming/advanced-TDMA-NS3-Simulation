@@ -3,11 +3,31 @@ import argparse
 import subprocess
 import time
 import sys
+import numpy as np
 from worker import run_bash_task
 
 mobility_data_num = 17
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-reference = True
+reference = False
+
+density = [
+    12.227106227106226,
+    12.52930402930403,
+    13.291208791208792,
+    13.95970695970696,
+    14.692307692307692,
+    15.523809523809524,
+    16.723443223443223,
+    18.234432234432234,
+    24.100732600732602,
+    26.521978021978022,
+    30.234432234432234,
+    32.34798534798535,
+    35.97985347985348,
+    41.227106227106226,
+    45.31684981684982,
+    50.61721611721612,
+    56.56776556776557]
 
 def reset_dir():
     os.chdir(BASE_DIR)
@@ -82,7 +102,7 @@ class SequentialSimulator:
         if reference:
             self.output_dir = os.path.join(BASE_DIR, "output_ref")
         else:
-            self.output_dir = os.path.join(BASE_DIR, "output_tmp")
+            self.output_dir = os.path.join(BASE_DIR, "output3")
         if not os.path.isabs(self.output_dir):
             self.output_dir = os.path.join(BASE_DIR, self.output_dir)
         self.sim_idx = cmd_opts.sim_idx
@@ -127,7 +147,7 @@ class SequentialSimulator:
         return self.cmd_opts.run
     
     def genrate_tasks(self, tasks):
-        task_num = 14
+        task_num = 8
         if self.cmd_opts.reversed:
             iterator = range(1, 1 + task_num)
         else:
@@ -139,7 +159,7 @@ class SequentialSimulator:
             }
             task["cw-min"]=15
             task["cw-max"]=1023
-            task["send-num"]=14
+            task["send-num"]=12
             task["mobility"] = os.path.join(BASE_DIR,
                 "../mobility", "fcd-trace-{}.ns2.output.xml".format(idx))
             trace_file_name = task["mobility"].split("/")[-1]
@@ -148,6 +168,9 @@ class SequentialSimulator:
             task["nnodes"] = get_node_num(task["start-time"])
             task["task-id"] = idx
             task["reference"] = reference
+            task["cca-threshold"] = -95+10*np.log10(density[idx-1]/density[0])
+            task["tx-gain"] = 6
+            task["ail-slot"] = int(density[idx-1]/density[8]*9)
             tasks.append(task)
 
 if __name__ == "__main__":
