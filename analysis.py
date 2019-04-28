@@ -56,7 +56,8 @@ def analysis(root_dir,index):
                         if sid<8:
                             throughput[rid]+=1
                     else:
-                        throughput[rid]+=1 
+                        if sid>=8:
+                            throughput[rid]+=1 
                 if packets[tmp[1]][2]==1:
                     ind=3
                 else:
@@ -102,8 +103,8 @@ def analysis(root_dir,index):
 
 if __name__ == "__main__":
     index=sys.argv[1]
-    result = analysis("output_tmp",index)
-    with open("result_tmp.txt",'a') as f:
+    result = analysis("output",index)
+    with open("result.txt",'a') as f:
         f.write(str(index)+'\n')
         for r in result:
             f.write(str(r)+',')

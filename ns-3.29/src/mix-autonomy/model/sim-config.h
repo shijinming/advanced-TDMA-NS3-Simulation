@@ -40,9 +40,12 @@ class SimulationConfig
     uint32_t cwMax = 1023;
     uint32_t sendNum = 5;
 
-    double txPower = 35;
+    double txPower = 33;
     
     bool reference = false;
+    double CCAthreshold = -99;
+    double txGain = 3;
+    uint32_t AILSlot = 9;
 
     void ParceCommandLineArguments(int argc, char **argv, bool doValidate);
     void ParceCommandLineArguments(int argc, char **argv)

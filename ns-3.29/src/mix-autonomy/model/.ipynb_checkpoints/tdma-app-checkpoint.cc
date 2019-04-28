@@ -77,8 +77,9 @@ void TDMAApplication::DoInitialize(void)
   Ptr<WifiPhy> phy = device->GetPhy ();
   if (IsAPApplicationInstalled(GetNode()))
   {
-    phy->SetTxPowerStart(config.txPower + 5);
-    phy->SetTxPowerEnd(config.txPower + 5);
+    phy->SetTxPowerStart(config.txPower + config.txGain);
+    phy->SetTxPowerEnd(config.txPower + config.txGain);
+    phy->SetCcaMode1Threshold(config.CCAthreshold);
   }
   phy->TraceConnectWithoutContext("PhyTxBegin", MakeCallback(&TDMAApplication::WifiPhyTxBeginTrace, this));
 //   phy->TraceConnectWithoutContext("PhyRxBegin", MakeCallback(&TDMAApplication::WifiPhyRxBeginTrace, this));
@@ -314,21 +315,21 @@ void TDMAApplication::SetCurSlot(void)
 {
   if(config.reference)
   {
-    curSlot.CCHSlotNum = 1*(config.apNum+1);
-    curSlot.SCHSlotNum = 0;
     curSlot.apCCHSlotNum = config.apNum+1;
     curSlot.apSCHSlotNum = 0;
     curSlot.hdvCCHSlotNum = 0;
     curSlot.hdvSCHSlotNum = 0;
+    curSlot.CCHSlotNum = curSlot.apCCHSlotNum + curSlot.hdvCCHSlotNum;
+    curSlot.SCHSlotNum = curSlot.apSCHSlotNum + curSlot.hdvSCHSlotNum;
   }
   else
   {
-    curSlot.CCHSlotNum = 2 * (config.apNum + 1);
-    curSlot.SCHSlotNum = 0;
     curSlot.apCCHSlotNum = config.apNum + 1;
     curSlot.apSCHSlotNum = 0;
-    curSlot.hdvCCHSlotNum = config.apNum + 1;
+    curSlot.hdvCCHSlotNum = config.AILSlot;
     curSlot.hdvSCHSlotNum = 0;
+    curSlot.CCHSlotNum = curSlot.apCCHSlotNum + curSlot.hdvCCHSlotNum;
+    curSlot.SCHSlotNum = curSlot.apSCHSlotNum + curSlot.hdvSCHSlotNum;
 
   }
 }

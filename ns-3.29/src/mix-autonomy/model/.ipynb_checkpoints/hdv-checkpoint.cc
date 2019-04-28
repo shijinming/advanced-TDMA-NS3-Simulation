@@ -39,7 +39,7 @@ int HumanApplication::GetStatus()
 void HumanApplication::AddToMiddle()
 {
   m_status = Middle;
-  std::cout << GetNode()->GetId() << " add to middle." << std::endl;
+  std::cout << GetNode()->GetId() << " add to middle." << Simulator::Now().GetMicroSeconds() << std::endl;
   if (isAtOwnSlot)
   {
     slotEndEvt.Cancel();
@@ -69,7 +69,7 @@ void HumanApplication::AddToMiddle()
 void HumanApplication::QuitFromMiddle()
 {
   m_status = Outter;
-  std::cout << GetNode()->GetId() << " quit from middle." << std::endl;
+  std::cout << GetNode()->GetId() << " quit from middle." << Simulator::Now().GetMicroSeconds() << std::endl;
   // ChangeWindowSize (15, 1023);
   // ChangeWindowSize (15, 1023);
 }
@@ -178,9 +178,9 @@ void HumanApplication::SendPacket(void)
   if (GetStatus() == Middle)
   {
     if (curSlot.curFrame == Frame::CCH_apFrame || curSlot.curFrame == Frame::CCH_hdvFrame)
-      CreatePackets(config.sendNum, 0, 500);
+      CreatePackets(7, 0, 1000);
     else
-      CreatePackets(0, config.sendNum, 500);
+      CreatePackets(0, 7, 1000);
     EventId sendPacket;
     Time t = MicroSeconds(rand()%slotSize.GetMicroSeconds());
     sendPacket = Simulator::Schedule(t, &HumanApplication::SendOut, this);
