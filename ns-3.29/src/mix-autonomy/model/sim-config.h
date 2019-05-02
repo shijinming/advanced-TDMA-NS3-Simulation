@@ -25,13 +25,13 @@ class SimulationConfig
     /** 物理层设置 */
     std::string phyMode = "OfdmRate6MbpsBW10MHz";
     /** 运动文件输入 */
-    std::string mobilityInput = "../../mobility/fcd-trace-1.ns2.output.xml";
+    std::string mobilityInput = "../../mobility1/fcd-trace-1.ns2.output.xml";
     /** 日志文件 */
     std::string packetTraceFile = "";
     std::string eventTraceFile = "";
     std::string throughputTraceFile = "";
     std::string mobilityTraceFile = "";
-    std::string startTimeFile = "";
+    std::string startTimeFile = "../../mobility1/fcd-trace-1.ns2.output.xml.node_start_time.txt";
 
     /** 全局队列属性 */
     uint32_t txqCapacity = 100; // 发送队列大小
