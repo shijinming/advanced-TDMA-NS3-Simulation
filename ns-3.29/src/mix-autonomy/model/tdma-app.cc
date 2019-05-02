@@ -73,8 +73,8 @@ void TDMAApplication::DoInitialize(void)
   curSlot = GetInitalSlot(Seconds(t));
   m_startTime = curSlot.start;
   m_stopTime = Seconds(config.simTime);
-  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
-  Ptr<WifiPhy> phy = device->GetPhy ();
+  Ptr<WaveNetDevice> device = DynamicCast<WaveNetDevice> (GetNode ()->GetDevice (0));
+  Ptr<WifiPhy> phy = device->GetPhy (0);
   if (IsAPApplicationInstalled(GetNode()))
   {
     phy->SetTxPowerStart(config.txPower + config.txGain);
