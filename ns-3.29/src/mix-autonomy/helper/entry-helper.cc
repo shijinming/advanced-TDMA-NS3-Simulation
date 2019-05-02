@@ -39,14 +39,11 @@ void SimulationEntry::Simulate(int argc, char **argv)
   wifiPhy.Set("TxPowerStart", DoubleValue(config.txPower));
   wifiPhy.Set("TxPowerEnd", DoubleValue(config.txPower)); // txPower: default valude is 35
   // Mac layer
-  auto wifi80211pMac = NqosWaveMacHelper::Default();
+  auto waveMac = QosWaveMacHelper::Default();
   // 802.11p protocol
-  auto wifi80211p = Wifi80211pHelper::Default();
-  wifi80211p.SetRemoteStationManager("ns3::ConstantRateWifiManager",
-                                     "DataMode", StringValue(config.phyMode),
-                                     "ControlMode", StringValue(config.phyMode));
+  auto waveHelper = WaveHelper::Default();
 
-  auto devices = wifi80211p.Install(wifiPhy, wifi80211pMac, nodes);
+  auto devices = waveHelper.Install(wifiPhy, waveMac, nodes);
 
   InternetStackHelper internet;
   internet.Install(nodes);
