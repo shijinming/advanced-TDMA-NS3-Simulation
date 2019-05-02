@@ -1,8 +1,10 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include "ns3/internet-module.h"
+#include "ns3/wifi-net-device.h"
 #include<stdlib.h>
 #include "csma-app.h"
+#include "ap-leader.h"
 
 namespace ns3
 {
@@ -28,6 +30,7 @@ CSMAApplication::GetTypeId()
 CSMAApplication::CSMAApplication()
 		:  config(SimulationConfig::Default())
 {
+  m_isMiddle = false;
 }
 
 CSMAApplication::~CSMAApplication()
@@ -67,6 +70,9 @@ CSMAApplication::DoInitialize()
   m_startTime = Seconds(t) + MicroSeconds(rand()%50000);
   m_stopTime = Seconds(config.simTime);
 
+  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
+  Ptr<WifiPhy> phy = device->GetPhy ();
+  phy->TraceConnectWithoutContext("PhyTxBegin", MakeCallback(&CSMAApplication::WifiPhyTxBeginTrace, this));
 	Application::DoInitialize();
 }
 
@@ -124,10 +130,134 @@ CSMAApplication::DoSendPacket(Ptr<Packet> pkt)
 void
 CSMAApplication::SendPacket(void)
 {
-	Ptr<Packet> pktToSend = Create<Packet>(1000);
+  bool curChannel=(Simulator::Now().GetMilliSeconds()%50 < 50);
+  Ptr<Packet> pktToSend;
+  if (curChannel)
+  {
+    if(!txqCCH.empty())
+    {
+      pktToSend = txqCCH.front();
+      txqCCH.pop();
+    }
+  }
+  else
+  {
+    if(!txqSCH.empty())
+    {
+      pktToSend = txqSCH.front();
+      txqSCH.pop();
+    }
+  }
 	DoSendPacket(pktToSend);
-	Time t = MilliSeconds(50);
-  sendEvent = Simulator::Schedule(t, &CSMAApplication::SendPacket, this);
+}
+
+void 
+CSMAApplication::WifiPhyTxBeginTrace(Ptr<const Packet> p)
+{
+  SendPacket();
+}
+
+void CSMAApplication::generateTraffic(void)
+{
+  if(m_isMiddle)
+  {
+
+  }
+  else
+  {
+    /* code */
+  }
+  
+}
+
+bool 
+CSMAApplication::IsAPApplicationInstalled(Ptr<Node> node)
+{
+  uint32_t nApps = node->GetNApplications();
+  for (uint32_t idx = 0; idx < nApps; idx++)
+  {
+    Ptr<Application> app = node->GetApplication(idx);
+    if (dynamic_cast<APFollower *>(PeekPointer(app)) || dynamic_cast<APLeader *>(PeekPointer(app)))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+void 
+CSMAApplication::ReceivePacket(Ptr<Packet> pkt, Address &srcAddr)
+{
+  InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom(srcAddr);
+  Ipv4Address addr = inetAddr.GetIpv4();
+  // 获取发送该数据包的节点
+  Ptr<Node> node = GetNodeFromAddress(addr);
+  if (IsAPApplicationInstalled(node))
+  {
+    lastTimeRecAP = Simulator::Now();
+    m_isMiddle = true;
+    ReceiveFromAP(pkt, node);
+  }
+  else
+  {
+    if(Simulator::Now()-lastTimeRecAP > MilliSeconds(200))
+      m_isMiddle = false;
+  }
+}
+
+Ptr<Node>
+CSMAApplication::GetNodeFromAddress(Ipv4Address &address)
+{
+  for (NodeList::Iterator n = NodeList::Begin();
+       n != NodeList::End(); n++)
+  {
+    Ptr<Node> node = *n;
+    Ptr<Ipv4> ipv4 = node->GetObject<Ipv4>();
+    NS_ASSERT(ipv4);
+    if (ipv4->GetInterfaceForAddress(address) != -1)
+    {
+      return node;
+    }
+  }
+  return NULL;
+}
+
+void 
+CSMAApplication::ReceiveFromAP(Ptr<Packet> pkt, Ptr<Node> node)
+{
+  
+}
+
+void 
+CSMAApplication::SwitchChannel()
+{
+  sendEvent.Cancel();
+  Time randomWait = MicroSeconds(rand()%1000);
+  if(Simulator::Now().GetMilliSeconds()%50 <50)
+    sendEvent=Simulator::Schedule(startTxCCH + randomWait, &CSMAApplication::SendPacket, this);
+  else
+    sendEvent=Simulator::Schedule(startTxSCH + randomWait, &CSMAApplication::SendPacket, this);
+  
+}
+
+void
+CSMAApplication::SwitchToNextChannel(uint32_t curChannelNumber, uint32_t nextChannelNumber)
+{
+  Ptr<WaveNetDevice> device = GetNode()->GetObject<WaveNetDevice>();
+  Ptr<WifiPhy> phy = device->GetPhy(0);
+  if (phy->GetChannelNumber() == nextChannelNumber)
+  {
+    return;
+  }
+  Ptr<OcbWifiMac> curMacEntity = device->GetMac(curChannelNumber);
+  Ptr<OcbWifiMac> nextMacEntity = device->GetMac(nextChannelNumber);
+  curMacEntity->Suspend();
+  curMacEntity->ResetWifiPhy();
+  phy->SetChannelNumber(nextChannelNumber);
+  Time switchTime = phy->GetChannelSwitchDelay();
+  nextMacEntity->MakeVirtualBusy(switchTime);
+  nextMacEntity->SetWifiPhy(phy);
+  nextMacEntity->Resume();
 }
 
 }

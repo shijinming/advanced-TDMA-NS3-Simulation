@@ -27,12 +27,26 @@ public:
   void OnReceivePacket(Ptr<Socket> socket);
 	void DoSendPacket(Ptr<Packet> pkt);
 	void SendPacket(void);
+  void WifiPhyTxBeginTrace(Ptr<const Packet> p);
+  void generateTraffic(void);
+  void ReceivePacket(Ptr<Packet> pkt, Address &srcAddr);
+  Ptr<Node> GetNodeFromAddress(Ipv4Address &address);
+  void ReceiveFromAP(Ptr<Packet> pkt, Ptr<Node> node);
+  bool IsAPApplicationInstalled(Ptr<Node> node);
+  void SwitchChannel();
+  void SwitchToNextChannel(uint32_t curChannelNumber, uint32_t nextChannelNumber);
 
 	SimulationConfig &config;
 	Ptr<Socket> socket;
 	Ptr<Socket> sink;
 	TypeId socketTid;
 	EventId sendEvent;
+  std::queue<Ptr<Packet>> txqCCH;
+  std::queue<Ptr<Packet>> txqSCH;
+  bool m_isMiddle;
+  Time lastTimeRecAP;
+  Time startTxCCH;
+  Time startTxSCH;
 };
 
 }
