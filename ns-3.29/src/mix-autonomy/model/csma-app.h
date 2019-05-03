@@ -33,8 +33,7 @@ public:
   Ptr<Node> GetNodeFromAddress(Ipv4Address &address);
   void ReceiveFromAP(Ptr<Packet> pkt, Ptr<Node> node);
   bool IsAPApplicationInstalled(Ptr<Node> node);
-  void SwitchChannel();
-  void SwitchToNextChannel(uint32_t curChannelNumber, uint32_t nextChannelNumber);
+  void SwitchSCH();
 
 	SimulationConfig &config;
 	Ptr<Socket> socket;
@@ -47,6 +46,11 @@ public:
   Time lastTimeRecAP;
   Time startTxCCH;
   Time startTxSCH;
+  Time m_gi;
+  Time m_cchi;
+  Time m_schi;
+  Time m_synci;
+
 };
 
 }

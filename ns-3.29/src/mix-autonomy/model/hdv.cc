@@ -2,7 +2,7 @@
 
 #include "hdv.h"
 #include "ap-leader.h"
-#include "ns3/wifi-net-device.h"
+#include "ns3/wave-module.h"
 #include<stdlib.h>
 
 namespace ns3
@@ -145,8 +145,8 @@ HumanApplication::GetNextSlotInterval(void)
       curSlot.start = curSlot.apSCHSlotNum * slotSize + minTxInterval;
       curSlot.duration = slotSize * curSlot.hdvSCHSlotNum - minTxInterval;
     }
-    Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
-    Ptr<WifiPhy> phy = device->GetPhy ();
+    Ptr<WaveNetDevice> device = DynamicCast<WaveNetDevice> (GetNode ()->GetDevice (0));
+    Ptr<WifiPhy> phy = device->GetPhy (0);
     phy->SetTxPowerStart(-1000);
     phy->SetTxPowerEnd(-1000);
   }
@@ -201,8 +201,8 @@ void HumanApplication::SendPacket(void)
 
 void HumanApplication::SlotWillStart(void)
 {
-  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
-  Ptr<WifiPhy> phy = device->GetPhy ();
+  Ptr<WaveNetDevice> device = DynamicCast<WaveNetDevice> (GetNode ()->GetDevice (0));
+  Ptr<WifiPhy> phy = device->GetPhy (0);
   phy->SetTxPowerStart(config.txPower);
   phy->SetTxPowerEnd(config.txPower);
   SendPacket();
@@ -215,8 +215,8 @@ void HumanApplication::SendOut(void)
 
 void HumanApplication::ChangeWindowSize(uint32_t cwMin, uint32_t cwMax)
 {
-  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice>(GetNode()->GetDevice(0));
-  Ptr<OcbWifiMac> mac = DynamicCast<OcbWifiMac>(device->GetMac());
+  Ptr<WaveNetDevice> device = DynamicCast<WaveNetDevice>(GetNode()->GetDevice(0));
+  Ptr<OcbWifiMac> mac = DynamicCast<OcbWifiMac>(device->GetMac(0));
   // if not modified, cwmin = 15, cwmax = 1023
   mac->ConfigureEdca(cwMin, cwMax, 2, AC_BE_NQOS);
   mac->ConfigureEdca(cwMin, cwMax, 2, AC_VO);

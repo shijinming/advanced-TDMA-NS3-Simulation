@@ -1,7 +1,6 @@
 #include "ns3/mobility-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/wave-module.h"
-#include "ns3/wifi-net-device.h"
 #include "tdma-app.h"
 #include <fstream>
 #include<stdlib.h>

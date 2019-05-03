@@ -1,7 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include "ns3/internet-module.h"
-#include "ns3/wifi-net-device.h"
+#include "ns3/wave-module.h"
 #include<stdlib.h>
 #include "csma-app.h"
 #include "ap-leader.h"
@@ -70,9 +70,13 @@ CSMAApplication::DoInitialize()
   m_startTime = Seconds(t) + MicroSeconds(rand()%50000);
   m_stopTime = Seconds(config.simTime);
 
-  Ptr<WifiNetDevice> device = DynamicCast<WifiNetDevice> (GetNode ()->GetDevice (0));
-  Ptr<WifiPhy> phy = device->GetPhy ();
+  Ptr<WaveNetDevice> device = DynamicCast<WaveNetDevice> (GetNode ()->GetDevice (0));
+  Ptr<WifiPhy> phy = device->GetPhy (0);
   phy->TraceConnectWithoutContext("PhyTxBegin", MakeCallback(&CSMAApplication::WifiPhyTxBeginTrace, this));
+  m_gi = device->GetChannelCoordinator()->GetGuardInterval();
+  m_cchi = device->GetChannelCoordinator()->GetCchInterval();
+  m_schi = device->GetChannelCoordinator()->GetSchInterval();
+  m_synci = device->GetChannelCoordinator()->GetSyncInterval();
 	Application::DoInitialize();
 }
 
@@ -229,35 +233,23 @@ CSMAApplication::ReceiveFromAP(Ptr<Packet> pkt, Ptr<Node> node)
 }
 
 void 
-CSMAApplication::SwitchChannel()
+CSMAApplication::SwitchSCH()
 {
-  sendEvent.Cancel();
-  Time randomWait = MicroSeconds(rand()%1000);
-  if(Simulator::Now().GetMilliSeconds()%50 <50)
-    sendEvent=Simulator::Schedule(startTxCCH + randomWait, &CSMAApplication::SendPacket, this);
+  if(!m_isMiddle)
+    return;
+  SchInfo schInfo;
+  if(Simulator::Now().GetMilliSeconds()%200<100)
+  {
+    schInfo = SchInfo (SCH1, false, EXTENDED_ALTERNATING);
+  }
   else
-    sendEvent=Simulator::Schedule(startTxSCH + randomWait, &CSMAApplication::SendPacket, this);
-  
+  {
+    schInfo = SchInfo (SCH2, false, EXTENDED_ALTERNATING);
+  }
+  Ptr<WaveNetDevice>  device = DynamicCast<WaveNetDevice> (GetNode()->GetDevice(0));
+  Simulator::Schedule (Seconds (0.0), &WaveNetDevice::StartSch, device, schInfo);
 }
 
-void
-CSMAApplication::SwitchToNextChannel(uint32_t curChannelNumber, uint32_t nextChannelNumber)
-{
-  Ptr<WaveNetDevice> device = GetNode()->GetObject<WaveNetDevice>();
-  Ptr<WifiPhy> phy = device->GetPhy(0);
-  if (phy->GetChannelNumber() == nextChannelNumber)
-  {
-    return;
-  }
-  Ptr<OcbWifiMac> curMacEntity = device->GetMac(curChannelNumber);
-  Ptr<OcbWifiMac> nextMacEntity = device->GetMac(nextChannelNumber);
-  curMacEntity->Suspend();
-  curMacEntity->ResetWifiPhy();
-  phy->SetChannelNumber(nextChannelNumber);
-  Time switchTime = phy->GetChannelSwitchDelay();
-  nextMacEntity->MakeVirtualBusy(switchTime);
-  nextMacEntity->SetWifiPhy(phy);
-  nextMacEntity->Resume();
-}
+
 
 }

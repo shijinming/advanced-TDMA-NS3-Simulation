@@ -43,6 +43,10 @@ void SimulationEntry::Simulate(int argc, char **argv)
   // 802.11p protocol
   auto waveHelper = WaveHelper::Default();
 
+  uint32_t channels[] = {CCH, SCH1, SCH2};
+  std::vector<uint32_t> channelsVector(channels,channels+3);
+  waveHelper.CreateMacForChannel (channelsVector);
+
   auto devices = waveHelper.Install(wifiPhy, waveMac, nodes);
 
   InternetStackHelper internet;
