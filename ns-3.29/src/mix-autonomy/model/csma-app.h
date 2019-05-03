@@ -31,17 +31,17 @@ public:
   void generateTraffic(void);
   void ReceivePacket(Ptr<Packet> pkt, Address &srcAddr);
   Ptr<Node> GetNodeFromAddress(Ipv4Address &address);
-  void ReceiveFromAP(Ptr<Packet> pkt, Ptr<Node> node);
+  virtual void ReceiveFromAP(Ptr<Packet> pkt, Ptr<Node> node);
   bool IsAPApplicationInstalled(Ptr<Node> node);
-  void SwitchSCH();
+  void StartCCH();
+  void ChangeSCH();
 
 	SimulationConfig &config;
 	Ptr<Socket> socket;
 	Ptr<Socket> sink;
 	TypeId socketTid;
 	EventId sendEvent;
-  std::queue<Ptr<Packet>> txqCCH;
-  std::queue<Ptr<Packet>> txqSCH;
+  std::queue<Ptr<Packet>> txq;
   bool m_isMiddle;
   Time lastTimeRecAP;
   Time startTxCCH;

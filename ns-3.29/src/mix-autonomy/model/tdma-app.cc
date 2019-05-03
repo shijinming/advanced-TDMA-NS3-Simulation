@@ -325,7 +325,7 @@ void TDMAApplication::SetCurSlot(void)
   {
     curSlot.apCCHSlotNum = config.apNum + 1;
     curSlot.apSCHSlotNum = 0;
-    curSlot.hdvCCHSlotNum = config.AILSlot;
+    curSlot.hdvCCHSlotNum = 9;
     curSlot.hdvSCHSlotNum = 0;
     curSlot.CCHSlotNum = curSlot.apCCHSlotNum + curSlot.hdvCCHSlotNum;
     curSlot.SCHSlotNum = curSlot.apSCHSlotNum + curSlot.hdvSCHSlotNum;

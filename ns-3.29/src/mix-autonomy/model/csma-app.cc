@@ -42,6 +42,9 @@ CSMAApplication::StartApplication(void)
 {
 	std::cout << GetNode()->GetId() << " starts at " << Simulator::Now() << std::endl;
 	CreateSocket();
+  startTxCCH = MilliSeconds(0);
+  startTxSCH = MilliSeconds(0);
+  
 	SendPacket();
 }
 
@@ -120,6 +123,7 @@ CSMAApplication::OnReceivePacket(Ptr<Socket> socket)
   {
     InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom(srcAddr);
     Address addr = inetAddr.GetIpv4();
+    ReceivePacket(pkt, srcAddr);
     rxTrace(pkt, this, addr);
   }
 }
@@ -134,23 +138,11 @@ CSMAApplication::DoSendPacket(Ptr<Packet> pkt)
 void
 CSMAApplication::SendPacket(void)
 {
-  bool curChannel=(Simulator::Now().GetMilliSeconds()%50 < 50);
   Ptr<Packet> pktToSend;
-  if (curChannel)
+  if(!txq.empty())
   {
-    if(!txqCCH.empty())
-    {
-      pktToSend = txqCCH.front();
-      txqCCH.pop();
-    }
-  }
-  else
-  {
-    if(!txqSCH.empty())
-    {
-      pktToSend = txqSCH.front();
-      txqSCH.pop();
-    }
+    pktToSend = txq.front();
+    txq.pop();
   }
 	DoSendPacket(pktToSend);
 }
@@ -163,14 +155,7 @@ CSMAApplication::WifiPhyTxBeginTrace(Ptr<const Packet> p)
 
 void CSMAApplication::generateTraffic(void)
 {
-  if(m_isMiddle)
-  {
 
-  }
-  else
-  {
-    /* code */
-  }
   
 }
 
@@ -200,11 +185,12 @@ CSMAApplication::ReceivePacket(Ptr<Packet> pkt, Address &srcAddr)
   {
     lastTimeRecAP = Simulator::Now();
     m_isMiddle = true;
+    startTxCCH = config.apNum * MicroSeconds(config.slotSize);
     ReceiveFromAP(pkt, node);
   }
   else
   {
-    if(Simulator::Now()-lastTimeRecAP > MilliSeconds(200))
+    if(Simulator::Now()-lastTimeRecAP > 2*m_synci)
       m_isMiddle = false;
   }
 }
@@ -233,12 +219,21 @@ CSMAApplication::ReceiveFromAP(Ptr<Packet> pkt, Ptr<Node> node)
 }
 
 void 
-CSMAApplication::SwitchSCH()
+CSMAApplication::StartCCH()
 {
-  if(!m_isMiddle)
-    return;
+  Ptr<Packet> pkt = Create<Packet> (200);
+  Simulator::Schedule (startTxCCH + MicroSeconds (rand()%1000), &CSMAApplication::DoSendPacket, this, pkt);
+  ChangeSCH();
+  startTxSCH = m_cchi + m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
+  Simulator::Schedule (startTxSCH, &CSMAApplication::SendPacket, this);
+  Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
+}
+
+void 
+CSMAApplication::ChangeSCH()
+{
   SchInfo schInfo;
-  if(Simulator::Now().GetMilliSeconds()%200<100)
+  if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds() && m_isMiddle)
   {
     schInfo = SchInfo (SCH1, false, EXTENDED_ALTERNATING);
   }
@@ -249,7 +244,5 @@ CSMAApplication::SwitchSCH()
   Ptr<WaveNetDevice>  device = DynamicCast<WaveNetDevice> (GetNode()->GetDevice(0));
   Simulator::Schedule (Seconds (0.0), &WaveNetDevice::StartSch, device, schInfo);
 }
-
-
 
 }

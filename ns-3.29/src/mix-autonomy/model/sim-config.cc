@@ -40,7 +40,6 @@ void SimulationConfig::ConfigureCommandLineParams(CommandLine &cmd)
     cmd.AddValue("reference", "simulation for reference", reference);
     cmd.AddValue("cca-threshold", "CCA threshold", CCAthreshold);
     cmd.AddValue("tx-gain", "increse tx power", txGain);
-    cmd.AddValue("ail-slot", "number of middle layer slots", AILSlot);
 }
 
 void SimulationConfig::PrintConfiguration()
@@ -66,7 +65,6 @@ void SimulationConfig::PrintConfiguration()
     SHOW_CONF(reference);
     SHOW_CONF(CCAthreshold);
     SHOW_CONF(txGain);
-    SHOW_CONF(AILSlot);
     LOG_UNCOND("====================");
 #undef SHOW_CONF
 }

@@ -45,7 +45,7 @@ class SimulationConfig
     bool reference = false;
     double CCAthreshold = -99;
     double txGain = 3;
-    uint32_t AILSlot = 9;
+    int slotSize = 1000;
 
     void ParceCommandLineArguments(int argc, char **argv, bool doValidate);
     void ParceCommandLineArguments(int argc, char **argv)
