@@ -75,6 +75,8 @@ public:
   uint32_t GetLocLon() { return m_data.locLon; }
   void SetLocLat(uint32_t locLat) { m_data.locLat = locLat; }
   uint32_t GetLocLat() { return m_data.locLat; }
+  uint16_t GetCCHSlotNum () {return m_data.CCHSlotNum; }
+  uint16_t GetSCHSlotNum () {return m_data.SCHSlotNum; }
   void SetCCHslotAllocation(std::vector<uint16_t> &CCHslotAllocation)
   {
     m_data.CCHSlotNum = CCHslotAllocation.size();

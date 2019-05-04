@@ -46,6 +46,7 @@ class SimulationConfig
     double CCAthreshold = -99;
     double txGain = 3;
     int slotSize = 1000;
+    int trafficSize = 20;
 
     void ParceCommandLineArguments(int argc, char **argv, bool doValidate);
     void ParceCommandLineArguments(int argc, char **argv)

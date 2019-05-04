@@ -4,7 +4,6 @@
 #include "ns3/wave-module.h"
 #include<stdlib.h>
 #include "csma-app.h"
-#include "ap-leader.h"
 
 namespace ns3
 {
@@ -18,6 +17,10 @@ CSMAApplication::GetTypeId()
   static TypeId tid = TypeId("ns3::CSMAApplication")
                           .SetParent<Application>()
                           .AddConstructor<CSMAApplication>()
+                          .AddAttribute("VehicleType", "Vehicle type",
+                                        UintegerValue(0),
+                                        MakeUintegerAccessor(&CSMAApplication::m_type),
+                                        MakeUintegerChecker<uint16_t>())
 													.AddTraceSource("Tx", "A new packet is created and is sent",
                                           MakeTraceSourceAccessor(&CSMAApplication::txTrace),
                                           "ns3::Packet::AddressTraceCallback")
@@ -30,7 +33,6 @@ CSMAApplication::GetTypeId()
 CSMAApplication::CSMAApplication()
 		:  config(SimulationConfig::Default())
 {
-  m_isMiddle = false;
 }
 
 CSMAApplication::~CSMAApplication()
@@ -41,24 +43,23 @@ void
 CSMAApplication::StartApplication(void)
 {
 	std::cout << GetNode()->GetId() << " starts at " << Simulator::Now() << std::endl;
-	CreateSocket();
+  m_device->SetReceiveCallback (MakeCallback(&CSMAApplication::ReceivePacket, this));
   startTxCCH = MilliSeconds(0);
   startTxSCH = MilliSeconds(0);
-  
-	SendPacket();
+  Time temp = MicroSeconds(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
+  Time start = (temp<=m_gi)?(m_gi-temp):(m_gi+m_synci-temp);
+  Simulator::Schedule (start, &CSMAApplication::StartCCH, this);
+  GenerateTraffic();
 }
 
 void 
 CSMAApplication::StopApplication(void)
 {
-	sendEvent.Cancel();
 }
 
 void
 CSMAApplication::DoDispose()
 {
-	socket = NULL;
-  sink = NULL;
 }
 
 void
@@ -70,67 +71,24 @@ CSMAApplication::DoInitialize()
   float t = 0;
   for (uint32_t i = 0; i <= GetNode()->GetId(); i++)
     f >> t;
-  m_startTime = Seconds(t) + MicroSeconds(rand()%50000);
+  m_startTime = Seconds(t);
   m_stopTime = Seconds(config.simTime);
-
-  Ptr<WaveNetDevice> device = DynamicCast<WaveNetDevice> (GetNode ()->GetDevice (0));
-  Ptr<WifiPhy> phy = device->GetPhy (0);
+  m_isMiddle = false;
+  m_device = DynamicCast<WaveNetDevice> (GetNode ()->GetDevice (0));
+  Ptr<WifiPhy> phy = m_device->GetPhy (0);
   phy->TraceConnectWithoutContext("PhyTxBegin", MakeCallback(&CSMAApplication::WifiPhyTxBeginTrace, this));
-  m_gi = device->GetChannelCoordinator()->GetGuardInterval();
-  m_cchi = device->GetChannelCoordinator()->GetCchInterval();
-  m_schi = device->GetChannelCoordinator()->GetSchInterval();
-  m_synci = device->GetChannelCoordinator()->GetSyncInterval();
+  m_gi = m_device->GetChannelCoordinator()->GetGuardInterval();
+  m_cchi = m_device->GetChannelCoordinator()->GetCchInterval();
+  m_schi = m_device->GetChannelCoordinator()->GetSchInterval();
+  m_synci = m_device->GetChannelCoordinator()->GetSyncInterval();
+  m_SCH = SCH2;
 	Application::DoInitialize();
 }
 
-void
-CSMAApplication::CreateSocket()
-{
-	auto broadcastAddr = InetSocketAddress(Ipv4Address("255.255.255.255"), config.socketPort);
-  socketTid = UdpSocketFactory::GetTypeId();
-  if (!socket)
-  {
-    socket = Socket::CreateSocket(GetNode(), socketTid);
-    if (socket->Bind())
-    {
-      LOG_UNCOND("Fatal Error: Fail to bind socket");
-      exit(1);
-    }
-    socket->Connect(broadcastAddr);
-    socket->SetAllowBroadcast(true);
-    socket->ShutdownRecv();
-  }
-  if (!sink)
-  {
-    sink = Socket::CreateSocket(GetNode(), socketTid);
-    if (sink->Bind(Address(InetSocketAddress(Ipv4Address::GetAny(), config.socketPort))))
-    {
-      LOG_UNCOND("Fatal Error: Fail to bind socket");
-      exit(1);
-    }
-    sink->Listen();
-    sink->ShutdownSend();
-    sink->SetRecvCallback(MakeCallback(&CSMAApplication::OnReceivePacket, this));
-  }
-}
-
 void 
-CSMAApplication::OnReceivePacket(Ptr<Socket> socket)
+CSMAApplication::DoSendPacket(Ptr<Packet> pkt, uint32_t channel)
 {
-	Ptr<Packet> pkt;
-  Address srcAddr;
-  while ((pkt = sink->RecvFrom(srcAddr)))
-  {
-    InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom(srcAddr);
-    Address addr = inetAddr.GetIpv4();
-    ReceivePacket(pkt, srcAddr);
-    rxTrace(pkt, this, addr);
-  }
-}
-void 
-CSMAApplication::DoSendPacket(Ptr<Packet> pkt)
-{
-  socket->Send(pkt);
+  m_device->SendX(pkt, Mac48Address::GetBroadcast (),config.socketPort, TxInfo(channel));
   Ptr<Ipv4> ipv4 = GetNode()->GetObject<Ipv4>();
   txTrace(pkt, ipv4->GetAddress(1, 0).GetLocal());
 }
@@ -138,13 +96,21 @@ CSMAApplication::DoSendPacket(Ptr<Packet> pkt)
 void
 CSMAApplication::SendPacket(void)
 {
+  Ptr<WaveNetDevice>  device = DynamicCast<WaveNetDevice> (GetNode()->GetDevice(0));
+  Time current =MicroSeconds(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
+  if(current < m_cchi + m_gi)
+    return;
+  if(m_type>0 && current > m_cchi + m_gi + startTxSCH + m_durationSCH)
+    return;
   Ptr<Packet> pktToSend;
+  // std::cout<<"txq length:"<<txq.size()<<std::endl;
   if(!txq.empty())
   {
     pktToSend = txq.front();
     txq.pop();
   }
-	DoSendPacket(pktToSend);
+	if(pktToSend!=NULL)
+    DoSendPacket(pktToSend, m_SCH);
 }
 
 void 
@@ -153,58 +119,51 @@ CSMAApplication::WifiPhyTxBeginTrace(Ptr<const Packet> p)
   SendPacket();
 }
 
-void CSMAApplication::generateTraffic(void)
+void CSMAApplication::GenerateTraffic(void)
 {
+  for (int i=0;i<rand()%config.trafficSize;i++)
+  {
+    Ptr<Packet> pkt = Create<Packet> (512);
+    txq.push(pkt);
+  }
+  Simulator::Schedule(MilliSeconds(rand()%500), &CSMAApplication::GenerateTraffic, this);
+}
 
-  
+int
+CSMAApplication::GetVehicleType ()
+{
+  return m_type;
 }
 
 bool 
-CSMAApplication::IsAPApplicationInstalled(Ptr<Node> node)
+CSMAApplication::ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t mode, const Address &srcAddr)
 {
-  uint32_t nApps = node->GetNApplications();
-  for (uint32_t idx = 0; idx < nApps; idx++)
-  {
-    Ptr<Application> app = node->GetApplication(idx);
-    if (dynamic_cast<APFollower *>(PeekPointer(app)) || dynamic_cast<APLeader *>(PeekPointer(app)))
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
-void 
-CSMAApplication::ReceivePacket(Ptr<Packet> pkt, Address &srcAddr)
-{
-  InetSocketAddress inetAddr = InetSocketAddress::ConvertFrom(srcAddr);
-  Ipv4Address addr = inetAddr.GetIpv4();
-  // 获取发送该数据包的节点
-  Ptr<Node> node = GetNodeFromAddress(addr);
-  if (IsAPApplicationInstalled(node))
+  rxTrace(pkt, this, srcAddr);
+  Ptr<Node> node = GetNodeFromAddress(srcAddr);
+  Ptr<CSMAApplication> app = DynamicCast<CSMAApplication> (node->GetApplication(0));
+  if (app->GetVehicleType()>0)
   {
     lastTimeRecAP = Simulator::Now();
     m_isMiddle = true;
     startTxCCH = config.apNum * MicroSeconds(config.slotSize);
-    ReceiveFromAP(pkt, node);
+    ReceiveFromAP(pkt, app->GetVehicleType());
   }
   else
   {
     if(Simulator::Now()-lastTimeRecAP > 2*m_synci)
       m_isMiddle = false;
   }
+  return true;
 }
 
 Ptr<Node>
-CSMAApplication::GetNodeFromAddress(Ipv4Address &address)
+CSMAApplication::GetNodeFromAddress(const Address &address)
 {
   for (NodeList::Iterator n = NodeList::Begin();
        n != NodeList::End(); n++)
   {
     Ptr<Node> node = *n;
-    Ptr<Ipv4> ipv4 = node->GetObject<Ipv4>();
-    NS_ASSERT(ipv4);
-    if (ipv4->GetInterfaceForAddress(address) != -1)
+    if (node->GetDevice(0)->GetAddress()==address)
     {
       return node;
     }
@@ -213,36 +172,52 @@ CSMAApplication::GetNodeFromAddress(Ipv4Address &address)
 }
 
 void 
-CSMAApplication::ReceiveFromAP(Ptr<Packet> pkt, Ptr<Node> node)
+CSMAApplication::ReceiveFromAP(Ptr<const Packet> pkt, uint16_t type)
 {
-  
+  if(type==2)
+  {
+    if(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds()<(m_cchi+m_gi).GetMicroSeconds())
+    {
+      PacketHeader pHeader;
+      pkt->PeekHeader(pHeader);
+      startTxCCH = MicroSeconds(config.slotSize)*config.apNum;
+      if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds() && m_isMiddle)
+        startTxSCH = MicroSeconds(config.slotSize)*pHeader.GetSCHSlotNum();
+      else
+        startTxSCH = MicroSeconds(0);
+    }
+  }
 }
 
 void 
 CSMAApplication::StartCCH()
 {
   Ptr<Packet> pkt = Create<Packet> (200);
-  Simulator::Schedule (startTxCCH + MicroSeconds (rand()%1000), &CSMAApplication::DoSendPacket, this, pkt);
+  if(m_type > 0)
+  {
+    PacketHeader pHeader;
+    SetupHeader(pHeader);
+  }
+  Simulator::Schedule (startTxCCH + MicroSeconds (rand()%1000), &CSMAApplication::DoSendPacket, this, pkt, CCH);
   ChangeSCH();
-  startTxSCH = m_cchi + m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
-  Simulator::Schedule (startTxSCH, &CSMAApplication::SendPacket, this);
+  Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
+  Simulator::Schedule (startTxSCH + wait, &CSMAApplication::SendPacket, this);
   Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
 }
 
 void 
 CSMAApplication::ChangeSCH()
 {
-  SchInfo schInfo;
   if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds() && m_isMiddle)
   {
-    schInfo = SchInfo (SCH1, false, EXTENDED_ALTERNATING);
+    m_SCH = SCH1;
   }
   else
   {
-    schInfo = SchInfo (SCH2, false, EXTENDED_ALTERNATING);
+    m_SCH = SCH2;
   }
-  Ptr<WaveNetDevice>  device = DynamicCast<WaveNetDevice> (GetNode()->GetDevice(0));
-  Simulator::Schedule (Seconds (0.0), &WaveNetDevice::StartSch, device, schInfo);
+  SchInfo schInfo = SchInfo (m_SCH, false, EXTENDED_ALTERNATING);
+  Simulator::Schedule (Seconds (0.0), &WaveNetDevice::StartSch, m_device, schInfo);
 }
 
 }

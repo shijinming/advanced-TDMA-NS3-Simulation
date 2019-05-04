@@ -8,7 +8,6 @@
 #include "ns3/mobility-module.h"
 
 #include "entry-helper.h"
-#include "ns3/tdma-app.h"
 
 namespace ns3
 {
@@ -31,13 +30,13 @@ void SimulationEntry::Simulate(int argc, char **argv)
   nodes.Create(config.nNodes);
 
   // Physical layer
-  auto wifiPhy = YansWavePhyHelper::Default();
+  auto wavePhy = YansWavePhyHelper::Default();
   auto wifiChannel = YansWifiChannelHelper::Default();
   Ptr<YansWifiChannel> channel = wifiChannel.Create();
-  wifiPhy.SetChannel(channel);
-  wifiPhy.SetPcapDataLinkType(WifiPhyHelper::DLT_IEEE802_11);
-  wifiPhy.Set("TxPowerStart", DoubleValue(config.txPower));
-  wifiPhy.Set("TxPowerEnd", DoubleValue(config.txPower)); // txPower: default valude is 35
+  wavePhy.SetChannel(channel);
+  wavePhy.SetPcapDataLinkType(WifiPhyHelper::DLT_IEEE802_11);
+  wavePhy.Set("TxPowerStart", DoubleValue(config.txPower));
+  wavePhy.Set("TxPowerEnd", DoubleValue(config.txPower)); // txPower: default valude is 35
   // Mac layer
   auto waveMac = QosWaveMacHelper::Default();
   // 802.11p protocol
@@ -46,8 +45,7 @@ void SimulationEntry::Simulate(int argc, char **argv)
   uint32_t channels[] = {CCH, SCH1, SCH2};
   std::vector<uint32_t> channelsVector(channels,channels+3);
   waveHelper.CreateMacForChannel (channelsVector);
-
-  auto devices = waveHelper.Install(wifiPhy, waveMac, nodes);
+  auto devices = waveHelper.Install(wavePhy, waveMac, nodes);
 
   InternetStackHelper internet;
   internet.Install(nodes);

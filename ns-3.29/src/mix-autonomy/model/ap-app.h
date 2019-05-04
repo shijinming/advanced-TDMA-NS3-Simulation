@@ -14,22 +14,26 @@
 namespace ns3
 {
 
-class APFollower : public CSMAApplication
+class APApplication : public CSMAApplication
 {
 public:
   static TypeId GetTypeId(void);
-  APFollower();
-  virtual ~APFollower();
-  void ReceivePacket(Ptr<Packet> pkt, Address &srcAddr); //判断接收到的包是否来自内核层
-  bool ReceivePacketFromAP(Ptr<Packet> pkt);             //对接收到的leader的控制包进行处理解析
+  APApplication();
+  virtual ~APApplication();
+  virtual void StartApplication(void);
+  virtual void DoInitialize();
+  virtual bool ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t mode, const Address &srcAddr);
+  virtual void ReceiveFromAP(Ptr<const Packet> pkt, uint16_t type);
   void SetupHeader(PacketHeader &hdr);
   void SlotAllocation();
-  void SendPacket(void);
 
 private:
   uint64_t CCHSendSlot;
   std::vector<uint64_t> SCHSendSlot;
   uint32_t leaderPacketCnt;
+  std::vector<uint16_t> m_CCHslotAllocation;
+  std::vector<uint16_t> m_SCHslotAllocation;
+  std::map<uint16_t, uint32_t> m_queueLen;
 };
 
 } // namespace ns3

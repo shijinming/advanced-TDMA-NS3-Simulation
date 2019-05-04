@@ -10,8 +10,7 @@
  */
 
 #include "ns3/network-module.h"
-#include "ap-helper.h"
-#include "hdv-helper.h"
+#include "ap-app-helper.h"
 #include "csma-app-helper.h"
 #include "entry-helper.h"
 #include "ns3/internet-module.h"
@@ -74,9 +73,8 @@ BeaconSimulationEntry::LoadMobilityData ()
 */
 void BeaconSimulationEntry::ConfigureApplication()
 {
-  APLeaderHelper apleaderHelper;
-  APFollowerHelper apfollowerHelper;
-  HumanApplicationHelper hdvHelper;
+  APApplicationHelper apHelper;
+  apHelper.SetAttribute("VehicleType",UintegerValue(1));
   CSMAApplicationHelper csmaHelper;
   //8辆自动驾驶车辆，其中一个为leader
   for (auto node = NodeList::Begin(); node != NodeList::End(); node++)
