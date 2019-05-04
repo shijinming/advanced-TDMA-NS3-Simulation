@@ -100,8 +100,11 @@ CSMAApplication::SendPacket(void)
   Time current =MicroSeconds(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   if(current < m_cchi + m_gi)
     return;
-  if(m_type>0 && current > m_cchi + m_gi + startTxSCH + m_durationSCH)
-    return;
+  if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds())
+  {
+    if(m_type>0 && current > m_cchi + m_gi + startTxSCH + m_durationSCH)
+      return;
+  }
   Ptr<Packet> pktToSend;
   // std::cout<<"txq length:"<<txq.size()<<std::endl;
   if(!txq.empty())
@@ -123,7 +126,7 @@ void CSMAApplication::GenerateTraffic(void)
 {
   for (int i=0;i<rand()%config.trafficSize;i++)
   {
-    Ptr<Packet> pkt = Create<Packet> (512);
+    Ptr<Packet> pkt = Create<Packet> (200);
     txq.push(pkt);
   }
   Simulator::Schedule(MilliSeconds(rand()%500), &CSMAApplication::GenerateTraffic, this);
@@ -145,7 +148,7 @@ CSMAApplication::ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16
   {
     lastTimeRecAP = Simulator::Now();
     m_isMiddle = true;
-    startTxCCH = config.apNum * MicroSeconds(config.slotSize);
+    startTxCCH = config.apNum * config.slotSize;
     ReceiveFromAP(pkt, app->GetVehicleType());
   }
   else
@@ -180,9 +183,9 @@ CSMAApplication::ReceiveFromAP(Ptr<const Packet> pkt, uint16_t type)
     {
       PacketHeader pHeader;
       pkt->PeekHeader(pHeader);
-      startTxCCH = MicroSeconds(config.slotSize)*config.apNum;
+      startTxCCH = config.slotSize*config.apNum;
       if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds() && m_isMiddle)
-        startTxSCH = MicroSeconds(config.slotSize)*pHeader.GetSCHSlotNum();
+        startTxSCH = config.slotSize*pHeader.GetSCHSlotNum();
       else
         startTxSCH = MicroSeconds(0);
     }
@@ -193,11 +196,6 @@ void
 CSMAApplication::StartCCH()
 {
   Ptr<Packet> pkt = Create<Packet> (200);
-  if(m_type > 0)
-  {
-    PacketHeader pHeader;
-    SetupHeader(pHeader);
-  }
   Simulator::Schedule (startTxCCH + MicroSeconds (rand()%1000), &CSMAApplication::DoSendPacket, this, pkt, CCH);
   ChangeSCH();
   Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());

@@ -34,7 +34,6 @@ public:
   int GetVehicleType();
   virtual void StartCCH();
   void ChangeSCH();
-  virtual void SetupHeader(PacketHeader &hdr) {}
 
 	SimulationConfig &config;
   uint16_t m_type;

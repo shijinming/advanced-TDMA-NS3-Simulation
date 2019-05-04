@@ -26,14 +26,13 @@ public:
   virtual void ReceiveFromAP(Ptr<const Packet> pkt, uint16_t type);
   void SetupHeader(PacketHeader &hdr);
   void SlotAllocation();
+  virtual void StartCCH();
 
 private:
-  uint64_t CCHSendSlot;
-  std::vector<uint64_t> SCHSendSlot;
-  uint32_t leaderPacketCnt;
   std::vector<uint16_t> m_CCHslotAllocation;
   std::vector<uint16_t> m_SCHslotAllocation;
   std::map<uint16_t, uint32_t> m_queueLen;
+  uint16_t *hdrSCHSlotAllocation;
 };
 
 } // namespace ns3

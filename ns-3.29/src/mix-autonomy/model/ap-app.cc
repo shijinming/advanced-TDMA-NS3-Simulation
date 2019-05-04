@@ -30,7 +30,7 @@ APApplication::StartApplication()
 {
   std::cout << GetNode()->GetId() << " starts at " << Simulator::Now() << std::endl;
   m_device->SetReceiveCallback (MakeCallback(&CSMAApplication::ReceivePacket, this));
-  startTxCCH = MicroSeconds((config.apNum-1-GetNode()->GetId())*config.slotSize);
+  startTxCCH = (config.apNum-1-GetNode()->GetId())*config.slotSize;
   startTxSCH = MilliSeconds(0);
   Time temp = MicroSeconds(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   Time start = (temp <= (m_gi  + startTxCCH)) ? (m_gi + startTxCCH - temp) : (m_gi + startTxCCH + m_synci - temp);
@@ -53,7 +53,9 @@ APApplication::ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t
   Ptr<CSMAApplication> app = DynamicCast<CSMAApplication> (node->GetApplication(0));
   if (app->GetVehicleType()>0)
   {
-    ReceiveFromAP(pkt, app->GetVehicleType());
+    Time current =MicroSeconds(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
+    if(current < m_cchi+m_gi)
+      ReceiveFromAP(pkt, app->GetVehicleType());
   }
   return true;
 }
@@ -63,13 +65,13 @@ APApplication::ReceiveFromAP(Ptr<const Packet> pkt, uint16_t type)
 {
   PacketHeader pHeader;
   pkt->PeekHeader(pHeader);
-  if(type==1)
+  if(m_type==1)
   {
     if(!pHeader.GetIsLeader())
       return;
-    
+      
   }
-  else if(type==2)
+  else if(m_type==2)
   {
     if(pHeader.GetIsLeader())
       return;
@@ -99,6 +101,20 @@ APApplication::SetupHeader(PacketHeader &hdr)
   if (m_type==1)
   {
     hdr.SetIsLeader(false);
+    hdrSCHSlotAllocation = hdr.GetSCHslotAllocation();
+    int start=0;
+    int duration = 0;
+    for(int i=0;i<hdr.GetSCHSlotNum();i++)
+    {
+      if(hdrSCHSlotAllocation[i]==GetNode()->GetId())
+      {
+        start = i;
+        duration++;
+      }
+      start = start - duration + 1;
+    }
+    startTxSCH = config.slotSize*start;
+    m_durationSCH = config.slotSize*duration;
   }
   else if(m_type==2)
   {
@@ -111,7 +127,35 @@ APApplication::SetupHeader(PacketHeader &hdr)
 void
 APApplication::SlotAllocation()
 {
+  m_SCHslotAllocation.clear();
+  std::map<uint16_t, uint32_t>::iterator iter;
+  int count=0;
+  for(iter = m_queueLen.begin();iter!=m_queueLen.end();iter++)
+  {
+    if(iter->second >=3)
+      count=3;
+    else
+      count=iter->second;
+    for(int i=0;i<count;i++)
+      m_SCHslotAllocation.push_back(iter->first);
+  }
+}
 
+void
+APApplication::StartCCH()
+{
+  Ptr<Packet> pkt = Create<Packet> (200);
+  PacketHeader pHeader;
+  SetupHeader(pHeader);
+  Simulator::Schedule (startTxCCH + MicroSeconds (rand()%1000), &CSMAApplication::DoSendPacket, this, pkt, CCH);
+  ChangeSCH();
+  Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
+  if(m_type==2)
+  {
+    Simulator::Schedule (wait, &APApplication::SlotAllocation, this);
+  }
+  Simulator::Schedule (startTxSCH + wait, &CSMAApplication::SendPacket, this);
+  Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
 }
 
 } // namespace ns3
