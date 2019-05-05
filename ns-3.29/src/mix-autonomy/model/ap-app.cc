@@ -33,8 +33,8 @@ APApplication::StartApplication()
   startTxCCH = (config.apNum-1-GetNode()->GetId())*config.slotSize;
   startTxSCH = MilliSeconds(0);
   Time temp = MicroSeconds(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
-  Time start = (temp <= (m_gi  + startTxCCH)) ? (m_gi + startTxCCH - temp) : (m_gi + startTxCCH + m_synci - temp);
-  Simulator::Schedule (start, &CSMAApplication::StartCCH, this);
+  Time start = (temp<=m_gi)?(m_gi-temp):(m_gi+m_synci-temp);
+  Simulator::Schedule (start, &APApplication::StartCCH, this);
   GenerateTraffic();
 }
 
@@ -153,6 +153,7 @@ APApplication::StartCCH()
   Ptr<Packet> pkt = Create<Packet> (200);
   PacketHeader pHeader;
   SetupHeader(pHeader);
+  pkt->AddHeader(pHeader);
   Simulator::Schedule (startTxCCH, &CSMAApplication::DoSendPacket, this, pkt, CCH);
   ChangeSCH();
   Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
@@ -161,10 +162,14 @@ APApplication::StartCCH()
     Simulator::Schedule (wait, &APApplication::SlotAllocation, this);
   }
   if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds())
-    Simulator::Schedule (startTxSCH + wait, &CSMAApplication::SendPacket, this);
+  {
+    if(m_durationSCH>0)
+      Simulator::Schedule (startTxSCH + wait, &CSMAApplication::SendPacket, this);
+  }
   else
     Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
   Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
+  std::cout<<GetNode()->GetId()<<" startTxSCH:"<<startTxSCH<<" duration:"<<m_durationSCH<<std::endl;
 }
 
 } // namespace ns3

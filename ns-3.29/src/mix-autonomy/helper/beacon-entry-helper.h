@@ -89,7 +89,8 @@ void BeaconSimulationEntry::ConfigureApplication()
       apHelper.SetAttribute("VehicleType",UintegerValue(1));
       app = apHelper.Install(*node);
     }
-    app = csmaHelper.Install(*node);
+    else
+      app = csmaHelper.Install(*node);
     app->TraceConnectWithoutContext("Tx", MakeCallback(&BeaconSimulationEntry::PrintSendPacket, this));
     app->TraceConnectWithoutContext("Rx", MakeCallback(&BeaconSimulationEntry::PrintReceivePacket, this));
     //(*node)->AddApplication (app);
