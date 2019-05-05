@@ -106,7 +106,6 @@ CSMAApplication::SendPacket(void)
       return;
   }
   Ptr<Packet> pktToSend;
-  // std::cout<<"txq length:"<<txq.size()<<std::endl;
   if(!txq.empty())
   {
     pktToSend = txq.front();

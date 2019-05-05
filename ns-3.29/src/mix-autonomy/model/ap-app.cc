@@ -81,8 +81,8 @@ APApplication::ReceiveFromAP(Ptr<const Packet> pkt, uint16_t type)
         start = i;
         duration++;
       }
-      start = start - duration + 1;
     }
+    start = start - duration + 1;
     startTxSCH = config.slotSize*start;
     m_durationSCH = config.slotSize*duration;
   }
