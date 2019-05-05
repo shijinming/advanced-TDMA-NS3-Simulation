@@ -153,7 +153,11 @@ CSMAApplication::ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16
   else
   {
     if(Simulator::Now()-lastTimeRecAP > 2*m_synci)
+    {
       m_isMiddle = false;
+      startTxCCH = MilliSeconds(0);
+      startTxSCH = MilliSeconds(0);
+    }
   }
   return true;
 }
