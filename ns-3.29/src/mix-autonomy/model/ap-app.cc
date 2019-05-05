@@ -63,13 +63,28 @@ APApplication::ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t
 void
 APApplication::ReceiveFromAP(Ptr<const Packet> pkt, uint16_t type)
 {
+  if(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds()>(m_cchi+m_gi).GetMicroSeconds())
+    return;
   PacketHeader pHeader;
   pkt->PeekHeader(pHeader);
   if(m_type==1)
   {
     if(!pHeader.GetIsLeader())
       return;
-      
+    hdrSCHSlotAllocation = pHeader.GetSCHslotAllocation();
+    int start=0;
+    int duration = 0;
+    for(int i=0;i<pHeader.GetSCHSlotNum();i++)
+    {
+      if(hdrSCHSlotAllocation[i]==GetNode()->GetId())
+      {
+        start = i;
+        duration++;
+      }
+      start = start - duration + 1;
+    }
+    startTxSCH = config.slotSize*start;
+    m_durationSCH = config.slotSize*duration;
   }
   else if(m_type==2)
   {
@@ -101,20 +116,6 @@ APApplication::SetupHeader(PacketHeader &hdr)
   if (m_type==1)
   {
     hdr.SetIsLeader(false);
-    hdrSCHSlotAllocation = hdr.GetSCHslotAllocation();
-    int start=0;
-    int duration = 0;
-    for(int i=0;i<hdr.GetSCHSlotNum();i++)
-    {
-      if(hdrSCHSlotAllocation[i]==GetNode()->GetId())
-      {
-        start = i;
-        duration++;
-      }
-      start = start - duration + 1;
-    }
-    startTxSCH = config.slotSize*start;
-    m_durationSCH = config.slotSize*duration;
   }
   else if(m_type==2)
   {
@@ -139,6 +140,11 @@ APApplication::SlotAllocation()
     for(int i=0;i<count;i++)
       m_SCHslotAllocation.push_back(iter->first);
   }
+  startTxSCH = config.slotSize*m_SCHslotAllocation.size();
+  count = (txq.size()<3)?txq.size():3;
+  for(int i=0;i<count;i++)
+    m_SCHslotAllocation.push_back(GetNode()->GetId());
+  m_durationSCH = config.slotSize*count;
 }
 
 void
@@ -147,14 +153,17 @@ APApplication::StartCCH()
   Ptr<Packet> pkt = Create<Packet> (200);
   PacketHeader pHeader;
   SetupHeader(pHeader);
-  Simulator::Schedule (startTxCCH + MicroSeconds (rand()%1000), &CSMAApplication::DoSendPacket, this, pkt, CCH);
+  Simulator::Schedule (startTxCCH, &CSMAApplication::DoSendPacket, this, pkt, CCH);
   ChangeSCH();
   Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   if(m_type==2)
   {
     Simulator::Schedule (wait, &APApplication::SlotAllocation, this);
   }
-  Simulator::Schedule (startTxSCH + wait, &CSMAApplication::SendPacket, this);
+  if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds())
+    Simulator::Schedule (startTxSCH + wait, &CSMAApplication::SendPacket, this);
+  else
+    Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
   Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
 }
 

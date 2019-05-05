@@ -184,10 +184,7 @@ CSMAApplication::ReceiveFromAP(Ptr<const Packet> pkt, uint16_t type)
       PacketHeader pHeader;
       pkt->PeekHeader(pHeader);
       startTxCCH = config.slotSize*config.apNum;
-      if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds() && m_isMiddle)
-        startTxSCH = config.slotSize*pHeader.GetSCHSlotNum();
-      else
-        startTxSCH = MicroSeconds(0);
+      startTxSCH = config.slotSize*pHeader.GetSCHSlotNum();
     }
   }
 }
@@ -199,7 +196,10 @@ CSMAApplication::StartCCH()
   Simulator::Schedule (startTxCCH + MicroSeconds (rand()%1000), &CSMAApplication::DoSendPacket, this, pkt, CCH);
   ChangeSCH();
   Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
-  Simulator::Schedule (startTxSCH + wait, &CSMAApplication::SendPacket, this);
+  if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds() && m_isMiddle)
+    Simulator::Schedule (startTxSCH + wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
+  else
+    Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
   Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
 }
 
