@@ -74,12 +74,21 @@ BeaconSimulationEntry::LoadMobilityData ()
 void BeaconSimulationEntry::ConfigureApplication()
 {
   APApplicationHelper apHelper;
-  apHelper.SetAttribute("VehicleType",UintegerValue(1));
   CSMAApplicationHelper csmaHelper;
   //8辆自动驾驶车辆，其中一个为leader
   for (auto node = NodeList::Begin(); node != NodeList::End(); node++)
   {
     Ptr<Application> app;
+    if((*node)->GetId()==0)
+    {
+      apHelper.SetAttribute("VehicleType",UintegerValue(2));
+      app = apHelper.Install(*node);
+    }
+    else if((*node)->GetId()<config.apNum)
+    {
+      apHelper.SetAttribute("VehicleType",UintegerValue(1));
+      app = apHelper.Install(*node);
+    }
     app = csmaHelper.Install(*node);
     app->TraceConnectWithoutContext("Tx", MakeCallback(&BeaconSimulationEntry::PrintSendPacket, this));
     app->TraceConnectWithoutContext("Rx", MakeCallback(&BeaconSimulationEntry::PrintReceivePacket, this));
