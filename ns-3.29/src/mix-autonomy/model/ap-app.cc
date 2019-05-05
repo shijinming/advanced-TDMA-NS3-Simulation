@@ -155,7 +155,7 @@ APApplication::StartCCH()
   SetupHeader(pHeader);
   pkt->AddHeader(pHeader);
   Simulator::Schedule (startTxCCH, &CSMAApplication::DoSendPacket, this, pkt, CCH);
-  ChangeSCH();
+  std::cout<<GetNode()->GetId()<<" SCH number:"<<m_SCH<<std::endl;
   Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   if(m_type==2)
   {
@@ -167,7 +167,9 @@ APApplication::StartCCH()
       Simulator::Schedule (startTxSCH + wait, &CSMAApplication::SendPacket, this);
   }
   else
-    Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
+  {
+    // Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
+  }
   Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
   std::cout<<GetNode()->GetId()<<" startTxSCH:"<<startTxSCH<<" duration:"<<m_durationSCH<<std::endl;
 }

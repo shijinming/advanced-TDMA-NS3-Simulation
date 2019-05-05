@@ -143,7 +143,7 @@ CSMAApplication::ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16
   rxTrace(pkt, this, srcAddr);
   Ptr<Node> node = GetNodeFromAddress(srcAddr);
   Ptr<CSMAApplication> app = DynamicCast<CSMAApplication> (node->GetApplication(0));
-  if (app->GetVehicleType()>0)
+  if (app->GetVehicleType()==2)
   {
     lastTimeRecAP = Simulator::Now();
     m_isMiddle = true;
@@ -194,6 +194,7 @@ CSMAApplication::StartCCH()
   Ptr<Packet> pkt = Create<Packet> (200);
   Simulator::Schedule (startTxCCH + MicroSeconds (rand()%1000), &CSMAApplication::DoSendPacket, this, pkt, CCH);
   ChangeSCH();
+  std::cout<<GetNode()->GetId()<<" SCH startTx:"<<startTxSCH<<std::endl;
   Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds() && m_isMiddle)
     Simulator::Schedule (startTxSCH + wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
