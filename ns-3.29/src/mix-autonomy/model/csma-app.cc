@@ -146,17 +146,22 @@ CSMAApplication::ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16
   if (app->GetVehicleType()==2)
   {
     lastTimeRecAP = Simulator::Now();
-    m_isMiddle = true;
+    if(!m_isMiddle)
+    {
+      m_isMiddle = true;
+      std::cout<<GetNode()->GetId()<<" add to middle "<<Simulator::Now().GetMicroSeconds()<<std::endl;
+    }
     startTxCCH = config.apNum * config.slotSize;
     ReceiveFromAP(pkt, app->GetVehicleType());
   }
   else
   {
-    if(Simulator::Now()-lastTimeRecAP > 2*m_synci)
+    if(Simulator::Now()-lastTimeRecAP > 2*m_synci && m_isMiddle)
     {
       m_isMiddle = false;
       startTxCCH = MilliSeconds(0);
       startTxSCH = MilliSeconds(0);
+      std::cout<<GetNode()->GetId()<<" quit from middle "<<Simulator::Now().GetMicroSeconds()<<std::endl;
     }
   }
   return true;
@@ -198,12 +203,14 @@ CSMAApplication::StartCCH()
   Ptr<Packet> pkt = Create<Packet> (200);
   Simulator::Schedule (startTxCCH + MicroSeconds (rand()%1000), &CSMAApplication::DoSendPacket, this, pkt, CCH);
   ChangeSCH();
-  std::cout<<GetNode()->GetId()<<" SCH startTx:"<<startTxSCH<<std::endl;
+  std::cout<<GetNode()->GetId()<<" SCH startTx:"<<startTxSCH.GetMicroSeconds()<<','<<Simulator::Now().GetMilliSeconds()<<std::endl;
   Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds() && m_isMiddle)
     Simulator::Schedule (startTxSCH + wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
   else
-    Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
+  {
+    // Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
+  }
   Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
 }
 
