@@ -48,7 +48,7 @@ APApplication::DoInitialize()
 bool
 APApplication::ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t mode, const Address &srcAddr)
 {
-  rxTrace(pkt, this, srcAddr);
+  // rxTrace(pkt, this, srcAddr);
   Ptr<Node> node = GetNodeFromAddress(srcAddr);
   Ptr<CSMAApplication> app = DynamicCast<CSMAApplication> (node->GetApplication(0));
   if (app->GetVehicleType()>0)
@@ -72,6 +72,8 @@ APApplication::ReceiveFromAP(Ptr<const Packet> pkt, uint16_t type)
     if(!pHeader.GetIsLeader())
       return;
     hdrSCHSlotAllocation = pHeader.GetSCHslotAllocation();
+    m_CCHSlotNum = pHeader.GetCCHSlotNum();
+    m_SCHSlotNum = pHeader.GetSCHSlotNum();
     int start=0;
     int duration = 0;
     for(int i=0;i<pHeader.GetSCHSlotNum();i++)
@@ -113,6 +115,8 @@ APApplication::SetupHeader(PacketHeader &hdr)
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   hdr.SetLocLat(pos.x);
   hdr.SetLocLon(pos.y);
+  hdr.SetCCHSlotNum(m_CCHSlotNum);
+  hdr.SetSCHSlotNum(m_SCHSlotNum);
   if (m_type==1)
   {
     hdr.SetIsLeader(false);

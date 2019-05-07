@@ -31,6 +31,8 @@ public:
 private:
   std::vector<uint16_t> m_CCHslotAllocation;
   std::vector<uint16_t> m_SCHslotAllocation;
+  uint16_t m_CCHSlotNum;
+  uint16_t m_SCHSlotNum;
   std::map<uint16_t, uint32_t> m_queueLen;
   uint16_t *hdrSCHSlotAllocation;
 };

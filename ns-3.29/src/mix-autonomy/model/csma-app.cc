@@ -102,8 +102,8 @@ CSMAApplication::SendPacket(void)
     return;
   if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds())
   {
-    if(m_type>0 && current > m_cchi + m_gi + startTxSCH + m_durationSCH)
-      return;
+    // if(m_type>0 && current > m_cchi + m_gi + startTxSCH + m_durationSCH)
+    //   return;
   }
   Ptr<Packet> pktToSend;
   if(!txq.empty())
@@ -118,6 +118,7 @@ CSMAApplication::SendPacket(void)
 void 
 CSMAApplication::WifiPhyTxBeginTrace(Ptr<const Packet> p)
 {
+  std::cout<<GetNode()->GetId()<<" Tx time: "<<Simulator::Now().GetMilliSeconds()<<std::endl;
   SendPacket();
 }
 
@@ -140,10 +141,10 @@ CSMAApplication::GetVehicleType ()
 bool 
 CSMAApplication::ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t mode, const Address &srcAddr)
 {
-  rxTrace(pkt, this, srcAddr);
+  // rxTrace(pkt, this, srcAddr);
   Ptr<Node> node = GetNodeFromAddress(srcAddr);
   Ptr<CSMAApplication> app = DynamicCast<CSMAApplication> (node->GetApplication(0));
-  if (app->GetVehicleType()==2)
+  if (app->GetVehicleType()>0)
   {
     lastTimeRecAP = Simulator::Now();
     if(!m_isMiddle)
@@ -185,13 +186,12 @@ CSMAApplication::GetNodeFromAddress(const Address &address)
 void 
 CSMAApplication::ReceiveFromAP(Ptr<const Packet> pkt, uint16_t type)
 {
-  if(type==2)
+  if(type>0)
   {
     if(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds()<(m_cchi+m_gi).GetMicroSeconds())
     {
       PacketHeader pHeader;
       pkt->PeekHeader(pHeader);
-      startTxCCH = config.slotSize*config.apNum;
       startTxSCH = config.slotSize*pHeader.GetSCHSlotNum();
     }
   }

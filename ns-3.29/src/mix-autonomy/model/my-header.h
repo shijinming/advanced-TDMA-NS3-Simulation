@@ -29,6 +29,8 @@ public:
     uint32_t timestamp; //当前仿真时间
     uint32_t locLon;    //车辆位置经度
     uint32_t locLat;    //车辆位置纬度
+    uint16_t CCHSlotNum;
+    uint16_t SCHSlotNum;
   };
   struct LeaderHeader
   {
@@ -75,7 +77,9 @@ public:
   uint32_t GetLocLon() { return m_data.locLon; }
   void SetLocLat(uint32_t locLat) { m_data.locLat = locLat; }
   uint32_t GetLocLat() { return m_data.locLat; }
+  void SetCCHSlotNum (uint16_t CCHSlotNum) {m_data.CCHSlotNum = CCHSlotNum; } 
   uint16_t GetCCHSlotNum () {return m_data.CCHSlotNum; }
+  void SetSCHSlotNum (uint16_t SCHSlotNum) {m_data.SCHSlotNum = SCHSlotNum; }
   uint16_t GetSCHSlotNum () {return m_data.SCHSlotNum; }
   void SetCCHslotAllocation(std::vector<uint16_t> &CCHslotAllocation)
   {
