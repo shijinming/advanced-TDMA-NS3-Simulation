@@ -2,6 +2,7 @@
 
 #include "ns3/internet-module.h"
 #include "ns3/wave-module.h"
+#include "ns3/seq-ts-header.h"
 #include<stdlib.h>
 #include "csma-app.h"
 
@@ -49,6 +50,8 @@ CSMAApplication::StartApplication(void)
   Time temp = MicroSeconds(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   Time start = (temp<=m_gi)?(m_gi-temp):(m_gi+m_synci-temp);
   Simulator::Schedule (start, &CSMAApplication::StartCCH, this);
+  SchInfo schInfo = SchInfo (m_SCH, false, EXTENDED_ALTERNATING);
+  Simulator::Schedule (start, &WaveNetDevice::StartSch, m_device, schInfo);
   GenerateTraffic();
 }
 
@@ -88,7 +91,11 @@ CSMAApplication::DoInitialize()
 void 
 CSMAApplication::DoSendPacket(Ptr<Packet> pkt, uint32_t channel)
 {
-  m_device->SendX(pkt, Mac48Address::GetBroadcast (),config.socketPort, TxInfo(channel));
+  const static uint16_t WSMP_PROT_NUMBER = 0x88DC;
+  if(channel==CCH)
+    m_device->SendX(pkt, Mac48Address::GetBroadcast (),WSMP_PROT_NUMBER, TxInfo(channel));
+  else
+    m_device->SendX(pkt, Mac48Address::GetBroadcast (),WSMP_PROT_NUMBER, TxInfo(channel));
   Ptr<Ipv4> ipv4 = GetNode()->GetObject<Ipv4>();
   txTrace(pkt, ipv4->GetAddress(1, 0).GetLocal());
 }
@@ -96,14 +103,14 @@ CSMAApplication::DoSendPacket(Ptr<Packet> pkt, uint32_t channel)
 void
 CSMAApplication::SendPacket(void)
 {
-  Ptr<WaveNetDevice>  device = DynamicCast<WaveNetDevice> (GetNode()->GetDevice(0));
+  Ptr<WifiPhy> phy = m_device->GetPhy(0);
   Time current =MicroSeconds(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   if(current < m_cchi + m_gi)
     return;
   if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds())
   {
-    // if(m_type>0 && current > m_cchi + m_gi + startTxSCH + m_durationSCH)
-    //   return;
+    if(m_type>0 && current > m_cchi + m_gi + startTxSCH + m_durationSCH)
+      return;
   }
   Ptr<Packet> pktToSend;
   if(!txq.empty())
@@ -118,7 +125,6 @@ CSMAApplication::SendPacket(void)
 void 
 CSMAApplication::WifiPhyTxBeginTrace(Ptr<const Packet> p)
 {
-  std::cout<<GetNode()->GetId()<<" Tx time: "<<Simulator::Now().GetMilliSeconds()<<std::endl;
   SendPacket();
 }
 
@@ -141,7 +147,7 @@ CSMAApplication::GetVehicleType ()
 bool 
 CSMAApplication::ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t mode, const Address &srcAddr)
 {
-  // rxTrace(pkt, this, srcAddr);
+  rxTrace(pkt, this, srcAddr);
   Ptr<Node> node = GetNodeFromAddress(srcAddr);
   Ptr<CSMAApplication> app = DynamicCast<CSMAApplication> (node->GetApplication(0));
   if (app->GetVehicleType()>0)
@@ -202,31 +208,21 @@ CSMAApplication::StartCCH()
 {
   Ptr<Packet> pkt = Create<Packet> (200);
   Simulator::Schedule (startTxCCH + MicroSeconds (rand()%1000), &CSMAApplication::DoSendPacket, this, pkt, CCH);
-  ChangeSCH();
-  std::cout<<GetNode()->GetId()<<" SCH startTx:"<<startTxSCH.GetMicroSeconds()<<','<<Simulator::Now().GetMilliSeconds()<<std::endl;
   Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
-  if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds() && m_isMiddle)
-    Simulator::Schedule (startTxSCH + wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
-  else
-  {
-    // Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
-  }
-  Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
-}
-
-void 
-CSMAApplication::ChangeSCH()
-{
+  m_device->StopSch(m_SCH);
   if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds() && m_isMiddle)
   {
     m_SCH = SCH1;
+    Simulator::Schedule (startTxSCH + wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
   }
   else
   {
     m_SCH = SCH2;
+    Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
   }
   SchInfo schInfo = SchInfo (m_SCH, false, EXTENDED_ALTERNATING);
-  Simulator::Schedule (Seconds (0.0), &WaveNetDevice::StartSch, m_device, schInfo);
+  m_device->StartSch(schInfo);
+  Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
 }
 
 }

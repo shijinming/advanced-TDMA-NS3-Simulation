@@ -35,6 +35,8 @@ APApplication::StartApplication()
   Time temp = MicroSeconds(Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   Time start = (temp<=m_gi)?(m_gi-temp):(m_gi+m_synci-temp);
   Simulator::Schedule (start, &APApplication::StartCCH, this);
+  SchInfo schInfo = SchInfo (m_SCH, false, EXTENDED_ALTERNATING);
+  Simulator::Schedule (start, &WaveNetDevice::StartSch, m_device, schInfo);
   GenerateTraffic();
 }
 
@@ -48,7 +50,7 @@ APApplication::DoInitialize()
 bool
 APApplication::ReceivePacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t mode, const Address &srcAddr)
 {
-  // rxTrace(pkt, this, srcAddr);
+  rxTrace(pkt, this, srcAddr);
   Ptr<Node> node = GetNodeFromAddress(srcAddr);
   Ptr<CSMAApplication> app = DynamicCast<CSMAApplication> (node->GetApplication(0));
   if (app->GetVehicleType()>0)
@@ -159,7 +161,6 @@ APApplication::StartCCH()
   SetupHeader(pHeader);
   pkt->AddHeader(pHeader);
   Simulator::Schedule (startTxCCH, &CSMAApplication::DoSendPacket, this, pkt, CCH);
-  std::cout<<GetNode()->GetId()<<" SCH number:"<<m_SCH<<std::endl;
   Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   if(m_type==2)
   {
@@ -175,7 +176,6 @@ APApplication::StartCCH()
     // Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
   }
   Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
-  std::cout<<GetNode()->GetId()<<" startTxSCH:"<<startTxSCH<<" duration:"<<m_durationSCH<<std::endl;
 }
 
 } // namespace ns3

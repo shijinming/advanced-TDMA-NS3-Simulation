@@ -33,7 +33,6 @@ public:
   virtual void ReceiveFromAP(Ptr<const Packet> pkt, uint16_t type);
   int GetVehicleType();
   virtual void StartCCH();
-  void ChangeSCH();
 
 	SimulationConfig &config;
   uint16_t m_type;
