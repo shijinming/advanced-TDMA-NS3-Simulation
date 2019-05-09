@@ -160,6 +160,7 @@ APApplication::StartCCH()
   PacketHeader pHeader;
   SetupHeader(pHeader);
   pkt->AddHeader(pHeader);
+  startTxCCH = MicroSeconds (rand()%1000);
   Simulator::Schedule (startTxCCH, &CSMAApplication::DoSendPacket, this, pkt, CCH);
   Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   if(m_type==2)
