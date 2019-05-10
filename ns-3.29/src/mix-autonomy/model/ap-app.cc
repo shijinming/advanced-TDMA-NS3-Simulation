@@ -45,6 +45,10 @@ APApplication::DoInitialize()
 {
   CSMAApplication::DoInitialize();
   m_SCH = SCH1;
+  Ptr<WifiPhy> phy = m_device->GetPhy (0);
+  phy->SetTxPowerStart(config.txPower + config.txGain);
+  phy->SetTxPowerEnd(config.txPower + config.txGain);
+  phy->SetCcaMode1Threshold(config.CCAthreshold);
 }
 
 bool
@@ -161,7 +165,7 @@ APApplication::StartCCH()
   SetupHeader(pHeader);
   pkt->AddHeader(pHeader);
   Simulator::Schedule (startTxCCH, &CSMAApplication::DoSendPacket, this, pkt, CCH);
-  // Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
+  Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   if(m_type==2)
   {
     Simulator::Schedule (wait, &APApplication::SlotAllocation, this);

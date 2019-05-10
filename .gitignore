@@ -17,3 +17,4 @@ build
 
 *.out
 *.ipynb
+*.py
