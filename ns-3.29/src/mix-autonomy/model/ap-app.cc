@@ -160,22 +160,21 @@ APApplication::StartCCH()
   PacketHeader pHeader;
   SetupHeader(pHeader);
   pkt->AddHeader(pHeader);
-  startTxCCH = MicroSeconds (rand()%2000);
   Simulator::Schedule (startTxCCH, &CSMAApplication::DoSendPacket, this, pkt, CCH);
-  Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
+  // Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   if(m_type==2)
   {
     Simulator::Schedule (wait, &APApplication::SlotAllocation, this);
   }
-  if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds())
-  {
-    if(m_durationSCH>0)
-      Simulator::Schedule (startTxSCH + wait, &CSMAApplication::SendPacket, this);
-  }
-  else
-  {
-    // Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
-  }
+  // if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds())
+  // {
+  //   if(m_durationSCH>0)
+  //     Simulator::Schedule (startTxSCH + wait, &CSMAApplication::SendPacket, this);
+  // }
+  // else
+  // {
+  //   Simulator::Schedule (wait + MicroSeconds (rand()%1000), &CSMAApplication::SendPacket, this);
+  // }
   Simulator::Schedule (m_synci, &CSMAApplication::StartCCH, this);
 }
 
