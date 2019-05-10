@@ -208,7 +208,7 @@ CSMAApplication::StartCCH()
 {
   Ptr<Packet> pkt = Create<Packet> (200);
   startTxCCH = MilliSeconds(0);
-  Simulator::Schedule (startTxCCH + MicroSeconds (rand()%1000), &CSMAApplication::DoSendPacket, this, pkt, CCH);
+  Simulator::Schedule (startTxCCH + MicroSeconds (rand()%2000), &CSMAApplication::DoSendPacket, this, pkt, CCH);
   // Time wait = m_cchi +m_gi - MicroSeconds (Simulator::Now().GetMicroSeconds()%m_synci.GetMicroSeconds());
   // m_device->StopSch(m_SCH);
   // if(Simulator::Now().GetMicroSeconds()%(2*m_synci.GetMicroSeconds()) < m_synci.GetMicroSeconds() && m_isMiddle)
